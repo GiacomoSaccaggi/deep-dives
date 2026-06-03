@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Causal Inference for Data Science</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Causal Inference for Data Science</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="correlation-vs-causality" class="section level2">
+<h2>1. Correlation vs Causality</h2>
+<p>Correlation measures the degree of linear association between two variables, but it does not imply causation. The distinction between correlation and causality is fundamental in empirical research. There are several types of relationships between variables:</p>
+
+<div id="types-of-relationships" class="section level3">
+<h3>Types of Relationships</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Direct causality:</strong> \(X \rightarrow Y\). A change in \(X\) directly causes a change in \(Y\). Example: smoking causes lung cancer.</li>
+<li><strong>Inverse causality:</strong> \(Y \rightarrow X\). What we think is the cause is actually the effect. Example: police presence and crime rates — more police are deployed where crime is high, not the reverse.</li>
+<li><strong>Cyclic (simultaneous) causality:</strong> \(X \leftrightarrow Y\). Both variables cause each other simultaneously. Example: supply and demand jointly determine price and quantity.</li>
+<li><strong>Chain causality:</strong> \(X \rightarrow Z \rightarrow Y\). The effect of \(X\) on \(Y\) is mediated through an intermediate variable \(Z\). Example: education → income → health outcomes.</li>
+<li><strong>Confounded relationship:</strong> \(X \leftarrow Z \rightarrow Y\). A common cause \(Z\) drives both \(X\) and \(Y\), creating a spurious correlation. Example: ice cream sales and drowning are both driven by temperature.</li>
+<li><strong>Tautological relationship:</strong> \(X\) and \(Y\) measure essentially the same construct. Example: correlating GDP with national income — they are definitionally linked.</li>
+<li><strong>Multivariate causality:</strong> Multiple variables jointly cause the outcome: \((X_1, X_2, \ldots, X_k) \rightarrow Y\). The effect of each variable depends on the others.</li>
+<li><strong>Spurious correlation:</strong> A statistical association that arises purely by chance or through data mining, with no meaningful causal mechanism. Example: per capita cheese consumption correlating with deaths by bedsheet tangling.</li>
+</ul>
+</div>
+
+<p>The key insight is that observational data can reveal correlations, but establishing causality requires either experimental design or careful econometric identification strategies.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="causal-vs-predictive" class="section level2">
+<h2>2. Causal Model vs Predictive Model</h2>
+<p>There is a fundamental difference in how economists and data scientists approach modeling. These two paradigms have different goals, assumptions, and evaluation criteria.</p>
+
+<div id="economist-approach" class="section level3">
+<h3>The Economist's Approach (Causal/Explanatory)</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Theory-driven:</strong> starts from economic theory and derives testable hypotheses</li>
+<li><strong>Retrospective:</strong> explains why something happened (ex-post analysis)</li>
+<li><strong>Goal:</strong> unbiased estimation of causal parameters</li>
+<li><strong>Model selection:</strong> guided by theory, not by in-sample fit</li>
+<li><strong>Key concern:</strong> internal validity — is the estimated effect truly causal?</li>
+<li><strong>Typical output:</strong> a single coefficient \(\hat{\beta}\) with a standard error and confidence interval</li>
+</ul>
+</div>
+
+<div id="data-scientist-approach" class="section level3">
+<h3>The Data Scientist's Approach (Predictive)</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Data-driven:</strong> lets the data reveal patterns without imposing strong structural assumptions</li>
+<li><strong>Prospective:</strong> predicts what will happen in the future (ex-ante forecasting)</li>
+<li><strong>Goal:</strong> minimize out-of-sample prediction error (bias-variance tradeoff)</li>
+<li><strong>Model selection:</strong> guided by cross-validation, information criteria</li>
+<li><strong>Key concern:</strong> generalization — does the model perform well on unseen data?</li>
+<li><strong>Typical output:</strong> a predicted value \(\hat{Y}\) with prediction intervals</li>
+</ul>
+</div>
+
+<div id="bias-variance" class="section level3">
+<h3>The Bias-Variance Tradeoff</h3>
+<p>The predictive approach explicitly manages the decomposition of expected prediction error:</p>
+<p><span class="math display">\[ E[(Y - \hat{f}(X))^2] = \text{Bias}[\hat{f}(X)]^2 + \text{Var}[\hat{f}(X)] + \sigma^2_\varepsilon \]</span></p>
+<p>A causal model prioritizes minimizing bias (unbiasedness of \(\hat{\beta}\)), even at the cost of higher variance. A predictive model accepts some bias if it substantially reduces variance, improving overall prediction accuracy.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="causal-effect-parameters" class="section level2">
+<h2>3. Causal Effect Parameters</h2>
+<p>In the potential outcomes framework, each unit \(i\) has two potential outcomes: \(Y_{1i}\) (outcome if treated) and \(Y_{0i}\) (outcome if not treated). The individual treatment effect is \(\tau_i = Y_{1i} - Y_{0i}\), which is never fully observable (the fundamental problem of causal inference).</p>
+<p>We define three key population-level causal parameters:</p>
+
+<div id="ate" class="section level3">
+<h3>Average Treatment Effect (ATE)</h3>
+<p>The expected causal effect across the entire population:</p>
+<p><span class="math display">\[ ATE = E[Y_1 - Y_0 | X] = E[Y_1 | X] - E[Y_0 | X] \]</span></p>
+<p>This answers: "What is the average effect of the treatment if we randomly assigned everyone?"</p>
+</div>
+
+<div id="tte" class="section level3">
+<h3>Treatment Effect on the Treated (TTE / ATT)</h3>
+<p>The expected causal effect among those who actually received treatment:</p>
+<p><span class="math display">\[ TTE = E[Y_1 - Y_0 | X, D=1] = E[Y_1 | X, D=1] - E[Y_0 | X, D=1] \]</span></p>
+<p>This answers: "What was the effect of the treatment on those who were treated?" The counterfactual \(E[Y_0 | X, D=1]\) — what would have happened to treated units had they not been treated — is unobservable.</p>
+</div>
+
+<div id="ute" class="section level3">
+<h3>Treatment Effect on the Untreated (UTE / ATU)</h3>
+<p>The expected causal effect among those who did not receive treatment:</p>
+<p><span class="math display">\[ UTE = E[Y_1 - Y_0 | X, D=0] = E[Y_1 | X, D=0] - E[Y_0 | X, D=0] \]</span></p>
+<p>This answers: "What would the effect have been on those who were not treated, had they been treated?" Relevant for policy questions about expanding a program.</p>
+</div>
+
+<p>Note that \(ATE = Pr(D=1) \cdot TTE + Pr(D=0) \cdot UTE\). The three parameters coincide only under constant treatment effects or random assignment.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="econometric-approach" class="section level2">
+<h2>4. The Econometric Approach</h2>
+<p>The workhorse of empirical economics is Ordinary Least Squares (OLS) regression. Consider the linear model:</p>
+<p><span class="math display">\[ Y_i = \beta_0 + \beta_1 D_i + X_i'\gamma + \varepsilon_i \]</span></p>
+<p>where \(D_i\) is the treatment indicator and \(X_i\) is a vector of controls. OLS estimates \(\hat{\beta}_1\) as the causal effect of treatment. However, the OLS estimate is only valid if \(E[\varepsilon_i | D_i, X_i] = 0\) (exogeneity).</p>
+
+<div id="threats-validity" class="section level3">
+<h3>Five Threats to Internal Validity</h3>
+<p>Internal validity means the estimated effect is truly causal within the study's context. OLS can fail due to:</p>
+<ol>
+<li><strong>Omitted Variable Bias (OVB):</strong> A variable correlated with both \(D\) and \(Y\) is excluded from the model. The bias is:
+<span class="math display">\[ \text{Bias}(\hat{\beta}_1) = \frac{Cov(D, Z)}{Var(D)} \cdot \gamma_Z \]</span>
+where \(Z\) is the omitted variable and \(\gamma_Z\) its true coefficient.</li>
+<li><strong>Sample Selection Bias:</strong> The sample is not representative of the population of interest. Self-selection into treatment makes the treated and control groups non-comparable.</li>
+<li><strong>Reverse Causality (Simultaneity):</strong> \(Y\) also affects \(D\), creating a feedback loop. OLS cannot disentangle the direction of causality.</li>
+<li><strong>Wrong Functional Form:</strong> The true relationship is nonlinear, but we impose a linear specification. This leads to misspecification bias.</li>
+<li><strong>Measurement Error:</strong> The treatment variable \(D\) or outcome \(Y\) is measured with error. Classical measurement error in \(D\) attenuates the estimated coefficient toward zero.</li>
+</ol>
+</div>
+
+<div id="internal-external" class="section level3">
+<h3>Internal vs External Validity</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Internal validity:</strong> The causal effect is correctly identified within the study's sample and setting. Threats: all five above.</li>
+<li><strong>External validity:</strong> The causal effect generalizes to other populations, settings, and time periods. Threats: differences in population composition, institutional context, general equilibrium effects, Hawthorne effects.</li>
+</ul>
+<p>A study can be internally valid but not externally valid (e.g., a perfectly designed RCT in a specific village may not generalize to national policy).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="big-data" class="section level2">
+<h2>5. Big Data in Causal Inference</h2>
+<p>Big Data refers to datasets that are too large, too fast, or too complex to be processed by traditional database management tools. The "V's" of Big Data are: Volume, Velocity, Variety, and Veracity.</p>
+
+<div id="big-data-characteristics" class="section level3">
+<h3>Characteristics Relevant to Causal Inference</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Real-time data:</strong> continuous streams (clicks, transactions, sensor data) enable near-immediate causal analysis</li>
+<li><strong>Large scale:</strong> millions or billions of observations — increases statistical power but also amplifies small biases</li>
+<li><strong>New types of variables:</strong> text, images, network connections, geolocation — potential instruments or controls previously unavailable</li>
+<li><strong>Unstructured data:</strong> requires NLP, computer vision, or other ML preprocessing before causal analysis</li>
+</ul>
+</div>
+
+<div id="big-data-advantages" class="section level3">
+<h3>Advantages</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>More granular heterogeneity analysis (treatment effects by subgroup)</li>
+<li>Better control variables reduce omitted variable bias</li>
+<li>Natural experiments become detectable at scale</li>
+<li>A/B testing can be deployed continuously and cheaply</li>
+<li>High-dimensional controls via ML methods (LASSO, Random Forests)</li>
+</ul>
+</div>
+
+<div id="big-data-limits" class="section level3">
+<h3>Limits</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Big data ≠ good data:</strong> selection bias, measurement error, and confounding persist regardless of sample size</li>
+<li><strong>Spurious correlations multiply:</strong> with thousands of variables, many will correlate by chance</li>
+<li><strong>p-hacking at scale:</strong> large samples make nearly everything "statistically significant"</li>
+<li><strong>Identification is not a sample size problem:</strong> no amount of data resolves omitted variable bias or reverse causality without a credible identification strategy</li>
+<li><strong>Algorithmic confounding:</strong> platform algorithms (recommendations, targeting) create endogenous data-generating processes</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="prediction-policy" class="section level2">
+<h2>6. Prediction Policy Problems</h2>
+<p>Kleinberg et al. (2015) identify a class of problems where prediction (not causal inference) is the binding constraint for policy. Examples: predicting which patients will benefit from surgery, which students will drop out, which loans will default. The policy action is known; the question is <em>who</em> to target.</p>
+
+<div id="regularization" class="section level3">
+<h3>Regularization Methods: LASSO and Ridge</h3>
+<p>In high-dimensional settings (\(p \gg n\) or many irrelevant features), OLS overfits. Regularization adds a penalty to the loss function:</p>
+<p><span class="math display">\[ \hat{\beta} = \arg\min_\beta \left\{ \sum_{i=1}^n (Y_i - X_i'\beta)^2 + \lambda \cdot R(f) \right\} \]</span></p>
+<p>where \(R(f) = \|\beta\|_\lambda\) is the regularization function:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>\(\lambda = 0\):</strong> no penalty → standard OLS</li>
+<li><strong>\(\lambda\) with \(L_2\) norm (Ridge):</strong> \(R(f) = \sum_j \beta_j^2\). Shrinks coefficients toward zero but never sets them exactly to zero. Handles multicollinearity.</li>
+<li><strong>\(\lambda\) with \(L_1\) norm (LASSO):</strong> \(R(f) = \sum_j |\beta_j|\). Performs variable selection by setting some coefficients exactly to zero. Produces sparse models.</li>
+</ul>
+<p>The general Elastic Net penalty nests both: \(R(f) = \alpha\|\beta\|_1 + (1-\alpha)\|\beta\|_2^2\).</p>
+</div>
+
+<div id="athey-imbens" class="section level3">
+<h3>Athey &amp; Imbens (2015): Robustness Approach</h3>
+<p>Athey and Imbens (2015) propose using ML methods for causal inference while maintaining valid statistical inference. Key ideas:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Sample splitting (honest estimation):</strong> use one part of the data to build the model (discover structure) and another to estimate treatment effects (inference). This avoids overfitting-driven bias in causal estimates.</li>
+<li><strong>Cross-fitting:</strong> swap the roles of the two halves and average, for efficiency.</li>
+<li><strong>Causal forests:</strong> adapt random forests to estimate heterogeneous treatment effects \(\tau(x) = E[Y_1 - Y_0 | X=x]\) with valid confidence intervals.</li>
+</ul>
+<p>The fundamental principle: ML is used as a tool within a causal identification framework, not as a replacement for it.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="causal-inference-methods" class="section level2">
+<h2>7. Causal Inference Methods Overview</h2>
+
+<div id="tttc" class="section level3">
+<h3>TTTC Framework: Train, Test, Treat, Compare</h3>
+<p>A practical framework for deploying causal inference in business settings:</p>
+<ol>
+<li><strong>Train:</strong> build a predictive model to identify heterogeneous treatment effects or select target populations</li>
+<li><strong>Test:</strong> validate the model on held-out data to ensure generalization</li>
+<li><strong>Treat:</strong> deploy the treatment (intervention, policy, marketing campaign) to the selected group</li>
+<li><strong>Compare:</strong> evaluate the causal impact by comparing treated vs. control outcomes using appropriate methods</li>
+</ol>
+</div>
+
+<div id="heterogeneous-effects" class="section level3">
+<h3>Heterogeneous Treatment Effects</h3>
+<p>The ATE masks important heterogeneity. Treatment effects may vary systematically by subgroup:</p>
+<p><span class="math display">\[ \tau(x) = E[Y_1 - Y_0 | X = x] \]</span></p>
+<p>This is the Conditional Average Treatment Effect (CATE). Methods to estimate it include: subgroup analysis, causal forests (Athey & Imbens), Bayesian Additive Regression Trees (BART), and meta-learners (S-learner, T-learner, X-learner).</p>
+</div>
+
+<div id="experiments" class="section level3">
+<h3>Randomized vs Natural Experiments</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Randomized Controlled Trials (RCTs):</strong> the gold standard. Random assignment ensures \(E[Y_0|D=1] = E[Y_0|D=0]\), eliminating selection bias. Limitations: ethical constraints, compliance issues, external validity concerns, cost.</li>
+<li><strong>Natural experiments:</strong> exploit exogenous variation created by nature, policy changes, or institutional rules (not by the researcher). Examples: lottery-based school assignment, regression discontinuity at policy thresholds, draft lotteries.</li>
+</ul>
+</div>
+
+<div id="threats-experiments" class="section level3">
+<h3>Threats to Experimental Validity</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Non-compliance:</strong> not everyone assigned to treatment actually takes it (Intent-to-Treat vs. Local Average Treatment Effect)</li>
+<li><strong>Attrition:</strong> differential dropout between treatment and control groups</li>
+<li><strong>Spillovers (SUTVA violation):</strong> treatment of one unit affects outcomes of others</li>
+<li><strong>Hawthorne effect:</strong> subjects modify behavior because they know they're being observed</li>
+<li><strong>John Henry effect:</strong> control group members compensate by working harder</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="rubin-causal-model" class="section level2">
+<h2>8. Rubin's Causal Model (Potential Outcomes Framework)</h2>
+<p>The Rubin Causal Model (RCM) formalizes causality through counterfactuals. For each unit \(i\):</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(Y_{1i}\): potential outcome under treatment (\(D_i = 1\))</li>
+<li>\(Y_{0i}\): potential outcome under control (\(D_i = 0\))</li>
+<li>Observed outcome: \(Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}\)</li>
+</ul>
+<p>The <strong>fundamental problem of causal inference</strong>: we only observe one potential outcome per unit, never both.</p>
+
+<div id="observable-quantities" class="section level3">
+<h3>Observable Quantities</h3>
+<p>What we can observe from the data:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(E[Y_0 | D=0]\): average outcome of untreated units (observable)</li>
+<li>\(E[Y_1 | D=1]\): average outcome of treated units (observable)</li>
+</ul>
+<p>The naive comparison yields:</p>
+<p><span class="math display">\[ E[Y_1|D=1] - E[Y_0|D=0] = \underbrace{E[Y_1 - Y_0|D=1]}_{TTE} + \underbrace{E[Y_0|D=1] - E[Y_0|D=0]}_{\text{Selection Bias}} \]</span></p>
+<p>Only if selection bias equals zero (random assignment) does the naive comparison identify the TTE.</p>
+</div>
+
+<div id="selection-observable" class="section level3">
+<h3>When Selection is Observable (Selection on Observables)</h3>
+<p>If, conditional on observed covariates \(X\), treatment assignment is independent of potential outcomes:</p>
+<p><span class="math display">\[ (Y_0, Y_1) \perp D \,|\, X \qquad \text{(Conditional Independence Assumption / Unconfoundedness)} \]</span></p>
+<p>Techniques: OLS with controls, matching, propensity score methods, inverse probability weighting.</p>
+</div>
+
+<div id="selection-unobservable" class="section level3">
+<h3>When Selection is Not Observable (Selection on Unobservables)</h3>
+<p>If unobserved factors jointly determine treatment and outcome, we need special identification strategies:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Instrumental Variables (IV):</strong> exploit exogenous variation in treatment via an instrument</li>
+<li><strong>Difference-in-Differences (DID):</strong> exploit parallel trends between groups over time</li>
+<li><strong>Regression Discontinuity (RD):</strong> exploit discontinuous treatment assignment rules</li>
+<li><strong>Control function / Heckman correction:</strong> model the selection process directly</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="did" class="section level2">
+<h2>9. Difference-in-Differences (DID)</h2>
+<p>DID exploits variation across groups and over time to estimate causal effects. It requires <strong>panel data</strong> (or repeated cross-sections): observations on treatment and control groups both before and after the intervention.</p>
+
+<div id="did-setup" class="section level3">
+<h3>Setup</h3>
+<p>Let \(t=0\) (pre-treatment) and \(t=1\) (post-treatment). Let \(D=1\) (treatment group) and \(D=0\) (control group). The DID estimator is:</p>
+<p><span class="math display">\[ \hat{\beta}_{DID} = \left(\bar{Y}_{1,1} - \bar{Y}_{1,0}\right) - \left(\bar{Y}_{0,1} - \bar{Y}_{0,0}\right) \]</span></p>
+<p>where \(\bar{Y}_{D,t}\) is the mean outcome for group \(D\) at time \(t\). Equivalently, in a regression framework:</p>
+<p><span class="math display">\[ Y_{it} = \alpha + \beta_1 D_i + \beta_2 Post_t + \beta_{DID} (D_i \times Post_t) + \varepsilon_{it} \]</span></p>
+<p>The coefficient \(\beta_{DID}\) on the interaction term is the causal effect of interest.</p>
+</div>
+
+<div id="common-trends" class="section level3">
+<h3>Common Trends Assumption</h3>
+<p>The key identifying assumption is that, in the absence of treatment, the treatment and control groups would have followed <strong>parallel trends</strong>:</p>
+<p><span class="math display">\[ E[Y_0^{t=1} - Y_0^{t=0} | D=1] = E[Y_0^{t=1} - Y_0^{t=0} | D=0] \]</span></p>
+<p>This assumption cannot be tested directly (it involves counterfactuals), but it can be supported by showing parallel pre-trends in periods before treatment. If pre-trends diverge, DID is not credible.</p>
+</div>
+
+<div id="did-extensions" class="section level3">
+<h3>Extensions</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Multiple time periods:</strong> event-study designs with leads and lags</li>
+<li><strong>Staggered treatment:</strong> different groups adopt treatment at different times (requires careful estimation — Goodman-Bacon decomposition, Callaway & Sant'Anna)</li>
+<li><strong>Triple differences (DDD):</strong> adds a third dimension to control for group-specific time trends</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="matching" class="section level2">
+<h2>10. Matching</h2>
+<p>Matching methods construct a counterfactual by pairing each treated unit with one or more "similar" control units based on observed covariates \(X\). The goal is to approximate the conditions of a randomized experiment by comparing units that look alike on observables.</p>
+<p>Under the Conditional Independence Assumption \((Y_0, Y_1) \perp D | X\), matching identifies the ATT:</p>
+<p><span class="math display">\[ ATT = E\left[Y_1 - Y_0 | D=1\right] = E\left[E[Y|D=1, X] - E[Y|D=0, X] \,|\, D=1\right] \]</span></p>
+
+<div id="nearest-neighbor" class="section level3">
+<h3>Nearest Neighbor Matching</h3>
+<p>For each treated unit \(i\), find the control unit \(j\) with the smallest distance \(\|X_i - X_j\|\) (Euclidean, Mahalanobis, or other metric). The matched estimator is:</p>
+<p><span class="math display">\[ \hat{ATT}_{NN} = \frac{1}{N_1} \sum_{i: D_i=1} \left(Y_i - Y_{j(i)}\right) \]</span></p>
+<p>Variants: matching with replacement, k-nearest neighbors, caliper matching (maximum allowed distance).</p>
+</div>
+
+<div id="stratification" class="section level3">
+<h3>Stratification (Subclassification)</h3>
+<p>Divide the propensity score \(p(X) = Pr(D=1|X)\) into strata (e.g., quintiles). Within each stratum, treatment assignment is approximately random. Compute the treatment effect within each stratum and average across strata, weighted by the proportion of treated units:</p>
+<p><span class="math display">\[ \hat{ATT}_{strat} = \sum_{s=1}^{S} \frac{N_{1s}}{N_1} \left(\bar{Y}_{1s} - \bar{Y}_{0s}\right) \]</span></p>
+</div>
+
+<div id="kernel-matching" class="section level3">
+<h3>Kernel Matching</h3>
+<p>Instead of selecting a single match, kernel matching uses a weighted average of all control units, with weights decreasing in the distance to the treated unit:</p>
+<p><span class="math display">\[ \hat{Y}_{0i} = \frac{\sum_{j: D_j=0} K\left(\frac{p_i - p_j}{h}\right) Y_j}{\sum_{j: D_j=0} K\left(\frac{p_i - p_j}{h}\right)} \]</span></p>
+<p>where \(K(\cdot)\) is a kernel function (Gaussian, Epanechnikov) and \(h\) is the bandwidth. This reduces variance compared to nearest-neighbor matching but introduces a bandwidth choice.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="regression-discontinuity" class="section level2">
+<h2>11. Regression Discontinuity Design (RDD)</h2>
+<p>RDD exploits situations where treatment assignment is determined by whether a "running variable" \(x\) crosses a known cutoff \(x^*\). Near the cutoff, units just above and just below are nearly identical — creating a local randomized experiment.</p>
+
+<div id="sharp-rd" class="section level3">
+<h3>Sharp RDD</h3>
+<p>Treatment is a deterministic function of the running variable:</p>
+<p><span class="math display">\[ D_i = \mathbf{1}(x_i \geq x^*) = \begin{cases} 1 & \text{if } x_i \geq x^* \\ 0 & \text{if } x_i < x^* \end{cases} \]</span></p>
+<p>The causal effect at the cutoff is:</p>
+<p><span class="math display">\[ \tau_{RD} = \lim_{x \downarrow x^*} E[Y|X=x] - \lim_{x \uparrow x^*} E[Y|X=x] \]</span></p>
+<p>This is a <strong>local</strong> estimate: it identifies the treatment effect only for units at the threshold. Examples: scholarship effects at GPA cutoffs, electoral effects at 50% vote thresholds.</p>
+</div>
+
+<div id="fuzzy-rd" class="section level3">
+<h3>Fuzzy RDD</h3>
+<p>The cutoff strongly predicts treatment but does not perfectly determine it. The probability of treatment jumps at \(x^*\) but does not go from 0 to 1:</p>
+<p><span class="math display">\[ \lim_{x \downarrow x^*} Pr(D=1|X=x) \neq \lim_{x \uparrow x^*} Pr(D=1|X=x) \]</span></p>
+<p>The Fuzzy RD is estimated via instrumental variables, using the indicator \(\mathbf{1}(x_i \geq x^*)\) as an instrument for \(D_i\):</p>
+<p><span class="math display">\[ \tau_{FRD} = \frac{\lim_{x \downarrow x^*} E[Y|X=x] - \lim_{x \uparrow x^*} E[Y|X=x]}{\lim_{x \downarrow x^*} E[D|X=x] - \lim_{x \uparrow x^*} E[D|X=x]} \]</span></p>
+<p>This identifies a Local Average Treatment Effect (LATE) for compliers at the threshold.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="instrumental-variables" class="section level2">
+<h2>12. Instrumental Variables (IV)</h2>
+<p>When the treatment \(D\) is endogenous (\(Cov(D, \varepsilon) \neq 0\)), we need an instrument \(Z\) that affects \(Y\) only through \(D\).</p>
+
+<div id="iv-assumptions" class="section level3">
+<h3>Assumptions</h3>
+<ol>
+<li><strong>Relevance:</strong> \(Cov(Z, D) \neq 0\) — the instrument must be correlated with the endogenous treatment. Testable via first-stage F-statistic (rule of thumb: F > 10).</li>
+<li><strong>Exclusion restriction:</strong> \(Cov(Z, \varepsilon) = 0\) — the instrument affects \(Y\) only through \(D\), not directly. Not testable (requires theoretical justification).</li>
+<li><strong>Independence:</strong> \(Z\) is as good as randomly assigned (no confounders of \(Z\) and \(Y\)).</li>
+<li><strong>Monotonicity (for LATE):</strong> the instrument affects everyone in the same direction (no "defiers").</li>
+</ol>
+</div>
+
+<div id="2sls" class="section level3">
+<h3>Two-Stage Least Squares (2SLS)</h3>
+<p><strong>First stage:</strong> regress the endogenous variable on the instrument(s) and controls:</p>
+<p><span class="math display">\[ D_i = \pi_0 + \pi_1 Z_i + X_i'\delta + \nu_i \]</span></p>
+<p><strong>Second stage:</strong> replace \(D_i\) with its predicted value \(\hat{D}_i\) in the structural equation:</p>
+<p><span class="math display">\[ Y_i = \beta_0 + \beta_1 \hat{D}_i + X_i'\gamma + \varepsilon_i \]</span></p>
+<p>The 2SLS estimator with a single instrument and no controls simplifies to the Wald estimator:</p>
+<p><span class="math display">\[ \hat{\beta}_{IV} = \frac{Cov(Z, Y)}{Cov(Z, D)} = \frac{\text{Reduced form}}{\text{First stage}} \]</span></p>
+</div>
+
+<div id="iv-examples" class="section level3">
+<h3>Classic Examples</h3>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Returns to schooling: use quarter of birth as an instrument for years of education (Angrist & Krueger, 1991)</li>
+<li>Effect of military service on earnings: use draft lottery number as instrument (Angrist, 1990)</li>
+<li>Effect of institutions on development: use settler mortality as instrument for institutional quality (Acemoglu et al., 2001)</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="structural-models" class="section level2">
+<h2>13. Structural Models</h2>
+<p>A structural model specifies the data-generating process through a system of causal equations derived from economic theory. Unlike reduced-form approaches, structural models make explicit assumptions about the mechanisms connecting variables.</p>
+
+<div id="causal-equations" class="section level3">
+<h3>Causal Equations</h3>
+<p>A structural equation represents a causal mechanism, not merely a statistical association. For example:</p>
+<p><span class="math display">\[ Y = f(X_1, X_2, \ldots, X_k, \varepsilon) \]</span></p>
+<p>means that \(Y\) is <em>generated by</em> the variables \(X_1, \ldots, X_k\) and an unobserved shock \(\varepsilon\). This is fundamentally different from a predictive equation where \(Y\) is merely associated with the right-hand-side variables.</p>
+<p>Key distinction: in a structural model, intervening on \(X_j\) (setting it to a value) changes \(Y\) according to the equation. In a predictive model, changing \(X_j\) may not change \(Y\) at all (if the correlation is driven by a confounder).</p>
+</div>
+
+<div id="prediction-vs-explanation" class="section level3">
+<h3>Prediction vs Explanation: The Stork Example</h3>
+<p>Consider the well-known spurious correlation: regions with more storks tend to have higher birth rates. A predictive model might find:</p>
+<p><span class="math display">\[ \widehat{Births} = \alpha + \beta \cdot Storks + \varepsilon, \qquad \hat{\beta} > 0, \; R^2 > 0 \]</span></p>
+<p>This model <em>predicts</em> well (knowing stork population improves prediction of births), but it does not <em>explain</em> anything causally. Culling storks would not reduce births.</p>
+<p>The structural (causal) model recognizes that both variables are driven by a confounder — rural area size (or urbanization level):</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Rural areas → more stork habitat → more storks</li>
+<li>Rural areas → more traditional family structures → higher birth rates</li>
+</ul>
+<p>The correct structural equations are:</p>
+<p><span class="math display">\[ Storks = g(Rural, \nu_1) \]</span></p>
+<p><span class="math display">\[ Births = h(Rural, \nu_2) \]</span></p>
+<p>where \(Rural\) is the common cause. Conditioning on (or intervening on) storks has no causal effect on births.</p>
+<p>This illustrates the fundamental limitation of prediction: a model that predicts well may be useless (or worse, misleading) for policy. <strong>Prediction answers "what will happen?" while explanation answers "what will happen if we do X?"</strong> — and these are very different questions.</p>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

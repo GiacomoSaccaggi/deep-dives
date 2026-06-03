@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Statistical Inference Theory</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Statistical Inference Theory</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="likelihood-function" class="section level2">
+<h2>Likelihood Function</h2>
+<p>Let \(X_1, X_2, \ldots, X_n\) be a random sample from a distribution with density \(p(x; \theta)\), where \(\theta \in \Theta\) is an unknown parameter. The <strong>likelihood function</strong> is defined as the joint density evaluated at the observed data, viewed as a function of \(\theta\):</p>
+<p><span class="math display">\[ L(\theta; \mathbf{x}) = \prod_{i=1}^{n} p(x_i; \theta) \]</span></p>
+<p>The likelihood is not a probability distribution over \(\theta\); it measures how well a particular value of \(\theta\) explains the observed data. Two likelihood functions \(L_1\) and \(L_2\) carry the same information about \(\theta\) if \(L_1(\theta; \mathbf{x}) = c \cdot L_2(\theta; \mathbf{x})\) for some constant \(c > 0\) not depending on \(\theta\).</p>
+
+<div id="log-likelihood" class="section level3">
+<h3>Log-Likelihood</h3>
+<p>The <strong>log-likelihood</strong> function is the natural logarithm of the likelihood:</p>
+<p><span class="math display">\[ \ell(\theta) = \log L(\theta; \mathbf{x}) = \sum_{i=1}^{n} \log p(x_i; \theta) \]</span></p>
+<p>Since the logarithm is a strictly increasing function, maximizing \(\ell(\theta)\) is equivalent to maximizing \(L(\theta; \mathbf{x})\). The log-likelihood transforms products into sums, making analytical and numerical optimization tractable.</p>
+</div>
+
+<div id="likelihood-ratio" class="section level3">
+<h3>Likelihood Ratio</h3>
+<p>For comparing two nested models \(M_0 \subset M_1\), the <strong>likelihood ratio</strong> is:</p>
+<p><span class="math display">\[ \Lambda(\mathbf{x}) = \frac{\sup_{\theta \in \Theta_0} L(\theta; \mathbf{x})}{\sup_{\theta \in \Theta} L(\theta; \mathbf{x})} = \frac{L(\hat{\theta}_0; \mathbf{x})}{L(\hat{\theta}; \mathbf{x})} \]</span></p>
+<p>where \(\hat{\theta}_0\) is the MLE under the restricted model and \(\hat{\theta}\) is the unrestricted MLE. Note that \(0 \leq \Lambda(\mathbf{x}) \leq 1\), and small values of \(\Lambda\) provide evidence against \(M_0\). Under regularity conditions and \(H_0\) true:</p>
+<p><span class="math display">\[ -2 \log \Lambda(\mathbf{x}) \xrightarrow{d} \chi^2_m \]</span></p>
+<p>where \(m = \dim(\Theta) - \dim(\Theta_0)\) is the difference in the number of free parameters.</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="sufficiency" class="section level2">
+<h2>Sufficiency</h2>
+<p>A statistic \(S = t(\mathbf{X})\) is <strong>sufficient</strong> for \(\theta\) if the conditional distribution of the data given \(S\) does not depend on \(\theta\):</p>
+<p><span class="math display">\[ g(\mathbf{x} | S = s; \theta) = g(\mathbf{x} | S = s) \quad \forall \theta \in \Theta \]</span></p>
+<p>Intuitively, a sufficient statistic captures all the information about \(\theta\) contained in the sample. Once we know the value of a sufficient statistic, the remaining variation in the data is pure noise — uninformative about the parameter.</p>
+
+<div id="factorization-theorem" class="section level3">
+<h3>Factorization Theorem (Fisher–Neyman)</h3>
+<p>A statistic \(S = t(\mathbf{X})\) is sufficient for \(\theta\) if and only if the likelihood can be factored as:</p>
+<p><span class="math display">\[ L(\theta; \mathbf{x}) = g(t(\mathbf{x}); \theta) \cdot h(\mathbf{x}) \]</span></p>
+<p>where \(g\) depends on the data only through \(t(\mathbf{x})\), and \(h\) does not depend on \(\theta\). This theorem provides a practical criterion for identifying sufficient statistics without computing conditional distributions directly.</p>
+</div>
+
+<div id="minimal-sufficiency" class="section level3">
+<h3>Minimal Sufficient Statistic (SSM)</h3>
+<p>A sufficient statistic \(S\) is <strong>minimal sufficient</strong> if it is a function of every other sufficient statistic. Equivalently, \(S\) achieves the maximum possible data reduction while retaining all information about \(\theta\). A sufficient statistic \(t(\mathbf{X})\) is minimal sufficient if and only if:</p>
+<p><span class="math display">\[ \frac{L(\theta; \mathbf{x})}{L(\theta; \mathbf{y})} \text{ does not depend on } \theta \iff t(\mathbf{x}) = t(\mathbf{y}) \]</span></p>
+<p>The minimal sufficient statistic is essentially unique (up to one-to-one transformations).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="exponential-family" class="section level2">
+<h2>Exponential Family</h2>
+<p>A parametric family of distributions belongs to the <strong>exponential family</strong> if its likelihood can be written in the form:</p>
+<p><span class="math display">\[ L(\mathbf{x}; \theta) = h(\mathbf{x}) \cdot \exp\left[ \sum_{j=1}^{k} g_j(\theta) \, s_j(\mathbf{x}) - k(\theta) \right] \]</span></p>
+<p>where:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(h(\mathbf{x}) \geq 0\) is the base measure (does not depend on \(\theta\))</li>
+<li>\(g_j(\theta)\) are the <strong>natural parameters</strong></li>
+<li>\(s_j(\mathbf{x})\) are the <strong>natural sufficient statistics</strong></li>
+<li>\(k(\theta) = \log \int h(\mathbf{x}) \exp\left[\sum_j g_j(\theta) s_j(\mathbf{x})\right] d\mathbf{x}\) is the log-partition function ensuring normalization</li>
+</ul>
+
+<div id="exponential-sufficiency" class="section level3">
+<h3>Sufficiency in the Exponential Family</h3>
+<p>By the Factorization Theorem, the vector \(\mathbf{S} = (s_1(\mathbf{x}), s_2(\mathbf{x}), \ldots, s_k(\mathbf{x}))\) is sufficient for \(\theta\). Moreover, if the natural parameter space contains an open set in \(\mathbb{R}^k\), then \(\mathbf{S}\) is the <strong>minimal sufficient statistic</strong>.</p>
+<p>This is a key result: for exponential families, the dimensionality of the minimal sufficient statistic equals the number of free parameters, regardless of sample size.</p>
+</div>
+
+<div id="exponential-examples" class="section level3">
+<h3>Common Examples</h3>
+<p>Normal: \(s_1(\mathbf{x}) = \sum x_i\), \(s_2(\mathbf{x}) = \sum x_i^2\) are jointly sufficient for \((\mu, \sigma^2)\).</p>
+<p>Poisson: \(s(\mathbf{x}) = \sum x_i\) is sufficient for \(\lambda\).</p>
+<p>Bernoulli: \(s(\mathbf{x}) = \sum x_i\) is sufficient for \(p\).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="properties-estimators" class="section level2">
+<h2>Properties of Estimators</h2>
+<p>An <strong>estimator</strong> \(T(\mathbf{X})\) is a function of the data used to estimate a parameter \(\tau(\theta)\). We evaluate estimators according to several criteria.</p>
+
+<div id="unbiasedness" class="section level3">
+<h3>Unbiasedness</h3>
+<p>An estimator \(T(\mathbf{X})\) is <strong>unbiased</strong> for \(\tau(\theta)\) if:</p>
+<p><span class="math display">\[ E_\theta[T(\mathbf{X})] = \tau(\theta) \quad \forall \theta \in \Theta \]</span></p>
+<p>The <strong>bias</strong> of an estimator is \(b(\theta) = E_\theta[T(\mathbf{X})] - \tau(\theta)\). An unbiased estimator has \(b(\theta) = 0\) for all \(\theta\).</p>
+</div>
+
+<div id="efficiency" class="section level3">
+<h3>Efficiency and Mean Squared Error</h3>
+<p>The <strong>mean squared error</strong> (MSE) decomposes as:</p>
+<p><span class="math display">\[ \text{MSE}_\theta(T) = E_\theta\left[(T(\mathbf{X}) - \tau(\theta))^2\right] = \text{Var}_\theta(T) + [b(\theta)]^2 \]</span></p>
+<p>For unbiased estimators, MSE equals variance. An estimator \(T_1\) is <strong>more efficient</strong> than \(T_2\) if \(\text{MSE}_\theta(T_1) \leq \text{MSE}_\theta(T_2)\) for all \(\theta\), with strict inequality for at least one value.</p>
+</div>
+
+<div id="consistency" class="section level3">
+<h3>Asymptotic Properties: Consistency</h3>
+<p>An estimator \(T_n = T_n(\mathbf{X})\) is <strong>consistent</strong> for \(\tau(\theta)\) if:</p>
+<p><span class="math display">\[ T_n \xrightarrow{P} \tau(\theta) \quad \text{as } n \to \infty \]</span></p>
+<p>A sufficient condition for consistency is that both \(\text{Var}_\theta(T_n) \to 0\) and \(b_n(\theta) \to 0\) as \(n \to \infty\).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="fisher-information" class="section level2">
+<h2>Fisher Information</h2>
+<p>The <strong>score function</strong> is the derivative of the log-likelihood with respect to \(\theta\):</p>
+<p><span class="math display">\[ s(\theta; \mathbf{x}) = \frac{\partial}{\partial \theta} \ell(\theta; \mathbf{x}) = \ell'(\theta) \]</span></p>
+<p>Under regularity conditions, \(E_\theta[s(\theta; \mathbf{X})] = 0\). The <strong>Fisher information</strong> is defined as the variance of the score:</p>
+<p><span class="math display">\[ I_{\mathbf{X}}(\theta) = E_\theta\left[\left(\ell'(\theta)\right)^2\right] = -E_\theta\left[\ell''(\theta)\right] \]</span></p>
+<p>The equality between the two forms holds under regularity conditions that allow interchange of differentiation and integration.</p>
+
+<div id="fisher-interpretation" class="section level3">
+<h3>Interpretation</h3>
+<p>Fisher information measures the <strong>curvature</strong> of the log-likelihood function at its maximum. High curvature (high information) means the likelihood is sharply peaked around the MLE, so the data are highly informative about \(\theta\). Low curvature (low information) means a flat likelihood and greater uncertainty.</p>
+<p>For a sample of \(n\) i.i.d. observations, information is additive:</p>
+<p><span class="math display">\[ I_{\mathbf{X}}(\theta) = n \cdot I_{X_1}(\theta) \]</span></p>
+</div>
+
+<div id="fisher-multivariate" class="section level3">
+<h3>Multivariate Case</h3>
+<p>When \(\theta = (\theta_1, \ldots, \theta_p)^T\) is a vector, the Fisher information becomes a \(p \times p\) matrix:</p>
+<p><span class="math display">\[ [I(\theta)]_{jk} = -E_\theta\left[\frac{\partial^2 \ell(\theta)}{\partial \theta_j \partial \theta_k}\right] = E_\theta\left[\frac{\partial \ell}{\partial \theta_j} \cdot \frac{\partial \ell}{\partial \theta_k}\right] \]</span></p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="cramer-rao" class="section level2">
+<h2>Cramér–Rao Inequality</h2>
+<p>The Cramér–Rao inequality establishes a <strong>lower bound</strong> on the variance of any unbiased estimator.</p>
+
+<div id="cramer-rao-unbiased" class="section level3">
+<h3>For Unbiased Estimators</h3>
+<p>If \(T(\mathbf{X})\) is an unbiased estimator of \(\theta\), then under regularity conditions:</p>
+<p><span class="math display">\[ \text{Var}_\theta(T(\mathbf{X})) \geq \frac{1}{I_{\mathbf{X}}(\theta)} \]</span></p>
+<p>An unbiased estimator that attains this lower bound is called <strong>efficient</strong> (or UMVUE for the class of unbiased estimators). It achieves the minimum possible variance.</p>
+</div>
+
+<div id="cramer-rao-general" class="section level3">
+<h3>General Form</h3>
+<p>For estimating a function \(\tau(\theta)\) with an estimator \(T(\mathbf{X})\) that may be biased, the general Cramér–Rao bound is:</p>
+<p><span class="math display">\[ \text{Var}_\theta(T(\mathbf{X})) \geq \frac{[\tau'(\theta)]^2}{I_{\mathbf{X}}(\theta)} \]</span></p>
+<p>where \(\tau'(\theta) = \frac{d}{d\theta}\tau(\theta)\). For the unbiased case (\(\tau(\theta) = \theta\)), we recover \(\tau'(\theta) = 1\) and the simpler form above.</p>
+</div>
+
+<div id="cramer-rao-attainment" class="section level3">
+<h3>Attainment of the Bound</h3>
+<p>The Cramér–Rao bound is attained if and only if the score function is a linear function of the estimator:</p>
+<p><span class="math display">\[ \ell'(\theta; \mathbf{x}) = a(\theta) \left[T(\mathbf{x}) - \tau(\theta)\right] \]</span></p>
+<p>This occurs naturally in exponential family distributions. If the bound is attained, then \(T\) is necessarily the UMVUE for \(\tau(\theta)\).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="rao-blackwell" class="section level2">
+<h2>Rao–Blackwell Theorem</h2>
+<p>The Rao–Blackwell theorem provides a method for improving estimators using sufficient statistics.</p>
+<p><strong>Theorem.</strong> Let \(T(\mathbf{X})\) be any unbiased estimator of \(\tau(\theta)\), and let \(S = t(\mathbf{X})\) be a sufficient statistic for \(\theta\). Define:</p>
+<p><span class="math display">\[ T^*(S) = E[T(\mathbf{X}) \mid S] \]</span></p>
+<p>Then:</p>
+<ol>
+<li>\(T^*\) is a function of \(S\) alone (does not depend on the full data)</li>
+<li>\(E_\theta[T^*] = \tau(\theta)\) for all \(\theta\) (unbiasedness is preserved)</li>
+<li>\(\text{Var}_\theta(T^*) \leq \text{Var}_\theta(T)\) for all \(\theta\) (variance is reduced or unchanged)</li>
+</ol>
+<p>The variance reduction follows from the law of total variance:</p>
+<p><span class="math display">\[ \text{Var}(T) = E[\text{Var}(T|S)] + \text{Var}(E[T|S]) = E[\text{Var}(T|S)] + \text{Var}(T^*) \]</span></p>
+<p>Since \(E[\text{Var}(T|S)] \geq 0\), we have \(\text{Var}(T^*) \leq \text{Var}(T)\), with equality if and only if \(T\) is already a function of \(S\).</p>
+<p>The process of conditioning on a sufficient statistic to improve an estimator is called <strong>Rao–Blackwellization</strong>.</p>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="lehmann-scheffe" class="section level2">
+<h2>Lehmann–Scheffé Theorem</h2>
+<p>The Lehmann–Scheffé theorem characterizes the <strong>unique best unbiased estimator</strong>.</p>
+
+<div id="completeness" class="section level3">
+<h3>Completeness</h3>
+<p>A sufficient statistic \(S\) is <strong>complete</strong> if for any measurable function \(g\):</p>
+<p><span class="math display">\[ E_\theta[g(S)] = 0 \quad \forall \theta \in \Theta \implies g(S) = 0 \text{ a.s.} \]</span></p>
+<p>Completeness means that the only unbiased estimator of zero based on \(S\) is the trivial one. In exponential families with natural parameter space containing an open set, the natural sufficient statistic is complete.</p>
+</div>
+
+<div id="lehmann-scheffe-statement" class="section level3">
+<h3>Statement</h3>
+<p><strong>Theorem (Lehmann–Scheffé).</strong> Let \(S\) be a <strong>complete sufficient statistic</strong> for \(\theta\). If \(T^* = h(S)\) is any unbiased estimator of \(\tau(\theta)\) that depends on the data only through \(S\), then \(T^*\) is the <strong>unique Uniformly Minimum Variance Unbiased Estimator (UMVUE)</strong> of \(\tau(\theta)\).</p>
+<p>The proof relies on completeness: if two unbiased estimators \(T_1^*\) and \(T_2^*\) are both functions of \(S\), then \(E_\theta[T_1^* - T_2^*] = 0\) for all \(\theta\), and completeness implies \(T_1^* = T_2^*\) a.s.</p>
+</div>
+
+<div id="umvue-recipe" class="section level3">
+<h3>Finding the UMVUE</h3>
+<p>Two strategies:</p>
+<ol>
+<li><strong>Direct approach:</strong> Find any unbiased estimator that is a function of the complete sufficient statistic. By Lehmann–Scheffé, it is the UMVUE.</li>
+<li><strong>Rao–Blackwell + Lehmann–Scheffé:</strong> Start with any unbiased estimator \(T\), condition on the complete sufficient statistic \(S\) to obtain \(T^* = E[T|S]\). This \(T^*\) is the UMVUE.</li>
+</ol>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="mle" class="section level2">
+<h2>Maximum Likelihood Estimator</h2>
+<p>The <strong>maximum likelihood estimator</strong> (MLE) is defined as the value of \(\theta\) that maximizes the likelihood function:</p>
+<p><span class="math display">\[ \hat{\theta}_{\text{MLE}} = \arg\max_{\theta \in \Theta} L(\theta; \mathbf{x}) = \arg\max_{\theta \in \Theta} \ell(\theta; \mathbf{x}) \]</span></p>
+<p>Under regularity conditions, the MLE is found by solving the <strong>score equation</strong>:</p>
+<p><span class="math display">\[ \ell'(\theta; \mathbf{x}) = \frac{\partial}{\partial \theta} \ell(\theta; \mathbf{x}) = 0 \]</span></p>
+
+<div id="mle-properties" class="section level3">
+<h3>Properties of the MLE</h3>
+<p><strong>1. Equivariance (Invariance):</strong> If \(\hat{\theta}\) is the MLE of \(\theta\), then for any function \(\psi = f(\theta)\), the MLE of \(\psi\) is \(\hat{\psi} = f(\hat{\theta})\).</p>
+<p><strong>2. Function of the sufficient statistic:</strong> In exponential families, the MLE is always a function of the minimal sufficient statistic.</p>
+<p><strong>3. Consistency:</strong> Under regularity conditions, \(\hat{\theta}_n \xrightarrow{P} \theta_0\) as \(n \to \infty\).</p>
+<p><strong>4. Asymptotic normality:</strong> Under regularity conditions:</p>
+<p><span class="math display">\[ \sqrt{n}(\hat{\theta}_n - \theta_0) \xrightarrow{d} N\left(0, \frac{1}{I_{X_1}(\theta_0)}\right) \]</span></p>
+<p>Equivalently, for finite \(n\):</p>
+<p><span class="math display">\[ \hat{\theta}_n \stackrel{\text{approx}}{\sim} N\left(\theta_0, \frac{1}{I_{\mathbf{X}}(\theta_0)}\right) = N\left(\theta_0, \frac{1}{n \cdot I_{X_1}(\theta_0)}\right) \]</span></p>
+<p><strong>5. Asymptotic efficiency:</strong> The MLE achieves the Cramér–Rao lower bound asymptotically. No consistent estimator has a smaller asymptotic variance.</p>
+</div>
+
+<div id="mle-not-unbiased" class="section level3">
+<h3>Note on Bias</h3>
+<p>The MLE is generally <strong>not</strong> unbiased in finite samples. For example, the MLE of \(\sigma^2\) in the normal model is \(\frac{1}{n}\sum(X_i - \bar{X})^2\), which has expectation \(\frac{n-1}{n}\sigma^2\). However, the bias vanishes asymptotically: \(b_n(\theta) = O(1/n)\).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="delta-method" class="section level2">
+<h2>Delta Method</h2>
+<p>The <strong>delta method</strong> provides the asymptotic distribution of a smooth function of an asymptotically normal estimator.</p>
+<p><strong>Theorem.</strong> If \(\sqrt{n}(\hat{\theta}_n - \theta) \xrightarrow{d} N(0, \sigma^2)\) and \(\psi = f(\theta)\) is a differentiable function with \(f'(\theta) \neq 0\), then:</p>
+<p><span class="math display">\[ \sqrt{n}(\hat{\psi}_n - \psi) = \sqrt{n}(f(\hat{\theta}_n) - f(\theta)) \xrightarrow{d} N\left(0, [f'(\theta)]^2 \sigma^2\right) \]</span></p>
+<p>Applied to the MLE with \(\sigma^2 = 1/I_{X_1}(\theta)\):</p>
+<p><span class="math display">\[ \sqrt{n}(\hat{\psi}_n - \psi) \xrightarrow{d} N\left(0, \frac{[f'(\theta)]^2}{I_{X_1}(\theta)}\right) \]</span></p>
+<p>This result is fundamental for constructing confidence intervals and hypothesis tests for transformed parameters. The asymptotic variance of \(\hat{\psi}_n\) is:</p>
+<p><span class="math display">\[ \text{Var}(\hat{\psi}_n) \approx \frac{[f'(\theta)]^2}{n \cdot I_{X_1}(\theta)} \]</span></p>
+
+<div id="delta-multivariate" class="section level3">
+<h3>Multivariate Delta Method</h3>
+<p>If \(\sqrt{n}(\hat{\boldsymbol{\theta}}_n - \boldsymbol{\theta}) \xrightarrow{d} N(\mathbf{0}, \Sigma)\) and \(\psi = f(\boldsymbol{\theta})\) with gradient \(\nabla f(\boldsymbol{\theta})\), then:</p>
+<p><span class="math display">\[ \sqrt{n}(f(\hat{\boldsymbol{\theta}}_n) - f(\boldsymbol{\theta})) \xrightarrow{d} N\left(0, \nabla f(\boldsymbol{\theta})^T \Sigma \, \nabla f(\boldsymbol{\theta})\right) \]</span></p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="wald-test" class="section level2">
+<h2>Hypothesis Testing — Wald Test</h2>
+<p>Consider testing \(H_0: \theta = \theta_0\) against \(H_1: \theta \neq \theta_0\). The three classical asymptotic tests are the Wald test, the likelihood ratio test, and the score (Rao) test. All three are asymptotically equivalent under \(H_0\).</p>
+
+<div id="wald-statistic" class="section level3">
+<h3>Wald Statistic</h3>
+<p>The <strong>Wald test</strong> is based on the asymptotic normality of the MLE. The test statistic is:</p>
+<p><span class="math display">\[ W(\mathbf{x}) = 2\left[\ell(\hat{\theta}) - \ell(\theta_0)\right] \]</span></p>
+<p>Under \(H_0\) and regularity conditions:</p>
+<p><span class="math display">\[ W(\mathbf{x}) \xrightarrow{d} \chi^2_m \]</span></p>
+<p>where \(m\) is the number of constraints imposed by \(H_0\) (i.e., the dimension of the parameter space reduction). We reject \(H_0\) at level \(\alpha\) if \(W(\mathbf{x}) > \chi^2_{m,\alpha}\).</p>
+</div>
+
+<div id="wald-alternative" class="section level3">
+<h3>Alternative Form</h3>
+<p>An equivalent formulation of the Wald test directly uses the standardized distance of the MLE from the null value:</p>
+<p><span class="math display">\[ W^*(\mathbf{x}) = (\hat{\theta} - \theta_0)^T I_{\mathbf{X}}(\hat{\theta}) (\hat{\theta} - \theta_0) \xrightarrow{d} \chi^2_m \]</span></p>
+<p>In the scalar case:</p>
+<p><span class="math display">\[ W^*(\mathbf{x}) = \frac{(\hat{\theta} - \theta_0)^2}{\text{Var}(\hat{\theta})} = (\hat{\theta} - \theta_0)^2 \cdot I_{\mathbf{X}}(\hat{\theta}) \xrightarrow{d} \chi^2_1 \]</span></p>
+<p>or equivalently, \(\frac{\hat{\theta} - \theta_0}{\text{se}(\hat{\theta})} \xrightarrow{d} N(0,1)\).</p>
+</div>
+
+<div id="three-tests" class="section level3">
+<h3>The Trinity of Asymptotic Tests</h3>
+<p>The three classical tests for \(H_0: \theta = \theta_0\) are:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Wald test:</strong> evaluates the distance of \(\hat{\theta}\) from \(\theta_0\) (requires unrestricted MLE)</li>
+<li><strong>Likelihood ratio test:</strong> compares \(\ell(\hat{\theta})\) to \(\ell(\theta_0)\) (requires both MLEs)</li>
+<li><strong>Score (Rao) test:</strong> evaluates the score at \(\theta_0\): \(S = \ell'(\theta_0)^2 / I(\theta_0) \sim \chi^2_1\) (requires only restricted MLE)</li>
+</ul>
+<p>All three converge to the same \(\chi^2_m\) distribution under \(H_0\) and have the same local asymptotic power.</p>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Lumos! Illuminating Failing Tests</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Lumos! Illuminating Failing Tests</h2>
+                        <hr class="small">
+                        <h5>Pytest Debugging &mdash; A Wizard's Guide</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<h2>🪄 Lumos! Illuminating Failing Tests</h2>
+<p>Every wizard knows that darkness is the enemy. When your tests fail and the traceback is a jumbled mess of cryptic runes, you need a spell to light the way. Welcome to Debugging with Pytest &mdash; the <em>Lumos</em> of the testing world.</p>
+
+<h3>1. Understanding Pytest Output &mdash; Choosing Your Wand's Brightness</h3>
+<p>Just as Lumos can shine at different intensities, pytest lets you control how much detail you see in tracebacks using <code>--tb</code>:</p>
+<pre><code class="python"># Short traceback &mdash; a dim glow, just the essentials
+pytest --tb=short
+
+# Long traceback &mdash; full Lumos Maxima, every frame exposed
+pytest --tb=long
+
+# One line per failure &mdash; a flickering candle
+pytest --tb=line
+
+# No traceback at all &mdash; Nox! Darkness returns
+pytest --tb=no
+</code></pre>
+<p>Use <code>--tb=short</code> when you're scanning many failures quickly (like skimming the Daily Prophet). Switch to <code>--tb=long</code> when you need to perform a full magical autopsy on a single cursed test.</p>
+
+<h3>2. Stopping at First Failure &mdash; The Impedimenta Jinx</h3>
+<p>Sometimes you don't want to watch the entire test suite crumble like a poorly cast Protego. Stop the carnage immediately:</p>
+<pre><code class="python"># Stop at the FIRST failure &mdash; Impedimenta!
+pytest -x
+
+# Stop after N failures &mdash; controlled jinx
+pytest --maxfail=3
+</code></pre>
+<p>This is essential during development: fix one curse at a time, like Madam Pomfrey treating one patient before moving to the next.</p>
+
+<h3>3. Running Last Failed &mdash; The Marauder's Map of Failures</h3>
+<p>The Marauder's Map shows you exactly where everyone is. Similarly, pytest remembers which tests failed last time:</p>
+<pre><code class="python"># Re-run ONLY the tests that failed last time
+pytest --lf   # "Last Failed" &mdash; I solemnly swear I am up to no good
+
+# Run failed tests FIRST, then the rest
+pytest --ff   # "Failed First" &mdash; prioritize the troublemakers
+</code></pre>
+<p>This uses a cache file (<code>.pytest_cache/</code>) to track state between runs. Mischief managed.</p>
+
+<h3>4. Verbose Mode &mdash; Amplifying the Signal</h3>
+<p>Like using Sonorus to amplify your voice across the Quidditch pitch:</p>
+<pre><code class="python"># Show each test name and result
+pytest -v
+
+# Even MORE detail &mdash; SONORUS MAXIMA
+pytest -vv
+</code></pre>
+<p>With <code>-vv</code>, pytest shows full diffs for assertion failures, making it trivial to spot exactly which potion ingredient went wrong.</p>
+
+<h3>5. Dropping into the Debugger &mdash; Legilimens on Your Code</h3>
+<p>Sometimes you need to peer directly into your code's mind. <code>--pdb</code> drops you into Python's debugger at the exact point of failure:</p>
+<pre><code class="python"># Cast Legilimens &mdash; enter the mind of the failing test
+pytest --pdb
+
+# Inside pdb, you can:
+# (Pdb) p variable_name    &mdash; inspect a variable
+# (Pdb) l                  &mdash; list surrounding code
+# (Pdb) n                  &mdash; next line
+# (Pdb) c                  &mdash; continue execution
+# (Pdb) q                  &mdash; quit
+</code></pre>
+<p>You're now a Legilimens, reading the program's memories at the moment of death. No Occlumency can hide the bug from you.</p>
+
+<h3>6. Finding Slow Tests &mdash; The Time-Turner Audit</h3>
+<p>Some tests are like Gilderoy Lockhart &mdash; all show, no substance, and terribly slow. Find them:</p>
+<pre><code class="python"># Show the 10 slowest tests
+pytest --durations=10
+
+# Show ALL test durations (including setup/teardown)
+pytest --durations=0
+</code></pre>
+<p>This reveals which tests are hogging your Time-Turner. Optimize or split them before they slow your entire CI pipeline to a crawl.</p>
+
+<h3>7. Flaky Tests &mdash; Taming the Niffler</h3>
+<p>Flaky tests are like Nifflers &mdash; unpredictable, occasionally destructive, and maddeningly hard to catch. Use <code>pytest-rerunfailures</code>:</p>
+<pre><code class="python"># Install the taming charm
+pip install pytest-rerunfailures
+
+# Re-run failed tests up to 3 times
+pytest --reruns 3
+
+# Add a delay between reruns (for timing-sensitive tests)
+pytest --reruns 3 --reruns-delay 2
+
+# Or mark individual tests as flaky
+import pytest
+
+@pytest.mark.flaky(reruns=5, reruns_delay=1)
+def test_niffler_behavior():
+    """This test sometimes fails due to network gremlins."""
+    response = call_external_api()
+    assert response.status_code == 200
+</code></pre>
+<p>Remember: flaky tests are a symptom, not a feature. Tame the Niffler, don't just put it on a leash.</p>
+
+<h3>8. Using Print and Logging &mdash; The Howler Approach</h3>
+<p>Sometimes the simplest debugging tool is a well-placed Howler (or <code>print</code> statement). But pytest captures stdout by default!</p>
+<pre><code class="python"># Allow print output to appear (disable capture)
+pytest -s
+
+# Or use Python's logging module for more control
+import logging
+
+logger = logging.getLogger(__name__)
+
+def test_with_logging():
+    logger.info("Starting the incantation...")
+    result = cast_spell("Expelliarmus")
+    logger.debug(f"Spell result: {result}")
+    assert result.success is True
+
+# Run with log output visible:
+pytest --log-cli-level=DEBUG
+</code></pre>
+<p>The <code>-s</code> flag is like removing a Silencing Charm from your tests. Suddenly, all those whispered <code>print()</code> statements ring out loud and clear, like a Howler in the Great Hall.</p>
+
+<h3>Summary &mdash; Your Debugging Spell Book</h3>
+<table class="table table-condensed">
+<tr><th>Situation</th><th>Spell (Command)</th></tr>
+<tr><td>Need less/more traceback</td><td><code>--tb=short/long/line/no</code></td></tr>
+<tr><td>Stop at first failure</td><td><code>-x</code> or <code>--maxfail=N</code></td></tr>
+<tr><td>Re-run only failures</td><td><code>--lf</code> (last failed)</td></tr>
+<tr><td>Failures first, then rest</td><td><code>--ff</code> (failed first)</td></tr>
+<tr><td>More output detail</td><td><code>-v</code> or <code>-vv</code></td></tr>
+<tr><td>Drop into debugger</td><td><code>--pdb</code></td></tr>
+<tr><td>Find slow tests</td><td><code>--durations=N</code></td></tr>
+<tr><td>Handle flaky tests</td><td><code>--reruns N</code></td></tr>
+<tr><td>See print output</td><td><code>-s</code></td></tr>
+<tr><td>See log output</td><td><code>--log-cli-level=DEBUG</code></td></tr>
+</table>
+
+<p><em>"Happiness can be found, even in the darkest of times, if one only remembers to turn on the light."</em> &mdash; Albus Dumbledore (and also anyone who remembers <code>pytest --pdb</code>).</p>
+
+    </div>
+
+    <script>
+      (function () {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+        document.getElementsByTagName("head")[0].appendChild(script);
+      })();
+    </script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

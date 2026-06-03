@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Bagging (Bootstrap Aggregating)</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Bagging (Bootstrap Aggregating)</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><strong>Bagging</strong> stands for <strong>B</strong>ootstrap <strong>AGG</strong>regat<strong>ING</strong>. It was proposed by Leo Breiman in 1996 as an ensemble method designed to reduce the variance of high-variance, low-bias models — most notably unpruned decision trees.</p>
+<p>The key insight is simple: averaging many noisy but approximately unbiased estimates reduces noise. If each estimate has variance <span class="math inline">\(\sigma^2\)</span>, the average of <span class="math inline">\(B\)</span> independent estimates has variance <span class="math inline">\(\sigma^2 / B\)</span>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="the-idea" class="section level2">
+<h2>The Idea</h2>
+<p>Imagine we had access to <span class="math inline">\(B\)</span> independent training sets drawn from the same population. We could train a model on each and average their predictions:</p>
+<p><span class="math display">\[ \hat{f}_{\text{avg}}(x) = \frac{1}{B} \sum_{b=1}^{B} \hat{f}_b(x) \]</span></p>
+<p>The variance of this average would be:</p>
+<p><span class="math display">\[ \text{Var}\left(\hat{f}_{\text{avg}}\right) = \frac{\sigma^2}{B} \]</span></p>
+<p><strong>Problem:</strong> in practice we only have one training set.</p>
+<p><strong>Solution:</strong> use the <em>bootstrap</em> to simulate multiple training sets! We sample with replacement from our single dataset to create <span class="math inline">\(B\)</span> pseudo-independent training sets.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="the-algorithm" class="section level2">
+<h2>The Algorithm</h2>
+<p>The bagging procedure consists of three steps:</p>
+
+<div id="step1" class="section level3">
+<h3>1. Generate Bootstrap Samples</h3>
+<p>For <span class="math inline">\(b = 1, 2, \ldots, B\)</span>: draw a sample of size <span class="math inline">\(n\)</span> <strong>with replacement</strong> from the original training data <span class="math inline">\(\mathcal{D} = \{(x_1, y_1), \ldots, (x_n, y_n)\}\)</span>. Each bootstrap sample <span class="math inline">\(\mathcal{D}^{*b}\)</span> has the same size as the original but contains duplicates.</p>
+</div>
+
+<div id="step2" class="section level3">
+<h3>2. Train Base Learners</h3>
+<p>Train a base learner <span class="math inline">\(\hat{f}_b\)</span> (typically an unpruned decision tree — high variance, low bias) on each bootstrap sample <span class="math inline">\(\mathcal{D}^{*b}\)</span>.</p>
+</div>
+
+<div id="step3" class="section level3">
+<h3>3. Aggregate Predictions</h3>
+<p><strong>Regression:</strong></p>
+<p><span class="math display">\[ \hat{f}_{\text{bag}}(x) = \frac{1}{B} \sum_{b=1}^{B} \hat{f}_b(x) \]</span></p>
+<p><strong>Classification:</strong> majority vote or average of class probabilities:</p>
+<p><span class="math display">\[ \hat{C}_{\text{bag}}(x) = \arg\max_k \sum_{b=1}^{B} \mathbb{1}\left(\hat{C}_b(x) = k\right) \]</span></p>
+<p>or equivalently, using probability averaging:</p>
+<p><span class="math display">\[ \hat{p}_k(x) = \frac{1}{B} \sum_{b=1}^{B} \hat{p}_{b,k}(x) \]</span></p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="why-it-works" class="section level2">
+<h2>Why It Works</h2>
+<p>The explanation lies in the <strong>bias-variance decomposition</strong>. For a single model:</p>
+<p><span class="math display">\[ \text{MSE} = \text{Bias}^2 + \text{Variance} \]</span></p>
+<p>Bagging does <strong>NOT</strong> reduce bias — each bootstrapped tree has approximately the same expected prediction as a tree trained on the full dataset. However, it <strong>does</strong> reduce variance through averaging.</p>
+<p>More formally, if we have <span class="math inline">\(B\)</span> trees each with variance <span class="math inline">\(\sigma^2\)</span> and pairwise correlation <span class="math inline">\(\rho\)</span>, the variance of the bagged ensemble is:</p>
+<p><span class="math display">\[ \text{Var}(\hat{f}_{\text{bag}}) = \rho \sigma^2 + \frac{1 - \rho}{B} \sigma^2 \]</span></p>
+<p>As <span class="math inline">\(B \to \infty\)</span>, the second term vanishes, leaving <span class="math inline">\(\rho \sigma^2\)</span>. The variance reduction is bounded by the correlation between the individual trees. The less correlated the trees, the greater the benefit of bagging.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="oob-estimation" class="section level2">
+<h2>Out-of-Bag (OOB) Estimation</h2>
+<p>Each bootstrap sample of size <span class="math inline">\(n\)</span> drawn with replacement leaves out a fraction of the original observations. The probability that observation <span class="math inline">\(i\)</span> is <strong>not</strong> selected in any single draw is:</p>
+<p><span class="math display">\[ P(\text{not selected}) = \left(1 - \frac{1}{n}\right)^n \xrightarrow{n \to \infty} e^{-1} \approx 0.368 \]</span></p>
+<p>So each bootstrap sample contains approximately <strong>63.2%</strong> of the unique observations, leaving ~36.8% "out of bag".</p>
+<p>The <strong>OOB prediction</strong> for observation <span class="math inline">\(i\)</span> is the aggregate prediction from all trees for which <span class="math inline">\(i\)</span> was <em>not</em> in the training set:</p>
+<p><span class="math display">\[ \hat{f}_{\text{OOB}}(x_i) = \frac{1}{|S_i|} \sum_{b \in S_i} \hat{f}_b(x_i) \]</span></p>
+<p>where <span class="math inline">\(S_i = \{b : (x_i, y_i) \notin \mathcal{D}^{*b}\}\)</span>.</p>
+<p>This provides an essentially <strong>free cross-validation</strong> estimate of the generalization error — no need for a separate validation set or expensive k-fold CV.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="when-bagging-helps" class="section level2">
+<h2>When Bagging Helps and When It Doesn't</h2>
+
+<div id="helps" class="section level3">
+<h3>Bagging helps with:</h3>
+<ul>
+<li>High-variance learners: deep (unpruned) decision trees, complex neural networks</li>
+<li>Unstable models where small changes in training data lead to very different fitted models</li>
+</ul>
+</div>
+
+<div id="doesnt-help" class="section level3">
+<h3>Bagging does NOT help with:</h3>
+<ul>
+<li>Stable/low-variance learners: linear regression, logistic regression, shallow trees</li>
+<li>High-bias models: averaging many biased predictions still gives a biased prediction</li>
+</ul>
+</div>
+
+<p><strong>Rule of thumb:</strong> the more unstable the base learner, the more bagging helps. If the base learner barely changes when you perturb the training data, bagging will have little effect.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="bagging-vs-random-forest" class="section level2">
+<h2>Bagging vs Random Forest</h2>
+<p>Standard bagging uses <strong>all <span class="math inline">\(p\)</span> features</strong> at each split. If one feature is very strong, most trees will use it at the top split, making the trees highly correlated. Recall from above:</p>
+<p><span class="math display">\[ \text{Var}(\hat{f}_{\text{bag}}) = \rho \sigma^2 + \frac{1 - \rho}{B} \sigma^2 \]</span></p>
+<p>High correlation <span class="math inline">\(\rho\)</span> limits the variance reduction achievable by bagging.</p>
+<p><strong>Random Forest</strong> addresses this by adding <strong>random feature subsampling</strong>: at each split, only a random subset of <span class="math inline">\(m \leq p\)</span> features is considered (typically <span class="math inline">\(m = \sqrt{p}\)</span> for classification, <span class="math inline">\(m = p/3\)</span> for regression). This <strong>decorrelates</strong> the trees, reducing <span class="math inline">\(\rho\)</span> and achieving further variance reduction beyond what plain bagging can offer.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="practical-considerations" class="section level2">
+<h2>Practical Considerations</h2>
+<ul>
+<li><strong>Number of trees <span class="math inline">\(B\)</span>:</strong> should be large enough (typically 100–500+). Unlike boosting, bagging does <strong>not overfit</strong> as <span class="math inline">\(B\)</span> increases — more trees simply stabilize the estimate.</li>
+<li><strong>Computational cost:</strong> training <span class="math inline">\(B\)</span> trees is embarrassingly parallel — each tree is independent. Modern implementations distribute across cores/machines easily.</li>
+<li><strong>Loss of interpretability:</strong> a single decision tree is highly interpretable. A bagged ensemble of hundreds of trees is not. Trade-off: better prediction accuracy at the cost of a "black box" model.</li>
+<li><strong>Variable importance:</strong> although we lose single-tree interpretability, we can still compute variable importance scores (e.g., total reduction in RSS or Gini impurity across all trees for each variable).</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

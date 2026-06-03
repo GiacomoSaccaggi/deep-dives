@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="ML e Statistica">
+    <meta name="description" content="ML and Statistica">
     <meta name="author" content="Giacomo Saccaggi">
 
     <title>Posterior synthesis</title>
@@ -22,7 +22,7 @@
 
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link rel="stylesheet" mean="screen and (min-width:481px)" href="cv.css">
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/clean-blog.min.css" rel="stylesheet">
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -114,10 +114,9 @@
                 <ul class="nav navbar-nav navbar-right">
                   
                     <li>
-                        <a href="https://giacomosaccaggi.github.io/articoli/">Data Science articles</a>
                     </li>
                     <li>
-                        <a href="https://giacomosaccaggi.github.io/all.html">All projects</a>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
                     </li>
                     <li>
                         <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
@@ -153,187 +152,187 @@
 
 <div id="sintesi-della-posterior" class="section level1">
 <h1>Posterior synthesis</h1>
-<p>Il problema che ci si trova a dover affrontare in questo articolo riguarda la Posterior synthesis, esponiamo il problema nel modo più generale possibile:</p>
+<p>The problem we face in this article concerns Posterior synthesis. Let us state the problem in the most general way possible:</p>
 <p><span class="math display">\[E^{\pi(.|x)}[g(\theta)]= \int_{\Theta}{g(\theta) \space \pi(\theta | x)} \space \space d\theta\]</span></p>
-<p>I principali metodi che si possono utilizzare per risolvere il problema appena esposto si possono dividere in tre categorie:</p>
+<p>The main methods that can be used to solve the problem just stated can be divided into three categories:</p>
 <blockquote>
-Metodi di integrazione numerica
+Numerical integration methods
 </blockquote>
 <blockquote>
-Metodi analitici
+Analytical methods
 </blockquote>
 <blockquote>
-Metodi simulativi
+Simulation methods
 </blockquote><br><br>
-<div id="metodi-di-integrazione-numerica-degli-integrali" class="section level2">
-<h2>Metodi di integrazione numerica degli integrali</h2>
-<p>L’integrazione numerica consiste in una serie di metodi che stimano il valore di un integrale definito, senza dover calcolare la primitiva della funzione integranda.</p>
-<p>La necessità di utilizzare l’integrazione numerica, è necessaria in quanto non tutte le funzioni ammettono una primitiva in forma esplicita (per esempio la curva gaussiana) oppure la primitiva della funzione può essere molto complicata da valutare o si è davanti ad una funzione disponibile solo in alcuni punti.</p>
-<p>I metodi di integrazione numerica possono essere distinti in due macrocategorie:</p>
+<div id="methods-di-integrazione-numerica-degli-integrali" class="section level2">
+<h2>Numerical Integration Methods</h2>
+<p>Numerical integration consists of a series of methods that estimate the value of a definite integral without having to calculate the antiderivative of the integrand function.</p>
+<p>The need for numerical integration arises because not all functions admit an antiderivative in explicit form (for example the Gaussian curve), or the antiderivative can be very complicated to evaluate, or we are dealing with a function available only at certain points.</p>
+<p>Numerical integration methods can be distinguished into two macro-categories:</p>
 <ul>
-<li>formule di Newton-Cotes (per esempio metodo dei trapezi);</li>
-<li>formule di Gauss (per esempio metodo monte carlo).</li>
+<li>Newton-Cotes formulae (e.g. trapezoidal method);</li>
+<li>Gauss formulae (e.g. Monte Carlo method).</li>
 </ul>
-<p>Questi metodi per l’approssimazione della posterior funzionano bene solo quando il parametro è molto piccolo, in questo ambito non si utilizzano molto, anche se nel caso di posterior coniugate i metodi monte carlo risultano unottima scelta.</p>
-<p>Inoltre spesso non si conosce <span class="math inline">\(m(x)= \int_{\Theta}{f(\underline{x} | \theta) \pi(\theta)} \space \space d\theta\)</span> e questo obbliga ad utilizzare delle approssimazioni.</p>
+<p>These methods for posterior approximation work well only when the parameter space is very small; in this context they are not used much, although for conjugate posteriors Monte Carlo methods are an excellent choice.</p>
+<p>Furthermore, often we do not know <span class="math inline">\(m(x)= \int_{\Theta}{f(\underline{x} | \theta) \pi(\theta)} \space \space d\theta\)</span> and this forces us to use approximations.</p>
 </div>
-<div id="metodi-analitici" class="section level2">
-<h2>Metodi analitici</h2>
-<div id="approssimazione-normale" class="section level3">
-<h3>Approssimazione Normale</h3>
-<p>L’approssimazione Normale è un metodo che utilizza le proprietà asintotiche della distribuzione Normale per riuscire a risolvere la problematica della Posterior synthesis quando non è possibile operare una integrazione numerica.</p>
+<div id="methods-analitici" class="section level2">
+<h2>Analytical methods</h2>
+<div id="approssimazione-normal" class="section level3">
+<h3>Normal Approximation</h3>
+<p>The Normal approximation is a method that uses the asymptotic properties of the Normal distribution to solve the Posterior synthesis problem when numerical integration is not feasible.</p>
 <p><span class="math display">\[ (\theta - \hat \theta) \sim Normale(\overline \theta , \space \overline \Sigma) \\ hp. \space \space \hat \theta \rightarrow \space moda \space a \space psteriori  \]</span></p>
-<p>Questa prima approssimazione si basa sul Teorema centrale del limite, per calcolare i due parametri della normale <span class="math inline">\(\overline \theta\)</span> e <span class="math inline">\(\overline \Sigma\)</span> basta:</p>
+<p>This first approximation is based on the Central Limit Theorem. To calculate the two parameters of the normal <span class="math inline">\(\overline \theta\)</span> and <span class="math inline">\(\overline \Sigma\)</span> it suffices to:</p>
 <ul>
 <li>
 <span class="math inline">\(\overline \theta \rightarrow\)</span>
 </li>
 <ul>
-Come primo step di questo metodo occorre calcolare la moda a posteriori, quando il nucleo della distribuzione è noto si possono utilizzare direttamente le formule reperibili nei libri (o sui siti riferiti a quelle distribuzioni tipo wikipedia), alternativamente basta massimizzare il nucleo della posterior per <span class="math inline">\(\theta\)</span>
+As the first step of this method, we need to calculate the posterior mode. When the kernel of the distribution is known, one can directly use the formulae found in textbooks (or on reference sites like Wikipedia); alternatively, it suffices to maximise the posterior kernel with respect to <span class="math inline">\(\theta\)</span>
 </ul>
 <li>
 <span class="math inline">\(\overline \Sigma \rightarrow\)</span>
 </li>
 <ul>
-<p>Come secondo step per trovare <span class="math inline">\(\overline \Sigma\)</span> calcolo la derivata seconda del logaritmo della posterior e sostituisco al posto di <span class="math inline">\(\theta\)</span> la moda calcolata allo step precedente. <span class="math display">\[ - \frac{\partial^2 \space \log ( \pi(\theta | x))}{\partial \space\theta^2} \bigg|_{\theta= \overline \theta} \]</span></p>
+<p>As the second step, to find <span class="math inline">\(\overline \Sigma\)</span> calculate the second derivative of the logarithm of the posterior and substitute in place of <span class="math inline">\(\theta\)</span> the mode calculated in the previous step. <span class="math display">\[ - \frac{\partial^2 \space \log ( \pi(\theta | x))}{\partial \space\theta^2} \bigg|_{\theta= \overline \theta} \]</span></p>
 </ul>
 </ul>
-<p><br><br> N.B. Metodo alternativo ma molto poco utilizzato in questo ambito è calcolare <span class="math inline">\(\overline \theta\)</span> e <span class="math inline">\(\overline \Sigma\)</span> attraverso un double bootstrap.</p>
+<p><br><br> N.B. An alternative method, though rarely used in this context, is to calculate <span class="math inline">\(\overline \theta\)</span> and <span class="math inline">\(\overline \Sigma\)</span> through a double bootstrap.</p>
 <p><br><br><br></p>
 </div>
 <div id="approssimazione-di-laplace" class="section level3">
-<h3>Approssimazione di Laplace</h3>
-<p><span class="math display">\[hp.\space E^{\pi(.|x)}[g(\theta)]= \int_{\Theta}{g(\theta) \space \pi(\theta | x)} \space \space d\theta= \int_\Theta e^{n \space h(\theta) }\space d\theta \\ dove \space \space h(\theta)= \frac1 n \log\bigg(g(\theta) \pi(\theta | \underline x)\bigg) \]</span></p>
-<p>Se faccio lo sviluppo di Taylor di <span class="math inline">\(h(\theta)\)</span> fino al secondo ordine ottengo:</p>
-<p><span class="math display">\[h(\theta^*) \approx h(\theta^*) + (\theta-\theta^*)\space h^|(\theta^*)+\frac{(\theta-\theta^*)^2}{2}\space h^{||}(\theta^*) \\ dove \space \space \theta^*= \hat\theta_{SMV}= moda \space a \space posteriori \]</span></p>
-<p>Quindi:</p>
+<h3>Laplace Approximation</h3>
+<p><span class="math display">\[hp.\space E^{\pi(.|x)}[g(\theta)]= \int_{\Theta}{g(\theta) \space \pi(\theta | x)} \space \space d\theta= \int_\Theta e^{n \space h(\theta) }\space d\theta \\ where \space \space h(\theta)= \frac1 n \log\bigg(g(\theta) \pi(\theta | \underline x)\bigg) \]</span></p>
+<p>If we perform the Taylor expansion of <span class="math inline">\(h(\theta)\)</span> up to the second order we get:</p>
+<p><span class="math display">\[h(\theta^*) \approx h(\theta^*) + (\theta-\theta^*)\space h^|(\theta^*)+\frac{(\theta-\theta^*)^2}{2}\space h^{||}(\theta^*) \\ where \space \space \theta^*= \hat\theta_{SMV}= moda \space a \space posteriori \]</span></p>
+<p>Therefore:</p>
 <p><span class="math display">\[\int_\Theta e^{n \space h(\theta) }\space d\theta \approx \int_\Theta e^{n \space \bigg[ h(\theta^*) + (\theta-\theta^*)\space h^|(\theta^*)+\frac{(\theta-\theta^*)^2}{2}\space h^{||}(\theta^*) \bigg] }\space d\theta \approx \\ \approx e^{n \space h(\theta) } \int_\Theta e^{n \space \frac{(\theta-\theta^*)^2}{2}\space h^{||}(\theta^*)
 }\space d\theta \]</span></p>
-<p>Tentando di riconoscere all’interno dell’integrale una Normale questa può essere riscritta come:</p>
+<p>Trying to recognise a Normal distribution within the integral, this can be rewritten as:</p>
 <p><span class="math display">\[\approx e^{n \space h(\theta) } \sqrt{2 \pi} \sigma \int_\Theta \frac{1}{\sqrt{2 \pi}} \frac{1}{\sigma} e^{n \space \frac{(\theta-\theta^*)^2}{2}\space h^{||}(\theta^*)
 }\space d\theta \approx \\ \approx e^{n \space h(\theta) } \sqrt{2 \pi} \sigma \int_\Theta \frac{1}{\sqrt{2 \pi \sigma^2}} \space e^{-\frac12 \space \frac{(\theta-\theta^*)^2}{- \frac{1}{n\space h^{||}(\theta^*)} }\space 
 }\space d\theta \]</span></p>
-<p>Tutto cio che c’è all’interno dell’integrale equivale ad 1 in quanto è una <span class="math inline">\(Normale(\theta^*, \space- \frac{1}{n\space h^{||}(\theta^*)})\)</span>, inoltre fuori dall’integrale c’è <span class="math inline">\(\sigma\)</span> che corrisponde a <span class="math inline">\(\sigma=\sqrt{- \frac{1}{n\space h^{||}(\theta^*)}}\)</span></p>
-<p>Quindi:</p>
+<p>Everything inside the integral equals 1 since it is a <span class="math inline">\(Normale(\theta^*, \space- \frac{1}{n\space h^{||}(\theta^*)})\)</span>, furthermore fuori dall’integrale c’è <span class="math inline">\(\sigma\)</span> which corresponds to <span class="math inline">\(\sigma=\sqrt{- \frac{1}{n\space h^{||}(\theta^*)}}\)</span></p>
+<p>Therefore:</p>
 <p><span class="math display">\[ \approx e^{n \space h(\theta) } \sqrt{2 \pi} \sigma \approx e^{n \space h(\theta) } \sqrt{2 \pi} \sqrt{- \frac{1}{n\space h^{||}(\theta^*)}} \approx \\ \approx  e^{n \space h(\theta) }  \sqrt{- \frac{2 \pi}{n\space h^{||}(\theta^*)}}  \]</span></p>
-<p>Con questo metodo a differenza della approssimazione Normale è necessaria la conoscenza di <span class="math inline">\(m(x)\)</span> in quanto all’interno di <span class="math inline">\(h\)</span> è presente.</p>
+<p>With this method, unlike the Normal approximation, knowledge of <span class="math inline">\(m(x)\)</span> in quanto all’interno di <span class="math inline">\(h\)</span> it is present.</p>
 </div>
 </div>
-<div id="metodi-simulativi" class="section level2">
-<h2>Metodi simulativi</h2>
-<p>I metodi di simulazione ricostruiscono le caratteristiche di una distribuzione complessa (nel nostro caso la posterior) tramite un campione di elementi indipendenti generato dalla distribuzione.</p>
-<div id="metodi-monte-carlo" class="section level3">
-<h3>Metodi Monte Carlo</h3>
-<p>Se conosco <span class="math inline">\(\pi(\theta | \underline x)\)</span> e posso fare estazioni da essa in modo i.i.d. allora posso utilizzare le tecniche monte carlo per stimare il valore atteso della posterior. In questa parte si spiegherà il metodo utilizzato in questo ambito mentre si lascia una spiegazione dettagliata del Metodo Monte Carlo all’articolo dedicato (<a href="https://giacomosaccaggi.github.io/articoli/MC.html">link articolo</a>).</p>
+<div id="methods-simulativi" class="section level2">
+<h2>Simulation methods</h2>
+<p>Simulation methods reconstruct the characteristics of a complex distribution (in our case the posterior) through a sample of independent elements generated from the distribution.</p>
+<div id="methods-monte-carlo" class="section level3">
+<h3>Monte Carlo Methods</h3>
+<p>If we know <span class="math inline">\(\pi(\theta | \underline x)\)</span> and posso fare estazioni da essa in modo i.i.d. allora posso utilizzare the tecniche monte carlo per estimatere the value atteso of the posterior. In this parte it spiegherà the method utilizzato in this ambito mentre it lascia a spiegazione dettagliata of the Metodo Monte Carlo all’articolo dedicato (<a href="https://giacomosaccaggi.github.io/deep-dives/MC.html">link articolo</a>).</p>
 <ul>
 <li>
 STEP 1:
 </li>
-Simulo <span class="math inline">\(m\)</span> valori pseudo casuali da <span class="math inline">\(\pi(\theta | \underline x)\)</span> <span class="math display">\[\theta_1,...,\theta_m \sim \pi(\theta | \underline x) \\ t.c. \space \space m \gg0\]</span>
+I simulate <span class="math inline">\(m\)</span> pseudo-random values from <span class="math inline">\(\pi(\theta | \underline x)\)</span> <span class="math display">\[\theta_1,...,\theta_m \sim \pi(\theta | \underline x) \\ t.c. \space \space m \gg0\]</span>
 <li>
 STEP 2:
 </li>
-Una volta generati i valori stimo il valore atteso: <span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{m}\sum_{i=1}^m g(\theta_i) \]</span>
+Once the values are generated, I estimate the expected value: <span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{m}\sum_{i=1}^m g(\theta_i) \]</span>
 </ul>
-<p>N.B. Per avere una stima intervallare si può sfruttare il Teorema Centrale del Limite e la legge forte dei grandi numeri per calcolare un intervallo di confidenza:</p>
+<p>N.B. To obtain an interval estimate, we can exploit the Central Limit Theorem and the Strong Law of Large Numbers to calculate a confidence interval:</p>
 <p><span class="math display">\[ \overline g_m \space  \pm \space  Z_{1-\frac{\alpha}{2}} \space \space \sqrt{\hat{Var}( \overline g_m)} \\ \rightarrow \hat{Var}( \overline g_m) = \frac{\sum_{i=1}^m\bigg(g(\theta_i)- \overline g_m \bigg)}{m(m-1)}\]</span></p>
 </div>
-<div id="metodi-monte-carlo-importance-sampling-mcis" class="section level3">
-<h3>Metodi Monte Carlo Importance Sampling (MCIS)</h3>
-<p>Questo secondo meccanismo di stima è una versione ponderata del metodo MC che utilizza delle funzioni ausiliarie per trovare un campione indipendente e identicamente distribuito della posterior, può essere molto utile quando non si conosce la posterior.</p>
+<div id="methods-monte-carlo-importance-sampling-mcis" class="section level3">
+<h3>Monte Carlo Methods Importance Sampling (MCIS)</h3>
+<p>This second estimation mechanism is a weighted version of the MC method that uses auxiliary functions to find an independent and identically distributed sample of the posterior; it can be very useful when the posterior is unknown.</p>
 <ul>
 <li>
 STEP 1:
 </li>
-Occorre scegliere una funzione <span class="math inline">\(h(\theta)\)</span> con lo stesso supporto della posterior <span class="math inline">\(\pi(\theta | \underline x)\)</span>
+We need to choose a function <span class="math inline">\(h(\theta)\)</span> with the same support as the posterior <span class="math inline">\(\pi(\theta | \underline x)\)</span>
 <li>
 STEP 2:
 </li>
-Simulo <span class="math inline">\(m\)</span> valori pseudo casuali da <span class="math inline">\(h(\theta)\)</span> <span class="math display">\[\theta'_1,...,\theta'_m \sim h(\theta) \\ t.c. \space \space m \gg0\]</span> Ora servono dei pesi che bilanciano <span class="math inline">\(h\)</span> (quando è vicina alla posterior i pesi saranno 1 mentre quando è lontana la deve riavvicinare).
+I simulate <span class="math inline">\(m\)</span> pseudo-random values from <span class="math inline">\(h(\theta)\)</span> <span class="math display">\[\theta'_1,...,\theta'_m \sim h(\theta) \\ t.c. \space \space m \gg0\]</span> Now we need weights that balance <span class="math inline">\(h\)</span> (when it is close to the posterior the weights will be 1, while when it is far the weights must bring it closer).
 <li>
 STEP 3:
 </li>
-Una volta generati i valori stimo il valore atteso: <span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{m}\sum_{i=1}^m \frac{\pi(\theta'_i|x)}{h(\theta'_i)}g(\theta'_i) \]</span>
+Once the values are generated, I estimate the expected value: <span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{m}\sum_{i=1}^m \frac{\pi(\theta'_i|x)}{h(\theta'_i)}g(\theta'_i) \]</span>
 </ul>
-<p><br> <b>Osservazione:</b><br> Se non conosco la posterior e la prior è propria allora posso intedere la posterior come $( | ) = $ da cui simulare i valori:</p>
+<p><br> <b>Observation:</b><br> If we do not know the posterior and the prior is proper, then we can express the posterior as $( | ) = $ from which to simulate the values:</p>
 <p><span class="math display">\[E^{\pi(.|x)}[g(\theta)]= \int_{\Theta}{g(\theta) \space \pi(\theta | x)} \space \space d\theta =\\= \int_{\Theta}{g(\theta) \space \frac{ f(\underline{x} | \theta) \pi(\theta)}{m(x)}} \space \space d\theta = \\ = \frac{ \int_\Theta g(\theta) f(\underline{x} | \theta) \pi(\theta) \space \space d\theta }{\int_\Theta f(\underline{x} | \theta) \pi(\theta) \space \space d\theta }\]</span></p>
-<p>Quindi se intendo come <span class="math inline">\(h(\theta)= \pi(\theta)\)</span> (si può utilizzare anche <span class="math inline">\(f(\underline x,\theta)\)</span> se è riconoscibile), allora:</p>
+<p>Therefore if we take as <span class="math inline">\(h(\theta)= \pi(\theta)\)</span> (one can also use <span class="math inline">\(f(\underline x,\theta)\)</span> if it is recognisable), then:</p>
 <p><span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \frac{\frac{1}{m}\sum_{i=1}^m \space  \space g(\theta'_i) \space f(\underline x | \theta'_i) }{\frac{1}{m}\sum_{i=1}^m \space  \space f(\underline x | \theta'_i)} = \\ = \sum_{i=1}^m\frac{ \space  \space g(\theta'_i) \space f(\underline x | \theta'_i) }{ \space  \space f(\underline x | \theta'_i)}\]</span></p>
-<p>N.B. Anche per MCIS vale la legge forte dei grandi numeri e il teorema centrale del limite.</p>
+<p>N.B. For MCIS too, the Strong Law of Large Numbers and the Central Limit Theorem apply.</p>
 </div>
 <div id="monte-carlo-markov-chain-mcmc" class="section level3">
 <h3>Monte Carlo Markov Chain (MCMC)</h3>
 <div id="gibbs-sampling" class="section level4">
 <h4>GIBBS SAMPLING</h4>
-<p>Impostiamo il problema classico nel caso multivariato, quindi con una serie di parametri da stimare con un approccio bayesiano:</p>
+<p>Let us set up the classical problem in the multivariate case, with a series of parameters to estimate using a Bayesian approach:</p>
 <p><span class="math display">\[x \sim f \space \space \underline \theta \space t.c. \theta_i \sim \pi_i(\theta_i) \space \space con \space \space i=1,...,k\]</span></p>
 <ul>
 <li>
-Step 1: Calcolo le <b>FULL CONDITIONAL</b>:
+Step 1: Compute the <b>FULL CONDITIONAL</b>:
 </li>
-<p><span class="math inline">\(x|\theta \sim x \Rightarrow\)</span> funzione di densità della x</p>
+<p><span class="math inline">\(x|\theta \sim x \Rightarrow\)</span> density function of x</p>
 <span class="math inline">\(\theta_i|x \sim \pi_i(\theta_i| \underline x) \Rightarrow\)</span> posterior
 <li>
-Step 2: Inizializzo un vettore in modo arbitrario:
+Step 2: Initialise a vector arbitrarily:
 </li>
 <p><span class="math display">\[(x^0, \theta_1^0,...,\theta_k^0) \Rightarrow \space in \space modo \space arbitrario\]</span></p>
 <li>
-Step 3: Estrazione ricorsiva
+Step 3: Recursive extraction
 </li>
-<p>Per <span class="math inline">\(\theta_1\)</span> al tempo 1</p>
-<p><span class="math inline">\(\theta_1^1 \Rightarrow\)</span> estraggo <span class="math inline">\(\theta^1\)</span> al tempo 1 dalla posterior <span class="math inline">\(x=x^0\)</span> e <span class="math inline">\(\theta_2 = \theta_2^0\)</span> …</p>
-<p>Per <span class="math inline">\(\theta_2\)</span> al tempo 1</p>
-<p><span class="math inline">\(\theta_2^1 \Rightarrow\)</span> estraggo <span class="math inline">\(\theta^2\)</span> al tempo 1 dalla posterior <span class="math inline">\(x=x^0\)</span> e <span class="math inline">\(\theta_1 = \theta_1^1, \theta_3 = \theta_3^0\)</span> …</p>
-<p>… così per i <span class="math inline">\(\theta_i\)</span> con <span class="math inline">\(i=1,...,k\)</span></p>
-<p><span class="math inline">\(x^1\)</span> estraggo <span class="math inline">\(x^1\)</span> al tempo 1 da <span class="math inline">\(f(\underline x | \theta_1 = \theta_1^1, ..., \theta_k = \theta_k^1)\)</span></p>
+<p>For <span class="math inline">\(\theta_1\)</span> at time 1</p>
+<p><span class="math inline">\(\theta_1^1 \Rightarrow\)</span> I draw <span class="math inline">\(\theta^1\)</span> at time 1 from the posterior <span class="math inline">\(x=x^0\)</span> and <span class="math inline">\(\theta_2 = \theta_2^0\)</span> …</p>
+<p>For <span class="math inline">\(\theta_2\)</span> at time 1</p>
+<p><span class="math inline">\(\theta_2^1 \Rightarrow\)</span> I draw <span class="math inline">\(\theta^2\)</span> at time 1 from the posterior <span class="math inline">\(x=x^0\)</span> and <span class="math inline">\(\theta_1 = \theta_1^1, \theta_3 = \theta_3^0\)</span> …</p>
+<p>… and so on for the <span class="math inline">\(\theta_i\)</span> con <span class="math inline">\(i=1,...,k\)</span></p>
+<p><span class="math inline">\(x^1\)</span> I draw <span class="math inline">\(x^1\)</span> at time 1 da <span class="math inline">\(f(\underline x | \theta_1 = \theta_1^1, ..., \theta_k = \theta_k^1)\)</span></p>
 <li>
-Reitero il processo <span class="math inline">\(m+n\)</span> volte
+I reiterate the process <span class="math inline">\(m+n\)</span> times
 </li>
 </ul>
 <p><br><br></p>
-<p><b>Perchè per <span class="math inline">\(m+n\)</span> volte?</b></p>
-<p><br>Perchè devo aspettare per un tempo <span class="math inline">\(m\)</span> che la catena raggiunga convergenza.<br><br></p>
+<p><b>Why for <span class="math inline">\(m+n\)</span> times?</b></p>
+<p><br>Because we must wait for a time <span class="math inline">\(m\)</span> for the chain to reach convergence.<br><br></p>
 <p><img src="data:image/png;base64,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" width="672" /></p>
 <p><span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{n}\sum_{i=m}^{m+n} g(\theta_i) \]</span></p>
 </div>
 <div id="metropolis-hastings" class="section level4">
-<h4>METROPOLIS HASTINGS</h4>
-<p>Si tratta di un algoritmo di Accettazione e Rifiuto.</p>
-<p>Si indica con <span class="math inline">\(q(\theta,\theta')\)</span> la proposal, ossia la legge di <span class="math inline">\(\theta'\)</span> condizionata a <span class="math inline">\(\theta\)</span></p>
-<p>Se estraggo da <span class="math inline">\(q\)</span> un candidato <span class="math inline">\(\theta'\)</span> la sua probabilità di accettazione è:</p>
+<h4>METROPOLIS-HASTINGS</h4>
+<p>This is an Accept-Reject algorithm.</p>
+<p>We denote by <span class="math inline">\(q(\theta,\theta')\)</span> the proposal, i.e. the law of <span class="math inline">\(\theta'\)</span> conditioned on <span class="math inline">\(\theta\)</span></p>
+<p>Se I draw da <span class="math inline">\(q\)</span> a candidate <span class="math inline">\(\theta'\)</span> its acceptance probability is:</p>
 <p><span class="math display">\[\alpha(\theta, \theta')= \begin{cases} \min\bigg\{\frac{\pi(\theta'|\underline x) \space q(\theta',\theta)}{\pi(\theta|\underline x) \space q(\theta,\theta')}\space \space, 1 \bigg\} &amp;se &amp;\pi(\theta'|\underline x) \space q(\theta',\theta) \ne 0   \\ 1 &amp;se &amp;\pi(\theta'|\underline x) \space q(\theta',\theta) = 0 \end{cases}\]</span></p>
-<p>Operativamente per implementare questo metodo occorre procedere seguendo 5 steps:</p>
+<p>Operationally, to implement this method we proceed following 5 steps:</p>
 <ul>
 <li>
-si fissa un <span class="math inline">\(\theta^0\)</span> in modo arbitrario (per velocizzare la converngenza si può scegliere tra media, mediano, moda …);
+fix a <span class="math inline">\(\theta^0\)</span> arbitrarily (to speed up convergence one can choose among mean, median, mode...);
 </li>
 <li>
-Si genera il candidato <span class="math inline">\(\theta'\)</span> da <span class="math inline">\(q(\theta^0,\theta')\)</span>;
+Generate the candidate <span class="math inline">\(\theta'\)</span> da <span class="math inline">\(q(\theta^0,\theta')\)</span>;
 </li>
 <li>
-Si genera <span class="math inline">\(u\)</span> da una uniforme <span class="math inline">\(U(0,1)\)</span> (essa ovviamente deve essere indipendente dalle precedenti generazioni);
+Generate <span class="math inline">\(u\)</span> from a uniform <span class="math inline">\(U(0,1)\)</span> (it must obviously be independent from previous generations);
 </li>
 <li>
-Se <span class="math display">\[U \leq\alpha(\theta^0, \theta')\]</span> Allora accetto il candidato come possibile generazione della posterior;
+Se <span class="math display">\[U \leq\alpha(\theta^0, \theta')\]</span> Then accept the candidate as a possible generation from the posterior;
 </li>
 <li>
-Reitero questo ragonamento <b>n+m volte</b> (per la convergenza).
+Reitero this ragonamento <b>n+m times</b> (per the convergenza).
 </li>
 </ul>
-<p>Una volta ottenuto il campione casuale di generazioni della posterior opero come con i metodi precedenti, quindi:</p>
+<p>Once the random sample of posterior generations is obtained, we proceed as with the previous methods:</p>
 <p><span class="math display">\[E^{\pi(.|x)}[g(\theta)] \cong \overline g_m = \frac{1}{n}\sum_{i=m}^{m+n} g(\theta_i) \]</span></p>
-<p>Di questo ultimo metodo ci sono due sviluppi (o modifiche) che permettono l’utilizzo di questo ache in altre situazioni:</p>
+<p>Di this ultimo method ci are due sviluppi (o modifiche) that permettono l’utilizzo di this ache in altre situazioni:</p>
 <ul>
 <ol style="list-style-type: lower-alpha">
 <li>Metropolis Random Walk
 <ul>
-Tiene in considerazione lo stato assunto al passo precedente <span class="math inline">\(\theta'=\theta+w\)</span>
+Takes into account the state assumed at the previous step <span class="math inline">\(\theta'=\theta+w\)</span>
 </ul></ul>
 <ul>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>Indipendent Metropolis
+<li>Independent Metropolis
 <ul>
-Si generano i <span class="math inline">\(\theta'\)</span> da qualche legge di distribuzione che non presenta <span class="math inline">\(\theta\)</span> (questo metodo di fatto risulta essere operativamente uguale a come si utilizza l’algoritmo accettazione e rifiuto nell’ambito di generazione dei numeri pseudo-casuali)
+The <span class="math inline">\(\theta'\)</span> are generated from some distribution law that does not involve <span class="math inline">\(\theta\)</span> (questo method di fatto risulta essere operativamente uguale a as it utilizza l’algoritmo accettazione and rifiuto nell’ambito di generazione of the numeri pseudo-random)
 </ul>
 </ul></li>
 </ol></li>

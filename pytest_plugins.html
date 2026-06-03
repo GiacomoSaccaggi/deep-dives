@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Weasleys' Wizard Wheezes: The Plugin Ecosystem</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Weasleys' Wizard Wheezes: The Plugin Ecosystem</h2>
+                        <hr class="small">
+                        <h5>Pytest Plugins &mdash; Magical Gadgets for Every Occasion</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<h2>🧙‍♂️ Welcome to Weasleys' Wizard Wheezes!</h2>
+<p>Step right up! Just as Fred and George's joke shop offered magical products for every conceivable need, the pytest plugin ecosystem extends your testing toolkit without modifying pytest's core. Each plugin is a cleverly packaged invention &mdash; install it, configure it, and watch the magic happen.</p>
+
+<h3>1. What Are Plugins? &mdash; Extendable Magic</h3>
+<p>Plugins are packages that hook into pytest's internal machinery. They can modify test collection, change reporting, add fixtures, or alter execution &mdash; all without touching pytest's source code. It's like enchanting your wand with new spells without reshaping the wood.</p>
+<pre><code class="python"># Installing any plugin is as simple as:
+pip install pytest-PLUGINNAME
+
+# pytest auto-discovers installed plugins. No configuration needed!
+# Check what's loaded:
+pytest --co -q  # shows collected tests with active plugins
+</code></pre>
+
+<h3>2. pytest-cov &mdash; The Sneakoscope (Coverage Detection)</h3>
+<p>A Sneakoscope spins when something untrustworthy is nearby. <code>pytest-cov</code> reveals untested code lurking in the shadows:</p>
+<pre><code class="python"># Install
+pip install pytest-cov
+
+# Run with coverage report
+pytest --cov=mypackage --cov-report=term-missing
+
+# Output shows which lines are NOT covered:
+# Name                 Stmts   Miss  Cover   Missing
+# mypackage/spells.py    42      7    83%    23-25, 31, 40-42
+</code></pre>
+
+<h3>3. pytest-xdist &mdash; The Time-Turner (Parallel Execution)</h3>
+<p>Hermione used a Time-Turner to attend multiple classes simultaneously. <code>pytest-xdist</code> runs tests in parallel across multiple CPUs:</p>
+<pre><code class="python"># Install
+pip install pytest-xdist
+
+# Run tests on 4 parallel workers
+pytest -n 4
+
+# Auto-detect number of CPUs
+pytest -n auto
+
+# Distribute by file (faster for many small test files)
+pytest -n 4 --dist=loadfile
+</code></pre>
+<p>Your CI pipeline just got a Time-Turner. A 10-minute suite might shrink to 3 minutes!</p>
+
+<h3>4. pytest-randomly &mdash; The Sorting Hat (Shuffled Order)</h3>
+<p>The Sorting Hat assigns houses unpredictably. <code>pytest-randomly</code> shuffles test execution order to catch hidden dependencies:</p>
+<pre><code class="python"># Install
+pip install pytest-randomly
+
+# Tests now run in random order by default!
+# To reproduce a specific order, use the seed from output:
+pytest -p randomly --randomly-seed=12345
+
+# Disable for a single run:
+pytest -p no:randomly
+</code></pre>
+
+<h3>5. pytest-timeout &mdash; The Stunning Spell (Time Limits)</h3>
+<p>Stupefy! If a test runs too long, stun it:</p>
+<pre><code class="python"># Install
+pip install pytest-timeout
+
+# Set a global timeout of 30 seconds
+pytest --timeout=30
+
+# Or per-test with a marker:
+import pytest
+
+@pytest.mark.timeout(5)
+def test_quick_spell():
+    """This must complete in 5 seconds or be stunned."""
+    result = cast_complex_charm()
+    assert result is not None
+</code></pre>
+
+<h3>6. pytest-mock &mdash; Polyjuice Potion (Mocking)</h3>
+<p>Polyjuice Potion lets you impersonate anyone. <code>pytest-mock</code> provides the <code>mocker</code> fixture for easy mocking:</p>
+<pre><code class="python"># Install
+pip install pytest-mock
+
+def test_send_owl(mocker):
+    """Mock the owl delivery service."""
+    # Polyjuice: make a fake owl service
+    mock_owl = mocker.patch("hogwarts.mail.send_owl")
+    mock_owl.return_value = {"status": "delivered"}
+
+    from hogwarts.mail import deliver_letter
+    result = deliver_letter("Harry", "You're a wizard!")
+
+    mock_owl.assert_called_once_with("Harry", "You're a wizard!")
+    assert result["status"] == "delivered"
+</code></pre>
+
+<h3>7. pytest-asyncio &mdash; The Floo Network (Async Testing)</h3>
+<p>The Floo Network handles asynchronous travel. <code>pytest-asyncio</code> lets you test <code>async</code> code naturally:</p>
+<pre><code class="python"># Install
+pip install pytest-asyncio
+
+import pytest
+
+@pytest.mark.asyncio
+async def test_floo_travel():
+    """Test async fireplace transportation."""
+    destination = await floo_network.travel("Diagon Alley")
+    assert destination.name == "Diagon Alley"
+    assert destination.arrived is True
+</code></pre>
+
+<h3>8. pytest-snapshot &mdash; The Pensieve (Snapshot Testing)</h3>
+<p>A Pensieve stores memories for comparison. <code>pytest-snapshot</code> stores expected outputs and compares against them:</p>
+<pre><code class="python"># Install
+pip install pytest-snapshot
+
+def test_spell_catalog(snapshot):
+    """Snapshot the spell catalog output."""
+    catalog = generate_spell_catalog()
+    snapshot.assert_match(catalog, "spell_catalog.txt")
+
+# First run: creates the snapshot file
+# Subsequent runs: compares against stored snapshot
+# Update snapshots: pytest --snapshot-update
+</code></pre>
+
+<h3>9. pytest-html &mdash; The Daily Prophet (HTML Reports)</h3>
+<p>The Daily Prophet delivers news in a readable format. <code>pytest-html</code> generates beautiful HTML test reports:</p>
+<pre><code class="python"># Install
+pip install pytest-html
+
+# Generate a report
+pytest --html=report.html --self-contained-html
+
+# The report includes:
+# - Pass/fail summary
+# - Duration per test
+# - Captured logs and stdout
+# - Environment metadata
+</code></pre>
+
+<h3>Quick Reference &mdash; The Product Catalog</h3>
+<table class="table table-condensed">
+<tr><th>Plugin</th><th>Weasley Product</th><th>Purpose</th></tr>
+<tr><td><code>pytest-cov</code></td><td>Sneakoscope</td><td>Code coverage reports</td></tr>
+<tr><td><code>pytest-xdist</code></td><td>Time-Turner</td><td>Parallel test execution</td></tr>
+<tr><td><code>pytest-randomly</code></td><td>Sorting Hat</td><td>Randomize test order</td></tr>
+<tr><td><code>pytest-timeout</code></td><td>Stupefy</td><td>Kill slow tests</td></tr>
+<tr><td><code>pytest-mock</code></td><td>Polyjuice Potion</td><td>Easy mocking</td></tr>
+<tr><td><code>pytest-asyncio</code></td><td>Floo Network</td><td>Async test support</td></tr>
+<tr><td><code>pytest-snapshot</code></td><td>Pensieve</td><td>Snapshot/golden testing</td></tr>
+<tr><td><code>pytest-html</code></td><td>Daily Prophet</td><td>HTML report generation</td></tr>
+</table>
+
+<p><em>"Why are you worrying about You-Know-Who? You should be worrying about U-No-Poo &mdash; the constipation sensation that's gripping the nation!"</em> &mdash; Weasleys' Wizard Wheezes advertisement (but also: don't worry about testing complexity when plugins handle it for you).</p>
+
+    </div>
+
+    <script>
+      (function () {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+        document.getElementsByTagName("head")[0].appendChild(script);
+      })();
+    </script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

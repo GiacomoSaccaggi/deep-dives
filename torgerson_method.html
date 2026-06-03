@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Torgerson Method: Psychometric Scaling</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Torgerson Method: Psychometric Scaling</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Psychometric scaling is the process of transforming qualitative judgments into quantitative scales. It is widely used in market research, psychology, and sensory analysis. The fundamental goal is to assign numerical values to stimuli based on paired comparisons or category judgments.</p>
+<p>When subjects evaluate stimuli (products, brands, statements), their responses are inherently ordinal. Psychometric scaling methods provide a principled way to construct interval-level measurement from these ordinal observations, enabling meaningful arithmetic operations on the resulting scale values.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="the-problem" class="section level2">
+<h2>The Problem</h2>
+<p>Given <span class="math inline">\(K\)</span> stimuli evaluated by judges on ordinal categories, we want to construct an <strong>interval scale</strong> — a scale where differences between values are meaningful and comparable.</p>
+<p>Stimuli can be of many kinds:</p>
+<ul>
+<li>Product attributes (taste, quality, design)</li>
+<li>Brand perceptions (luxury, reliability, innovation)</li>
+<li>Attitude statements (agreement scales)</li>
+<li>Sensory intensities (sweetness, loudness, brightness)</li>
+</ul>
+<p>The key assumption underlying all scaling methods in this family is that there exists a <strong>latent continuous variable</strong> driving the observed categorical judgments. This is the foundation of Thurstone's model: each stimulus occupies a position on a psychological continuum, and observed judgments are noisy reflections of these true positions.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="thurstones-law" class="section level2">
+<h2>Thurstone's Law of Comparative Judgment</h2>
+<p>Thurstone (1927) proposed that each stimulus <span class="math inline">\(i\)</span> evokes a <strong>discriminal process</strong> — a random variable representing its perceived value on any given occasion:</p>
+<p><span class="math display">\[ X_i \sim N(S_i, \sigma_i^2) \]</span></p>
+<p>where <span class="math inline">\(S_i\)</span> is the true scale value (mean of the discriminal process) and <span class="math inline">\(\sigma_i^2\)</span> is the discriminal dispersion.</p>
+
+<div id="general-form" class="section level3">
+<h3>General Form</h3>
+<p>When a judge compares stimuli <span class="math inline">\(j\)</span> and <span class="math inline">\(i\)</span>, the probability that <span class="math inline">\(j\)</span> is judged greater than <span class="math inline">\(i\)</span> is:</p>
+<p><span class="math display">\[ P(j > i) = \Phi\left( \frac{S_j - S_i}{\sqrt{\sigma_i^2 + \sigma_j^2 - 2\rho_{ij}\sigma_i\sigma_j}} \right) \]</span></p>
+<p>where <span class="math inline">\(\Phi\)</span> is the standard normal CDF and <span class="math inline">\(\rho_{ij}\)</span> is the correlation between discriminal processes for stimuli <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>.</p>
+</div>
+
+<div id="case-v" class="section level3">
+<h3>Case V Simplification</h3>
+<p>Thurstone's Case V assumes equal discriminal dispersions (<span class="math inline">\(\sigma_i = \sigma\)</span> for all <span class="math inline">\(i\)</span>) and zero correlations (<span class="math inline">\(\rho_{ij} = 0\)</span>). Under these assumptions:</p>
+<p><span class="math display">\[ P(j > i) = \Phi\left( \frac{S_j - S_i}{\sigma\sqrt{2}} \right) \]</span></p>
+<p>This is the most commonly used form because it requires the fewest parameters to estimate and leads directly to Torgerson's scaling method.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="torgersons-method" class="section level2">
+<h2>Torgerson's Method (1958)</h2>
+<p>Torgerson provided a systematic procedure to recover scale values from observed comparison data under Case V assumptions. The method proceeds in four steps:</p>
+
+<div id="step1" class="section level3">
+<h3>Step 1: Collect Data</h3>
+<p>Collect paired comparison or category judgment data and organize into a <strong>frequency matrix</strong> <span class="math inline">\(F\)</span>, where <span class="math inline">\(F_{ij}\)</span> is the number of times stimulus <span class="math inline">\(j\)</span> was judged greater than stimulus <span class="math inline">\(i\)</span>.</p>
+</div>
+
+<div id="step2" class="section level3">
+<h3>Step 2: Proportion Matrix</h3>
+<p>Convert frequencies to proportions:</p>
+<p><span class="math display">\[ P_{ij} = \frac{F_{ij}}{N} \]</span></p>
+<p>where <span class="math inline">\(N\)</span> is the total number of judges. <span class="math inline">\(P_{ij}\)</span> represents the proportion of judges who rated stimulus <span class="math inline">\(j\)</span> higher than stimulus <span class="math inline">\(i\)</span>.</p>
+</div>
+
+<div id="step3" class="section level3">
+<h3>Step 3: Z-score Transformation</h3>
+<p>Apply the inverse normal (probit) transformation to each proportion:</p>
+<p><span class="math display">\[ Z_{ij} = \Phi^{-1}(P_{ij}) \]</span></p>
+<p>Under Case V, we have <span class="math inline">\(Z_{ij} = \frac{S_j - S_i}{\sigma\sqrt{2}}\)</span>, which is the key relationship linking observed data to latent scale values.</p>
+</div>
+
+<div id="step4" class="section level3">
+<h3>Step 4: Compute Scale Values</h3>
+<p>The scale values are obtained as column means of the <span class="math inline">\(Z\)</span> matrix:</p>
+<p><span class="math display">\[ S_j = \frac{1}{K} \sum_{i=1}^{K} Z_{ij} \]</span></p>
+<p>This works because summing over rows for a fixed column <span class="math inline">\(j\)</span>:</p>
+<p><span class="math display">\[ \sum_{i=1}^{K} Z_{ij} = \frac{1}{\sigma\sqrt{2}} \sum_{i=1}^{K}(S_j - S_i) = \frac{K \cdot S_j - \sum_i S_i}{\sigma\sqrt{2}} \]</span></p>
+<p>Setting the scale origin such that <span class="math inline">\(\sum_i S_i = 0\)</span> and unit such that <span class="math inline">\(\sigma\sqrt{2} = 1\)</span>, the column mean directly yields <span class="math inline">\(S_j\)</span>.</p>
+<p><strong>Note:</strong> The resulting scale is an <strong>interval scale</strong> — the origin and unit of measurement are arbitrary. Only differences between scale values are meaningful.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="categories-to-paired" class="section level2">
+<h2>From Categories to Paired Comparisons</h2>
+<p>When data comes from category ratings rather than direct paired comparisons, Torgerson's method can still be applied with an intermediate step:</p>
+<ol>
+<li><strong>Construct the cumulative frequency matrix</strong>: for each stimulus <span class="math inline">\(i\)</span> and category boundary <span class="math inline">\(g\)</span>, compute the cumulative proportion <span class="math inline">\(C_{ig}\)</span> of judges placing stimulus <span class="math inline">\(i\)</span> at or below category <span class="math inline">\(g\)</span>.</li>
+<li><strong>Apply the normal deviate transformation</strong> at each category boundary:
+<span class="math display">\[ Z_{ig} = \Phi^{-1}(C_{ig}) \]</span></li>
+<li><strong>Estimate thresholds and scale values simultaneously</strong>: category boundaries <span class="math inline">\(t_g\)</span> and stimulus scale values <span class="math inline">\(S_i\)</span> are related by:
+<span class="math display">\[ Z_{ig} = \frac{t_g - S_i}{\sigma} \]</span></li>
+</ol>
+<p>Thresholds are estimated as row means and scale values as column means (with sign reversal) of the <span class="math inline">\(Z\)</span> matrix, analogous to the paired comparison case.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="goodness-of-fit" class="section level2">
+<h2>Goodness of Fit</h2>
+<p>Once scale values are estimated, we can assess how well the Case V model fits the data through an internal consistency check.</p>
+
+<div id="predicted-proportions" class="section level3">
+<h3>Predicted Proportions</h3>
+<p>From the estimated scale values, compute predicted proportions:</p>
+<p><span class="math display">\[ \hat{P}_{ij} = \Phi\left( \frac{S_j - S_i}{\sigma\sqrt{2}} \right) \]</span></p>
+</div>
+
+<div id="discrepancy" class="section level3">
+<h3>Discrepancy Assessment</h3>
+<p>Compare predicted <span class="math inline">\(\hat{P}_{ij}\)</span> with observed <span class="math inline">\(P_{ij}\)</span> using:</p>
+<ul>
+<li><strong>Chi-squared statistic</strong>: <span class="math display">\[ \chi^2 = \sum_{i < j} \frac{N(P_{ij} - \hat{P}_{ij})^2}{\hat{P}_{ij}(1-\hat{P}_{ij})} \]</span></li>
+<li><strong>Average absolute discrepancy</strong>: <span class="math display">\[ \bar{D} = \frac{2}{K(K-1)} \sum_{i < j} |P_{ij} - \hat{P}_{ij}| \]</span></li>
+</ul>
+<p>If the fit is poor, Case V assumptions may not hold. In such cases, one may relax assumptions (Case III: unequal variances) or consider non-metric alternatives such as multidimensional scaling.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="applications" class="section level2">
+<h2>Applications</h2>
+<ul>
+<li><strong>Market research</strong>: positioning brands on perceptual dimensions (e.g., scaling "premium" perception across competing brands)</li>
+<li><strong>Sensory science</strong>: scaling taste or smell intensity (e.g., bitterness levels of food samples)</li>
+<li><strong>Clinical psychology</strong>: severity scaling of symptoms (e.g., constructing depression severity scales from clinician judgments)</li>
+<li><strong>Education</strong>: difficulty scaling of test items (e.g., ordering exam questions by difficulty using student performance data)</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<ul>
+<li><strong>Large samples required</strong>: proportions must be stable for the normal deviate transformation to be reliable. Small samples produce noisy estimates.</li>
+<li><strong>Extreme proportions</strong>: when <span class="math inline">\(P_{ij} = 0\)</span> or <span class="math inline">\(P_{ij} = 1\)</span>, the Z-score is <span class="math inline">\(\pm\infty\)</span>. Corrections are needed, such as replacing 0 with <span class="math inline">\(\frac{1}{2N}\)</span> and 1 with <span class="math inline">\(1 - \frac{1}{2N}\)</span>.</li>
+<li><strong>Normality assumption</strong>: the method assumes discriminal processes are normally distributed. Violations lead to biased scale values.</li>
+<li><strong>Interval scale only</strong>: there is no absolute zero — ratios of scale values are not meaningful. Only differences carry information.</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

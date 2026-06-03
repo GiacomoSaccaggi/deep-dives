@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Cluster Analysis</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Cluster Analysis</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Cluster analysis is a fundamental task in <strong>unsupervised learning</strong>: the goal is to group observations into clusters such that within-cluster similarity is high and between-cluster similarity is low. Unlike supervised methods, there are no labels to guide the process — the algorithm must discover structure in the data on its own.</p>
+<p>Applications include:</p>
+<ul>
+<li><strong>Customer segmentation</strong> — identifying groups of customers with similar purchasing behaviour</li>
+<li><strong>Gene expression analysis</strong> — grouping genes with similar expression profiles across conditions</li>
+<li><strong>Image compression</strong> — reducing the number of colours by clustering pixel values</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="distance-measures" class="section level2">
+<h2>Distance Measures</h2>
+<p>The choice of distance metric fundamentally determines what "similar" means. Common measures include:</p>
+
+<div id="euclidean-distance" class="section level3">
+<h3>Euclidean Distance</h3>
+<p>The most common distance in continuous spaces:</p>
+<p><span class="math display">\[ d(\mathbf{x}, \mathbf{y}) = \sqrt{\sum_{i=1}^{p} (x_i - y_i)^2} \]</span></p>
+</div>
+
+<div id="manhattan-distance" class="section level3">
+<h3>Manhattan Distance</h3>
+<p>Sum of absolute differences along each dimension:</p>
+<p><span class="math display">\[ d(\mathbf{x}, \mathbf{y}) = \sum_{i=1}^{p} |x_i - y_i| \]</span></p>
+</div>
+
+<div id="minkowski-distance" class="section level3">
+<h3>Minkowski Distance</h3>
+<p>A generalization of both Euclidean (<span class="math inline">\(q=2\)</span>) and Manhattan (<span class="math inline">\(q=1\)</span>):</p>
+<p><span class="math display">\[ d(\mathbf{x}, \mathbf{y}) = \left( \sum_{i=1}^{p} |x_i - y_i|^q \right)^{1/q} \]</span></p>
+</div>
+
+<div id="cosine-similarity" class="section level3">
+<h3>Cosine Similarity</h3>
+<p>Measures the angle between two vectors, ignoring magnitude:</p>
+<p><span class="math display">\[ \text{cos}(\mathbf{x}, \mathbf{y}) = \frac{\mathbf{x} \cdot \mathbf{y}}{\|\mathbf{x}\| \, \|\mathbf{y}\|} = \frac{\sum_{i=1}^p x_i y_i}{\sqrt{\sum_{i=1}^p x_i^2} \sqrt{\sum_{i=1}^p y_i^2}} \]</span></p>
+<p>The cosine distance is then <span class="math inline">\(1 - \text{cos}(\mathbf{x}, \mathbf{y})\)</span>.</p>
+</div>
+
+<div id="correlation-based-distance" class="section level3">
+<h3>Correlation-Based Distance</h3>
+<p><span class="math display">\[ d(\mathbf{x}, \mathbf{y}) = 1 - \text{corr}(\mathbf{x}, \mathbf{y}) \]</span></p>
+<p>Useful when the pattern of variation matters more than absolute values.</p>
+</div>
+
+<div id="standardization" class="section level3">
+<h3>Standardization</h3>
+<p>The choice of distance depends on data type and scale. When features have different units or scales, <strong>standardization</strong> (e.g. z-score normalization) is critical — otherwise features with larger ranges will dominate the distance computation.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="k-means-clustering" class="section level2">
+<h2>K-Means Clustering</h2>
+
+<div id="algorithm" class="section level3">
+<h3>Algorithm</h3>
+<p>K-Means partitions <span class="math inline">\(n\)</span> observations into <span class="math inline">\(K\)</span> clusters by iterating:</p>
+<ol>
+<li><strong>Initialize</strong> <span class="math inline">\(K\)</span> centroids (randomly or via K-means++)</li>
+<li><strong>Assign</strong> each observation to the nearest centroid</li>
+<li><strong>Recompute</strong> each centroid as the mean of its assigned points</li>
+<li><strong>Repeat</strong> steps 2–3 until convergence (assignments no longer change)</li>
+</ol>
+</div>
+
+<div id="objective-function" class="section level3">
+<h3>Objective Function</h3>
+<p>K-Means minimizes the total within-cluster sum of squares:</p>
+<p><span class="math display">\[ W(C) = \sum_{k=1}^{K} \sum_{\mathbf{x} \in C_k} \|\mathbf{x} - \boldsymbol{\mu}_k\|^2 \]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\mu}_k = \frac{1}{|C_k|}\sum_{\mathbf{x} \in C_k} \mathbf{x}\)</span> is the centroid of cluster <span class="math inline">\(C_k\)</span>.</p>
+</div>
+
+<div id="properties" class="section level3">
+<h3>Properties</h3>
+<ul>
+<li>The algorithm is guaranteed to <strong>converge</strong>, but only to a <strong>local minimum</strong> — the result depends on initialization</li>
+<li>Use <strong>multiple random starts</strong> and select the solution with lowest <span class="math inline">\(W(C)\)</span></li>
+<li>Assumes spherical, equally-sized clusters</li>
+</ul>
+</div>
+
+<div id="choosing-k" class="section level3">
+<h3>Choosing K</h3>
+<ul>
+<li><strong>Elbow method:</strong> plot <span class="math inline">\(W(C)\)</span> vs <span class="math inline">\(K\)</span> and look for the "elbow" where marginal decrease flattens</li>
+<li><strong>Silhouette score:</strong> choose <span class="math inline">\(K\)</span> that maximizes the average silhouette width</li>
+<li><strong>Gap statistic:</strong> compare <span class="math inline">\(\log W(C)\)</span> to the expected value under a null reference distribution (uniform)</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="hierarchical-clustering" class="section level2">
+<h2>Hierarchical Clustering</h2>
+
+<div id="agglomerative" class="section level3">
+<h3>Agglomerative (Bottom-Up)</h3>
+<p>Start with <span class="math inline">\(n\)</span> clusters (one per observation). At each step, merge the two closest clusters. Repeat until a single cluster remains.</p>
+</div>
+
+<div id="divisive" class="section level3">
+<h3>Divisive (Top-Down)</h3>
+<p>Start with one cluster containing all observations. At each step, split a cluster into two. Less common in practice.</p>
+</div>
+
+<div id="linkage-methods" class="section level3">
+<h3>Linkage Methods</h3>
+<p>The definition of "distance between clusters" varies by linkage:</p>
+<ul>
+<li><strong>Single linkage:</strong> <span class="math inline">\(d(A,B) = \min_{a \in A, b \in B} d(a,b)\)</span> — minimum distance (tends to produce elongated chains)</li>
+<li><strong>Complete linkage:</strong> <span class="math inline">\(d(A,B) = \max_{a \in A, b \in B} d(a,b)\)</span> — maximum distance (produces compact clusters)</li>
+<li><strong>Average linkage:</strong> <span class="math inline">\(d(A,B) = \frac{1}{|A||B|}\sum_{a \in A}\sum_{b \in B} d(a,b)\)</span></li>
+<li><strong>Ward's method:</strong> merge the pair that minimizes the increase in total within-cluster variance:
+<span class="math display">\[ \Delta W = \frac{|A| \cdot |B|}{|A|+|B|} \|\boldsymbol{\mu}_A - \boldsymbol{\mu}_B\|^2 \]</span></li>
+</ul>
+</div>
+
+<div id="dendrogram" class="section level3">
+<h3>Dendrogram</h3>
+<p>A tree diagram representing the nested sequence of merges. The height at which two clusters merge reflects the dissimilarity between them. <strong>Cut</strong> the dendrogram at a desired height to obtain <span class="math inline">\(K\)</span> clusters.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="dbscan" class="section level2">
+<h2>DBSCAN</h2>
+<p><strong>Density-Based Spatial Clustering of Applications with Noise.</strong></p>
+
+<div id="key-concepts" class="section level3">
+<h3>Key Concepts</h3>
+<ul>
+<li><strong>Core point:</strong> a point with at least <span class="math inline">\(\text{minPts}\)</span> neighbours within radius <span class="math inline">\(\varepsilon\)</span></li>
+<li><strong>Border point:</strong> within <span class="math inline">\(\varepsilon\)</span> of a core point but does not have <span class="math inline">\(\text{minPts}\)</span> neighbours itself</li>
+<li><strong>Noise point:</strong> neither core nor border — not assigned to any cluster</li>
+</ul>
+</div>
+
+<div id="algorithm-dbscan" class="section level3">
+<h3>Algorithm</h3>
+<ol>
+<li>Find all core points</li>
+<li>Form clusters by connecting core points that are within <span class="math inline">\(\varepsilon\)</span> of each other (density-reachable)</li>
+<li>Assign each border point to the cluster of its nearest core point</li>
+<li>Label remaining points as noise</li>
+</ol>
+</div>
+
+<div id="advantages" class="section level3">
+<h3>Advantages</h3>
+<ul>
+<li>Discovers clusters of <strong>arbitrary shape</strong> (not just spherical)</li>
+<li><strong>Detects outliers</strong> naturally as noise points</li>
+<li><strong>No need to specify <span class="math inline">\(K\)</span></strong> — the number of clusters is determined by the data</li>
+</ul>
+</div>
+
+<div id="parameters" class="section level3">
+<h3>Parameters</h3>
+<ul>
+<li><span class="math inline">\(\varepsilon\)</span> (eps): neighbourhood radius — can be tuned using a k-distance plot</li>
+<li><span class="math inline">\(\text{minPts}\)</span>: minimum number of points to form a dense region — rule of thumb: <span class="math inline">\(\text{minPts} \geq p + 1\)</span> where <span class="math inline">\(p\)</span> is dimensionality</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="evaluation-metrics" class="section level2">
+<h2>Evaluation Metrics</h2>
+
+<div id="internal-silhouette" class="section level3">
+<h3>Internal: Silhouette Coefficient</h3>
+<p>For each observation <span class="math inline">\(i\)</span>:</p>
+<p><span class="math display">\[ s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}} \]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(a(i)\)</span> = mean distance from <span class="math inline">\(i\)</span> to all other points in the same cluster (intra-cluster distance)</li>
+<li><span class="math inline">\(b(i)\)</span> = mean distance from <span class="math inline">\(i\)</span> to all points in the nearest neighbouring cluster</li>
+</ul>
+<p>Range: <span class="math inline">\([-1, 1]\)</span>. Values near 1 indicate well-clustered points; near 0 means on the boundary; negative values suggest misclassification.</p>
+</div>
+
+<div id="external-metrics" class="section level3">
+<h3>External Metrics (when true labels are available)</h3>
+<ul>
+<li><strong>Adjusted Rand Index (ARI):</strong> measures agreement between predicted and true clustering, adjusted for chance. Range <span class="math inline">\([-1, 1]\)</span>, with 1 = perfect agreement.</li>
+<li><strong>Normalized Mutual Information (NMI):</strong> measures the mutual information between predicted and true labels, normalized to <span class="math inline">\([0, 1]\)</span>.</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="practical-guidelines" class="section level2">
+<h2>Practical Guidelines</h2>
+<ul>
+<li><strong>Scale features</strong> before clustering — use standardization or min-max normalization</li>
+<li><strong>Try multiple values of <span class="math inline">\(K\)</span></strong> — there is rarely a single "correct" answer</li>
+<li><strong>Visualize results</strong> using dimensionality reduction (PCA, t-SNE, UMAP) to project to 2D</li>
+<li><strong>Combine methods</strong> — use hierarchical clustering to suggest <span class="math inline">\(K\)</span>, then refine with K-Means</li>
+<li><strong>Beware the curse of dimensionality</strong> — in high dimensions, distances become less meaningful; consider feature selection or dimensionality reduction first</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

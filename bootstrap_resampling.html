@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Bootstrap and Resampling Methods</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Bootstrap and Resampling Methods</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="introduction" class="section level2">
+<h2>Introduction to Bootstrap</h2>
+<p>The bootstrap, introduced by Efron (1979), is a computationally intensive method for statistical inference. The fundamental idea is simple yet powerful: if the sample is a good representation of the population, then resampling from the sample mimics drawing new samples from the population.</p>
+<p>The core problem in statistics is estimating the sampling distribution of a statistic \(\hat{\theta} = T(\mathbf{X})\). Traditionally, we derive this distribution analytically (often relying on asymptotic approximations). The bootstrap replaces analytical derivation with computational simulation: we <strong>resample with replacement</strong> from the observed data to generate an empirical approximation of the sampling distribution.</p>
+<p>The key insight is the <strong>plug-in principle</strong>: we estimate the unknown population distribution \(F\) with the empirical distribution function \(\hat{F}_n\), which places mass \(1/n\) on each observed data point:</p>
+<p><span class="math display">\[ \hat{F}_n(x) = \frac{1}{n} \sum_{i=1}^{n} I(X_i \leq x) \]</span></p>
+<p>Any quantity that depends on \(F\) can then be estimated by substituting \(\hat{F}_n\). The bootstrap automates this substitution for complex statistics where analytical derivations are intractable.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="nonparametric-bootstrap" class="section level2">
+<h2>Nonparametric Bootstrap</h2>
+<p>Given an observed sample \(\mathbf{x} = (x_1, x_2, \ldots, x_n)\) from an unknown distribution \(F\), and a statistic of interest \(\hat{\theta} = T(\mathbf{x})\), the nonparametric bootstrap algorithm proceeds as follows:</p>
+<p><strong>Algorithm:</strong></p>
+<ol>
+<li>For \(b = 1, 2, \ldots, B\):</li>
+<ol type="a">
+<li>Draw a bootstrap sample \(\mathbf{x}^*_b = (x^*_1, x^*_2, \ldots, x^*_n)\) by sampling \(n\) observations <strong>with replacement</strong> from \(\hat{F}_n\) (i.e., from the original sample)</li>
+<li>Compute the bootstrap replicate \(\hat{\theta}^*_b = T(\mathbf{x}^*_b)\)</li>
+</ol>
+<li>Use the empirical distribution of \(\{\hat{\theta}^*_1, \hat{\theta}^*_2, \ldots, \hat{\theta}^*_B\}\) to approximate the sampling distribution of \(\hat{\theta}\)</li>
+</ol>
+<p>The bootstrap estimate of the standard error of \(\hat{\theta}\) is:</p>
+<p><span class="math display">\[ \widehat{SE}_{boot} = \sqrt{\frac{1}{B-1} \sum_{b=1}^{B} \left(\hat{\theta}^*_b - \bar{\theta}^*\right)^2} \]</span></p>
+<p>where \(\bar{\theta}^* = \frac{1}{B} \sum_{b=1}^{B} \hat{\theta}^*_b\) is the mean of the bootstrap replicates.</p>
+<p>The bootstrap estimate of bias is:</p>
+<p><span class="math display">\[ \widehat{Bias}_{boot} = \bar{\theta}^* - \hat{\theta} \]</span></p>
+<p>In practice, \(B = 200\) is often sufficient for standard error estimation, while \(B \geq 1000\) is recommended for confidence intervals.</p>
+
+<div id="bootstrap-validity" class="section level3">
+<h3>Conditions for Validity</h3>
+<p>The nonparametric bootstrap is consistent (i.e., the bootstrap distribution converges to the true sampling distribution) under relatively mild conditions. However, it can fail when:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>The statistic is not smooth (e.g., extremes like \(\max(X_1, \ldots, X_n)\))</li>
+<li>The parameter lies on the boundary of the parameter space</li>
+<li>The rate of convergence is not \(\sqrt{n}\)</li>
+<li>The sample is not i.i.d. (time series, clustered data)</li>
+</ul>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="parametric-bootstrap" class="section level2">
+<h2>Parametric Bootstrap</h2>
+<p>When the nonparametric bootstrap fails — for instance when the parameter of interest influences the support of the distribution — or when a parametric model is believed to be correct, we can use the <strong>parametric bootstrap</strong>.</p>
+<p>Instead of resampling from \(\hat{F}_n\), we:</p>
+<ol>
+<li>Assume a parametric family \(F_\theta\) for the data-generating process</li>
+<li>Estimate the parameters: \(\hat{\theta} = \hat{\theta}(\mathbf{x})\)</li>
+<li>Generate bootstrap samples from the fitted model \(F_{\hat{\theta}}\)</li>
+</ol>
+<p><strong>Algorithm:</strong></p>
+<ol>
+<li>Fit the parametric model to the data: obtain \(\hat{\theta}\)</li>
+<li>For \(b = 1, 2, \ldots, B\):</li>
+<ol type="a">
+<li>Generate \(\mathbf{x}^*_b = (x^*_1, \ldots, x^*_n)\) where \(x^*_i \stackrel{i.i.d.}{\sim} F_{\hat{\theta}}\)</li>
+<li>Compute \(\hat{\theta}^*_b = T(\mathbf{x}^*_b)\)</li>
+</ol>
+<li>Use \(\{\hat{\theta}^*_1, \ldots, \hat{\theta}^*_B\}\) to approximate the sampling distribution</li>
+</ol>
+<p><strong>Example:</strong> Consider estimating the endpoint \(\theta\) of a Uniform\((0, \theta)\) distribution using \(\hat{\theta} = X_{(n)} = \max(X_1, \ldots, X_n)\). The nonparametric bootstrap fails here because bootstrap samples from \(\hat{F}_n\) cannot exceed \(X_{(n)}\), so the bootstrap distribution of \(\hat{\theta}^*\) is degenerate at \(X_{(n)}\). The parametric bootstrap generates from Uniform\((0, \hat{\theta})\), correctly capturing the variability of the maximum.</p>
+<p>The parametric bootstrap is more efficient than the nonparametric version when the model is correctly specified, but is inconsistent if the model is misspecified.</p>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="bootstrap-regression" class="section level2">
+<h2>Bootstrap for Regression</h2>
+<p>Consider the linear regression model:</p>
+<p><span class="math display">\[ Y_i = \mathbf{x}_i^\top \boldsymbol{\beta} + \varepsilon_i, \quad i = 1, \ldots, n \]</span></p>
+<p>There are two distinct bootstrap strategies depending on whether the covariates are treated as random or fixed.</p>
+
+<div id="random-x" class="section level3">
+<h3>Random-X Resampling (Resample Cases)</h3>
+<p>Treat each pair \((Y_i, \mathbf{x}_i)\) as a single observation drawn from a joint distribution. The bootstrap resamples entire cases:</p>
+<ol>
+<li>For \(b = 1, \ldots, B\): draw \(n\) pairs \((Y^*_i, \mathbf{x}^*_i)\) with replacement from \(\{(Y_1, \mathbf{x}_1), \ldots, (Y_n, \mathbf{x}_n)\}\)</li>
+<li>Fit the regression on the bootstrap sample to obtain \(\hat{\boldsymbol{\beta}}^*_b\)</li>
+</ol>
+<p>This approach:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Makes no assumptions about the error distribution or homoscedasticity</li>
+<li>Is valid under heteroscedasticity</li>
+<li>Is the default choice when \(\mathbf{x}\) is observational (not experimentally controlled)</li>
+</ul>
+</div>
+
+<div id="fixed-x" class="section level3">
+<h3>Fixed-X Resampling (Resample Residuals)</h3>
+<p>When the design matrix \(\mathbf{X}\) is fixed (experimental design), we resample residuals:</p>
+<ol>
+<li>Fit the model: obtain \(\hat{\boldsymbol{\beta}}\) and residuals \(\hat{e}_i = Y_i - \mathbf{x}_i^\top \hat{\boldsymbol{\beta}}\)</li>
+<li>For \(b = 1, \ldots, B\): draw \(e^*_1, \ldots, e^*_n\) with replacement from \(\{\hat{e}_1, \ldots, \hat{e}_n\}\)</li>
+<li>Construct bootstrap responses: \(Y^*_i = \mathbf{x}_i^\top \hat{\boldsymbol{\beta}} + e^*_i\)</li>
+<li>Fit the regression on \((\mathbf{X}, \mathbf{Y}^*)\) to obtain \(\hat{\boldsymbol{\beta}}^*_b\)</li>
+</ol>
+<p>This approach:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Preserves the design structure</li>
+<li>Assumes errors are i.i.d. (homoscedastic)</li>
+<li>Is more efficient than case resampling when the model is correctly specified</li>
+<li>Fails under heteroscedasticity (use Wild Bootstrap instead)</li>
+</ul>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="jackknife" class="section level2">
+<h2>The Jackknife</h2>
+<p>The jackknife, introduced by Quenouille (1949) and developed by Tukey (1958), is a resampling method based on systematically leaving out one observation at a time. It predates the bootstrap and can be seen as a linear approximation to it.</p>
+<p>Given a sample \(\mathbf{x} = (x_1, \ldots, x_n)\) and statistic \(\hat{\theta} = T(\mathbf{x})\), the \(i\)-th jackknife replicate is computed on the sample with the \(i\)-th observation removed:</p>
+<p><span class="math display">\[ \hat{\theta}_{(i)} = T(\mathbf{x}_{(-i)}) = T(x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n) \]</span></p>
+<p>The jackknife mean is:</p>
+<p><span class="math display">\[ \bar{\theta}_{(\cdot)} = \frac{1}{n} \sum_{i=1}^{n} \hat{\theta}_{(i)} \]</span></p>
+
+<div id="jackknife-bias" class="section level3">
+<h3>Bias Estimation</h3>
+<p>The jackknife estimate of bias is:</p>
+<p><span class="math display">\[ \widehat{Bias}_{jack} = (n-1)\left(\bar{\theta}_{(\cdot)} - \hat{\theta}\right) \]</span></p>
+<p>The bias-corrected jackknife estimator is:</p>
+<p><span class="math display">\[ \tilde{\theta}_{jack} = \hat{\theta} - \widehat{Bias}_{jack} = n\hat{\theta} - (n-1)\bar{\theta}_{(\cdot)} \]</span></p>
+</div>
+
+<div id="jackknife-variance" class="section level3">
+<h3>Variance Estimation</h3>
+<p>The jackknife estimate of variance is:</p>
+<p><span class="math display">\[ \widehat{Var}_{jack} = \frac{n-1}{n} \sum_{i=1}^{n} \left(\hat{\theta}_{(i)} - \bar{\theta}_{(\cdot)}\right)^2 \]</span></p>
+<p>Note the factor \(\frac{n-1}{n}\) instead of the usual \(\frac{1}{n-1}\) — this compensates for the high correlation between jackknife replicates (each pair shares \(n-2\) observations).</p>
+</div>
+
+<div id="jackknife-pseudo" class="section level3">
+<h3>Jackknife Pseudo-Values</h3>
+<p>The pseudo-values are defined as:</p>
+<p><span class="math display">\[ \tilde{\theta}_i = n\hat{\theta} - (n-1)\hat{\theta}_{(i)} \]</span></p>
+<p>These pseudo-values are approximately independent and can be used as input to standard parametric procedures (e.g., t-tests).</p>
+</div>
+
+<div id="jackknife-limitations" class="section level3">
+<h3>Limitations</h3>
+<p>The jackknife fails for non-smooth statistics such as the median or quantiles. For such statistics, the delete-\(d\) jackknife (removing \(d > 1\) observations at a time) may be used, but the bootstrap is generally preferred.</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="bootstrap-ci" class="section level2">
+<h2>Bootstrap Confidence Intervals</h2>
+<p>Let \(\hat{\theta}\) be an estimator of \(\theta\) and \(\{\hat{\theta}^*_1, \ldots, \hat{\theta}^*_B\}\) the bootstrap replicates. We seek a \((1-\alpha)\) confidence interval for \(\theta\). Several methods exist, with increasing sophistication.</p>
+
+<div id="ci-normal" class="section level3">
+<h3>(a) Asymptotic Normal Interval</h3>
+<p>The simplest approach assumes the sampling distribution of \(\hat{\theta}\) is approximately normal:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[\hat{\theta} - z_{\alpha/2} \cdot \widehat{SE}_{boot}, \quad \hat{\theta} + z_{\alpha/2} \cdot \widehat{SE}_{boot}\right] \]</span></p>
+<p>where \(z_{\alpha/2}\) is the \((1-\alpha/2)\) quantile of the standard normal and \(\widehat{SE}_{boot}\) is the bootstrap standard error.</p>
+<p>This interval is first-order accurate: its coverage error is \(O(n^{-1/2})\). It fails when the sampling distribution is skewed or when the normal approximation is poor.</p>
+</div>
+
+<div id="ci-studentized" class="section level3">
+<h3>(b) Studentized (Pivotal) Bootstrap Interval</h3>
+<p>This method bootstraps the pivotal quantity (t-statistic) rather than the estimator itself. For each bootstrap replicate, compute:</p>
+<p><span class="math display">\[ t^*_b = \frac{\hat{\theta}^*_b - \hat{\theta}}{\widehat{SE}^*_b} \]</span></p>
+<p>where \(\widehat{SE}^*_b\) is the estimated standard error of \(\hat{\theta}^*_b\) (which may itself require a nested bootstrap or analytical formula). Let \(t^*_{(\alpha)}\) denote the \(\alpha\)-quantile of the bootstrap t-distribution. The confidence interval is:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[\hat{\theta} - t^*_{(1-\alpha/2)} \cdot \widehat{SE}, \quad \hat{\theta} - t^*_{(\alpha/2)} \cdot \widehat{SE}\right] \]</span></p>
+<p>This interval is second-order accurate: coverage error is \(O(n^{-1})\). It respects asymmetry in the sampling distribution and is transformation-invariant in the pivotal sense. However, it requires an estimate of \(\widehat{SE}^*_b\) for each replicate, making it computationally expensive.</p>
+</div>
+
+<div id="ci-basic" class="section level3">
+<h3>(c) Basic Bootstrap Interval</h3>
+<p>The basic (or reverse percentile) method uses the bootstrap distribution of \((\hat{\theta}^* - \hat{\theta})\) to approximate the distribution of \((\hat{\theta} - \theta)\). The interval is:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[2\hat{\theta} - \hat{\theta}^*_{(1-\alpha/2)}, \quad 2\hat{\theta} - \hat{\theta}^*_{(\alpha/2)}\right] \]</span></p>
+<p>where \(\hat{\theta}^*_{(\alpha)}\) is the \(\alpha\)-quantile of the bootstrap distribution. Equivalently:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[\hat{\theta} - (\hat{\theta}^*_{(1-\alpha/2)} - \hat{\theta}), \quad \hat{\theta} - (\hat{\theta}^*_{(\alpha/2)} - \hat{\theta})\right] \]</span></p>
+<p>This interval reflects the bootstrap distribution about \(\hat{\theta}\). It is first-order accurate like the normal interval but does not require normality.</p>
+</div>
+
+<div id="ci-percentile" class="section level3">
+<h3>(d) Percentile Interval</h3>
+<p>The percentile method directly uses quantiles of the bootstrap distribution:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[\hat{\theta}^*_{(\alpha/2)}, \quad \hat{\theta}^*_{(1-\alpha/2)}\right] \]</span></p>
+<p>This is the simplest and most intuitive method. It is transformation-respecting: if \(\phi = g(\theta)\), then the percentile interval for \(\phi\) is \([g(\hat{\theta}^*_{(\alpha/2)}), g(\hat{\theta}^*_{(1-\alpha/2)})]\).</p>
+<p>However, it is only first-order accurate and can have poor coverage when the bootstrap distribution is biased (i.e., not centred at \(\hat{\theta}\)).</p>
+</div>
+
+<div id="ci-bc" class="section level3">
+<h3>(e) Bias-Corrected (BC) Interval</h3>
+<p>The BC interval corrects the percentile interval for bias in the bootstrap distribution. Define the bias-correction constant:</p>
+<p><span class="math display">\[ \hat{z}_0 = \Phi^{-1}\left(\frac{\#\{\hat{\theta}^*_b < \hat{\theta}\}}{B}\right) \]</span></p>
+<p>where \(\Phi^{-1}\) is the standard normal quantile function. If the bootstrap distribution is centred at \(\hat{\theta}\), then \(\hat{z}_0 = 0\) and BC reduces to the percentile method.</p>
+<p>The BC interval adjusts the percentile levels:</p>
+<p><span class="math display">\[ CI_{1-\alpha} = \left[\hat{\theta}^*_{(\alpha_1)}, \quad \hat{\theta}^*_{(\alpha_2)}\right] \]</span></p>
+<p>where:</p>
+<p><span class="math display">\[ \alpha_1 = \Phi\left(2\hat{z}_0 + z_{\alpha/2}\right), \qquad \alpha_2 = \Phi\left(2\hat{z}_0 + z_{1-\alpha/2}\right) \]</span></p>
+</div>
+
+<div id="ci-bca" class="section level3">
+<h3>(f) BC<sub>a</sub> (Bias-Corrected and Accelerated) Interval</h3>
+<p>The BC<sub>a</sub> method extends BC by adding an <strong>acceleration constant</strong> \(\hat{a}\) that accounts for the rate at which the standard error of \(\hat{\theta}\) changes with \(\theta\). The adjusted percentile levels are:</p>
+<p><span class="math display">\[ \alpha_1 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{\alpha/2})}\right) \]</span></p>
+<p><span class="math display">\[ \alpha_2 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{1-\alpha/2})}\right) \]</span></p>
+<p>The acceleration constant is typically estimated using the jackknife:</p>
+<p><span class="math display">\[ \hat{a} = \frac{\sum_{i=1}^{n} \left(\bar{\theta}_{(\cdot)} - \hat{\theta}_{(i)}\right)^3}{6 \left[\sum_{i=1}^{n} \left(\bar{\theta}_{(\cdot)} - \hat{\theta}_{(i)}\right)^2\right]^{3/2}} \]</span></p>
+<p>The BC<sub>a</sub> interval is:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Second-order accurate</strong>: coverage error is \(O(n^{-1})\)</li>
+<li><strong>Transformation-respecting</strong>: invariant under monotone reparametrizations</li>
+<li><strong>Range-preserving</strong>: endpoints respect the natural range of \(\theta\)</li>
+</ul>
+<p>When \(\hat{z}_0 = 0\) and \(\hat{a} = 0\), BC<sub>a</sub> reduces to the standard percentile method. In practice, BC<sub>a</sub> is considered the best general-purpose bootstrap confidence interval.</p>
+</div>
+
+<div id="ci-summary" class="section level3">
+<h3>Summary Comparison</h3>
+<table class="table table-condensed">
+<thead>
+<tr><th>Method</th><th>Accuracy</th><th>Transform-Respecting</th><th>Requires</th></tr>
+</thead>
+<tbody>
+<tr><td>Normal</td><td>\(O(n^{-1/2})\)</td><td>No</td><td>Normality of \(\hat{\theta}\)</td></tr>
+<tr><td>Basic</td><td>\(O(n^{-1/2})\)</td><td>No</td><td>Symmetry of pivot</td></tr>
+<tr><td>Percentile</td><td>\(O(n^{-1/2})\)</td><td>Yes</td><td>Unbiased bootstrap</td></tr>
+<tr><td>Studentized</td><td>\(O(n^{-1})\)</td><td>No</td><td>SE estimate per replicate</td></tr>
+<tr><td>BC</td><td>\(O(n^{-1/2})\)</td><td>Yes</td><td>Bias correction \(\hat{z}_0\)</td></tr>
+<tr><td>BC<sub>a</sub></td><td>\(O(n^{-1})\)</td><td>Yes</td><td>\(\hat{z}_0\) + acceleration \(\hat{a}\)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

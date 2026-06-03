@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Subspace Communications: Managing Prompts</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        #myInput { width: 100%; font-size: 16px; border-radius: 4px; padding: 12px 20px 12px 40px; border: 1px solid #ddd; margin-bottom: 12px; }
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a { padding: 12px; text-decoration: none; font-size: 18px; color: black; white-space: pre; display: block; }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Subspace Communications: Managing Prompts</h2>
+                        <hr class="small">
+                        <h5>MCP Deep-Dive Series</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>📋 What Are Prompts?</h2>
+<p>In MCP, <strong>Prompts</strong> are user-controlled prompt templates — pre-programmed tactical maneuvers that the <em>user</em> (not the model) can select and invoke. Think of them as Captain Picard's numbered tactical patterns: "Pattern Delta-5" triggers a known sequence of instructions.</p>
+<p>Key differences from Tools:</p>
+<ul>
+<li><strong>Tools</strong> are model-controlled — the AI decides when to call them</li>
+<li><strong>Prompts</strong> are user-controlled — the human selects them from a menu</li>
+</ul>
+<p>A Prompt is essentially a function that returns a formatted string (or a list of messages) to be injected into the conversation. It can accept arguments to customize the tactical approach.</p>
+</div>
+
+<div class="section level2">
+<h2>🎯 The <code>@mcp.prompt()</code> Decorator</h2>
+<p>Registering a prompt is as elegant as programming a new tactical maneuver into the ship's computer:</p>
+
+<pre><code class="python">from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP("USS Enterprise NCC-1701-D")
+
+@enterprise.prompt()
+def tactical_analysis(threat: str, quadrant: str = 'Alpha') -> str:
+    """Request a tactical analysis of a threat in a specific quadrant.
+    Args:
+        threat: The nature of the threat (e.g. 'Romulan warbird', 'spatial anomaly')
+        quadrant: The quadrant where the threat is located
+    """
+    return (
+        f'You are the tactical officer aboard the USS Enterprise.\n\n'
+        f'Analyze the following threat: {threat} in the {quadrant} Quadrant.\n\n'
+        f'Provide: 1) Threat assessment 2) Recommended shield configuration '
+        f'3) Suggested evasive maneuvers 4) Diplomatic options if applicable.'
+    )
+</code></pre>
+
+<p>When a user selects this prompt in their client (e.g., Claude Desktop shows it in a slash-command menu), they provide the arguments, and the resulting text becomes part of the conversation context. The model then responds to that structured prompt.</p>
+</div>
+
+<div class="section level2">
+<h2>🧠 Prompts with Complex Context Injection</h2>
+<p>Prompts can do more than return a simple string. They can assemble multi-message conversations, inject system context, and even embed resource data:</p>
+
+<pre><code class="python">from mcp.server.fastmcp import FastMCP
+from mcp.types import TextContent, UserMessage, AssistantMessage
+
+enterprise = FastMCP("USS Enterprise NCC-1701-D")
+
+@enterprise.prompt()
+def away_team_briefing(planet: str, mission_type: str = 'survey') -> list:
+    """Generate a complete away team briefing for a planetary mission.
+    Args:
+        planet: Target planet designation
+        mission_type: Type of mission (survey, rescue, diplomatic, combat)
+    """
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are Commander Data, second officer of the USS Enterprise. "
+                "You provide precise, thorough briefings with relevant data."
+            )
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Commander Data, prepare an away team briefing for a "
+                f"{mission_type} mission to {planet}.\n\n"
+                f"Include:\n"
+                f"- Environmental hazards\n"
+                f"- Recommended team composition\n"
+                f"- Equipment checklist\n"
+                f"- Contingency protocols\n"
+                f"- Estimated mission duration"
+            )
+        }
+    ]
+</code></pre>
+
+<p>This creates a fully structured conversation that primes the model to respond as Commander Data giving a mission briefing. The user just picks "Away Team Briefing" from the menu and provides the planet name.</p>
+</div>
+
+<div class="section level2">
+<h2>⚖️ When to Use Prompts vs System Messages</h2>
+<p>You might wonder: "Why not just put instructions in the system message?" Here's the tactical distinction:</p>
+
+<table class="table table-condensed">
+<tr><th>Criterion</th><th>System Message</th><th>MCP Prompt</th></tr>
+<tr><td>Who controls it?</td><td>Developer (hardcoded)</td><td>User (selectable at runtime)</td></tr>
+<tr><td>When applied?</td><td>Always, at conversation start</td><td>On demand, user-triggered</td></tr>
+<tr><td>Parameterized?</td><td>No (static)</td><td>Yes (dynamic arguments)</td></tr>
+<tr><td>Discoverable?</td><td>No</td><td>Yes (listed via <code>prompts/list</code>)</td></tr>
+<tr><td>Star Trek analogy</td><td>Standing orders</td><td>Tactical patterns (selectable maneuvers)</td></tr>
+</table>
+
+<p><strong>Use system messages</strong> for baseline personality and constraints ("You are a helpful assistant"). <strong>Use Prompts</strong> for specialized interaction patterns the user can invoke on demand ("Analyze this code for security vulnerabilities").</p>
+</div>
+
+<div class="section level2">
+<h2>🚀 Combining All Three Primitives — The Complete Ship</h2>
+<p>A fully operational starship exposes Resources (sensors), Tools (weapons &amp; systems), and Prompts (tactical patterns). Here's a complete server that demonstrates all three working together:</p>
+
+<pre><code class="python">from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP("USS Enterprise NCC-1701-D")
+
+# === RESOURCE: Ship's sensor data (read-only, application-controlled) ===
+@enterprise.resource("enterprise://sensors/status")
+def sensor_status() -> str:
+    """Current sensor array status and readings."""
+    return (
+        "Long-range sensors: Online\n"
+        "Short-range sensors: Online\n"
+        "Nearest vessel: Romulan Warbird, bearing 247 mark 3, distance 2.4 light-years\n"
+        "Anomalies detected: Subspace distortion at coordinates 427.3, 291.7"
+    )
+
+# === TOOL: Actionable capability (model-controlled) ===
+@enterprise.tool()
+def fire_phasers(target: str, power_level: int = 50) -> str:
+    """Fire phaser array at specified target. Power level 1-100."""
+    if power_level > 80:
+        return f'Maximum phaser discharge at {target}. Direct hit!'
+    return f'Phaser burst at {target}, power level {power_level}%. Standing by.'
+
+@enterprise.tool()
+def raise_shields(configuration: str = 'standard') -> str:
+    """Raise deflector shields with specified configuration."""
+    configs = {
+        'standard': 'Standard shield configuration. All frequencies rotating.',
+        'modulated': 'Shields modulated to Borg cutting beam frequency.',
+        'metaphasic': 'Metaphasic shields engaged. Safe for stellar corona entry.'
+    }
+    return configs.get(configuration, f'Unknown configuration: {configuration}')
+
+# === PROMPT: Tactical pattern (user-controlled) ===
+@enterprise.prompt()
+def tactical_analysis(threat: str, quadrant: str = 'Alpha') -> str:
+    """Request a tactical analysis of a threat in a specific quadrant."""
+    return (
+        f'You are the tactical officer aboard the USS Enterprise.\n\n'
+        f'Analyze the following threat: {threat} in the {quadrant} Quadrant.\n\n'
+        f'Provide: 1) Threat assessment 2) Recommended shield configuration '
+        f'3) Suggested evasive maneuvers 4) Diplomatic options if applicable.'
+    )
+
+@enterprise.prompt()
+def captains_log(stardate: str, summary: str) -> str:
+    """Format a Captain's Log entry."""
+    return (
+        f"Captain's Log, Stardate {stardate}.\n\n"
+        f"Context: {summary}\n\n"
+        f"Write a formal Captain's Log entry in the style of Jean-Luc Picard. "
+        f"Include reflections on the moral and philosophical implications."
+    )
+
+if __name__ == "__main__":
+    enterprise.run()
+</code></pre>
+
+<p>This single server file gives you a fully operational starship:</p>
+<ul>
+<li>The client can <strong>read</strong> sensor data (Resource)</li>
+<li>The model can <strong>fire phasers</strong> or <strong>raise shields</strong> when needed (Tools)</li>
+<li>The user can <strong>request a tactical analysis</strong> or <strong>dictate a Captain's Log</strong> (Prompts)</li>
+</ul>
+<p><strong>Engage.</strong> 🖖</p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

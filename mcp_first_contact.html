@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>First Contact: What is the Model Context Protocol</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>First Contact: What is the Model Context Protocol</h2>
+                        <hr class="small">
+                        <h5>MCP Series — Part 1</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>🖖 Captain's Log, Stardate 2026.06 — The Universal Translator for AI</h2>
+<p>In the vast cosmos of artificial intelligence, Large Language Models are brilliant officers — capable of reasoning, generating text, and solving complex problems. But like any Starfleet officer confined to the bridge, they are <strong>blind to the outside universe</strong> without their sensors, databases, and tools.</p>
+<p>The <strong>Model Context Protocol (MCP)</strong> is the Universal Translator of the AI world. Just as the Universal Translator allows every species in the Federation to communicate seamlessly, MCP provides a <strong>standardized, open protocol</strong> that lets any AI model talk to any external data source or tool — without custom adapters for each one.</p>
+</div>
+
+<div class="section level2">
+<h2>🚨 Red Alert: The Problem MCP Solves</h2>
+<p>Before MCP, connecting an LLM to external systems was like establishing diplomatic relations with a new species from scratch — every time. Each integration required:</p>
+<ul>
+<li>Custom API wrappers</li>
+<li>Bespoke authentication handling</li>
+<li>Tool-specific serialization formats</li>
+<li>Fragile, one-off connections that broke at the slightest change</li>
+</ul>
+<p>The result? An N×M problem — N models × M tools = chaos. MCP collapses this into a single, standardized interface. One protocol to rule them all. 🖖</p>
+</div>
+
+<div class="section level2">
+<h2>🌉 Architecture: The Ship's Bridge</h2>
+<p>MCP follows a client-server architecture, much like a starship's chain of command:</p>
+
+<table class="table table-condensed">
+<thead><tr><th>Component</th><th>Star Trek Analogy</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><strong>Host</strong></td><td>The Ship's Bridge (Claude, VS Code, your app)</td><td>The application the user interacts with</td></tr>
+<tr><td><strong>Client</strong></td><td>The Communications Officer (Uhura)</td><td>Maintains a 1:1 connection with a server</td></tr>
+<tr><td><strong>Server</strong></td><td>The Away Team</td><td>Exposes data and capabilities to the model</td></tr>
+</tbody>
+</table>
+
+<p>The Host spawns one or more Clients, each Client connects to one Server. The Server is where the action happens — it's the away team beaming down to gather intelligence, execute actions, and report back.</p>
+</div>
+
+<div class="section level2">
+<h2>📡 The Three Primitives: Resources, Tools, and Prompts</h2>
+
+<h3>1. Resources — The Sensor Array 📊</h3>
+<p>Resources are <strong>read-only data</strong> that the model can access. Think of them as the Enterprise's long-range sensors scanning a planet: they provide information but don't alter the environment.</p>
+<ul>
+<li>File contents, database records, API responses</li>
+<li>Identified by URIs (e.g., <code>file:///logs/warp-core.log</code>)</li>
+<li><strong>Application-controlled</strong> — the host decides when to fetch them</li>
+</ul>
+
+<h3>2. Tools — The Phaser Array 🔫</h3>
+<p>Tools are <strong>executable functions</strong> the model can invoke. Like firing phasers — the model decides when and how to use them, with real-world side effects.</p>
+<ul>
+<li>Run a query, send a message, deploy code</li>
+<li><strong>Model-controlled</strong> — the LLM decides when to call them</li>
+<li>Require user confirmation for dangerous operations (safety interlocks!)</li>
+</ul>
+
+<h3>3. Prompts — Pre-Programmed Maneuvers 🎯</h3>
+<p>Prompts are reusable templates — like the Picard Maneuver. Pre-defined interaction patterns that optimize how the model engages with specific tasks.</p>
+</div>
+
+<div class="section level2">
+<h2>📻 Transport: Communication Channels</h2>
+
+<h3>stdio — Internal Comms (Turbolift Network)</h3>
+<p>Direct process-to-process communication. Fast, local, used by desktop clients like Claude Desktop or VS Code. The server runs as a subprocess.</p>
+
+<h3>SSE / Streamable HTTP — Subspace Frequencies</h3>
+<p>Remote communication over HTTP. Used when the server is deployed on a different machine — like hailing Starfleet Command from deep space.</p>
+</div>
+
+<div class="section level2">
+<h2>🛠️ Project Setup: Reporting for Duty</h2>
+
+<p>Install the MCP SDK with the CLI tools:</p>
+<pre><code class="bash">pip install 'mcp[cli]'</code></pre>
+
+<p>Project structure — think of it as the ship's engineering section:</p>
+<pre><code>starfleet_engineering/
+├── warp_core.py          # Main MCP server
+├── sensors/              # Resource modules
+│   └── long_range.py
+├── weapons/              # Tool modules
+│   └── phaser_array.py
+└── maneuvers/            # Prompt templates
+    └── picard_maneuver.py</code></pre>
+
+<h3>Your First Warp Core — The Minimal Server</h3>
+<pre><code class="python"># starfleet_engineering/warp_core.py
+from mcp.server.fastmcp import FastMCP
+
+# Initialize the ship's computer core
+enterprise = FastMCP('USS Enterprise NCC-1701-D')
+
+if __name__ == '__main__':
+    # Engage! Start listening for commands
+    enterprise.run(transport='stdio')
+</code></pre>
+
+<p>That's it. With just 4 lines, you've brought the warp core online. The <code>FastMCP</code> class is your matter/antimatter reactor — the heart of every MCP server. It handles all the protocol negotiation, message routing, and lifecycle management.</p>
+
+<p>Run it with the MCP inspector to verify everything is operational:</p>
+<pre><code class="bash">mcp dev starfleet_engineering/warp_core.py</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🖖 What's Next</h2>
+<p>In the next installment, we'll activate the ship's computer with <strong>Ollama</strong> — a local LLM that doesn't require phoning home to Starfleet Command. No cloud APIs, no latency, no data leaving the ship. Total operational independence.</p>
+<p><em>Make it so.</em></p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

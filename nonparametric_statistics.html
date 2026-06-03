@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Nonparametric Statistics</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Nonparametric Statistics</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="introduction" class="section level2">
+<h2>Introduction to Nonparametric Statistics</h2>
+<p>Parametric methods used to solve univariate and multivariate problems have, as a limitation, the need to introduce very restrictive assumptions (normality, homoscedasticity, independence and identical distribution of the error component) which are rarely satisfied in practice. Nonparametric methods provide an alternative when:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>The distributional model is unknown</li>
+<li>Normality cannot be assumed</li>
+<li>Inference concerns qualitative variables</li>
+<li>The sample size is smaller than the number of variables</li>
+<li>There are non-random missing data</li>
+</ul>
+<p>In the nonparametric framework, the representative indicator of a distribution is the <strong>median</strong>, which unlike the mean, is a robust estimator. Exploiting the fact that for any continuous random variable:</p>
+<p><span class="math display">\[ Pr(X \geq Me) = Pr(X \leq Me) = \frac{1}{2} \]</span></p>
+<p>Alternatively, we can use <strong>rank</strong> variables, defined as the integer corresponding to the position that the random variable occupies when passing from the random sample \((X_1, X_2, \ldots, X_n)\) to the ordered random sample \((X_{(1)}, X_{(2)}, \ldots, X_{(n)})\). Ranks are very robust even in the presence of notable variations in data — any monotone transformation does not alter them.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="sign-test" class="section level2">
+<h2>The Sign Test</h2>
+<p>Let \(Me\) be the median of a continuous random variable \(X\). We construct a test to verify \(H_0: Me = Me_0\) against \(H_1: Me \neq Me_0\).</p>
+<p>If \(H_0\) is true, approximately half the observations should be above (below) \(Me_0\). For a random sample \((X_1, X_2, \ldots, X_n)\), the number of observations \(T_n\) greater than \(Me_0\) is a binomial random variable:</p>
+<p><span class="math display">\[ T_n \sim Bi(n, \theta) \]</span></p>
+<p>Testing \(H_0: Me = Me_0\) is equivalent to testing \(H_0: \theta = \frac{1}{2}\) vs. \(H_1: \theta \neq \frac{1}{2}\).</p>
+
+<div id="critical-region" class="section level3">
+<h3>Critical Region</h3>
+<p>Under \(H_0\), \(T_n \sim Bi(n, 1/2)\), so on average the sample will contain \(n/2\) observations above \(Me_0\). The critical region is:</p>
+<p><span class="math display">\[ |T_n - n/2| \geq c_{\alpha/2} \]</span></p>
+<p>Using the normal approximation to the binomial with continuity correction:</p>
+<p><span class="math display">\[ c_{\alpha/2} \approx z_{\alpha/2} \frac{\sqrt{n} - 1}{2} \]</span></p>
+<p>The procedure is called the <em>sign test</em> because to compute the test statistic we mark with + (−) values above (not above) \(Me_0\) and count the number of positive signs.</p>
+</div>
+
+<div id="paired-data" class="section level3">
+<h3>Application to Paired Data</h3>
+<p>This test can be used for paired data. Suppose we want to verify the effect of a known action on the same statistical unit: \(X_i\) is measured before the experiment and \(Y_i\) after. Let:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(+\) denote the event \(\{X_i > Y_i\}\)</li>
+<li>\(-\) denote the event \(\{X_i < Y_i\}\)</li>
+<li>\(\theta = Pr(X_i > Y_i)\)</li>
+</ul>
+<p>If \(H_0: X_i = Y_i\) is true (no effect), then \(\theta = 1/2\). The number of + signs follows \(Bi(n, \theta)\).</p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="wilcoxon" class="section level2">
+<h2>Wilcoxon Signed-Rank Test</h2>
+<p>This test can be used to verify whether a random sample has a certain median or whether paired differences have median equal to 0. It is the nonparametric equivalent of Student's t-test for paired (dependent) samples.</p>
+<p>Given the random sample of paired observations \((X_1, Y_1), (X_2, Y_2), \ldots, (X_n, Y_n)\), let \(D_i = (Y_i - X_i)\) be the corresponding differences. We assume the \(D_i\) are continuous, symmetric, independent and all with the same median.</p>
+
+<div id="wilcoxon-hypotheses" class="section level3">
+<h3>Hypotheses and Test Statistic</h3>
+<p>The hypotheses to test are:</p>
+<ol>
+<li>\(H_0: Me(D_i) = 0\) vs. \(H_1: Me(D_i) > 0\)</li>
+<li>\(H_0: Me(D_i) = 0\) vs. \(H_1: Me(D_i) < 0\)</li>
+<li>\(H_0: Me(D_i) = 0\) vs. \(H_1: Me(D_i) \neq 0\)</li>
+</ol>
+<p>The test statistic is the sum of ranks \(r(|D_i|)\) corresponding to differences \(D_i > 0\):</p>
+<p><span class="math display">\[ T_n = \sum_{i=1}^{n} r(|D_i|) \cdot I(D_i > 0) \]</span></p>
+<p>where \(I(\cdot)\) is the indicator function. Under the null hypothesis:</p>
+<p><span class="math display">\[ E(T_n) = \frac{n(n+1)}{4} \qquad V(T_n) = \frac{n(n+1)(2n+1)}{24} \]</span></p>
+<p>For large \(n\) (n > 15), we can use the normal approximation (with continuity correction):</p>
+<p><span class="math display">\[ \frac{T_n - n(n+1)/4 - 1/2}{\sqrt{n(n+1)(2n+1)/24}} \xrightarrow{d} N(0,1) \]</span></p>
+</div>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="mcnemar" class="section level2">
+<h2>McNemar's Sign Test</h2>
+<p>Consider paired data. Let:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(U = \#(D_i > 0) = \sum_i I(D_i > 0)\) — the number of positive differences</li>
+<li>\(\nu = \#(D_i \neq 0)\) — the number of non-zero differences</li>
+</ul>
+<p>Under \(H_0\), the statistic \(U\) has a binomial distribution with parameters \(\nu\) and \(1/2\), i.e., \(U \sim Bin(\nu, 1/2)\). Under the alternative \(H_1\), \(U\) is still binomial but with parameters \(\nu\) and \(\theta > 1/2\).</p>
+<p>For example, with \(\nu = 20\) and \(U = 17\):</p>
+<p><span class="math display">\[ Pr(U \geq 17 | D) = \sum_{i \geq 17} \binom{20}{i} 2^{-20} = 0.0013 \]</span></p>
+<p>which is significant at level \(\alpha = 0.005\).</p>
+</div>
+
+<br><hr><p><br></p>
+
+<div id="permutation-tests" class="section level2">
+<h2>Nonparametric Permutation Methods</h2>
+<p>Permutation tests are characterized by conditioning on the set of observed data, which is a set of sufficient statistics regardless of the underlying model. These tests are called <strong>distribution-free</strong>: the distributions of the tests are completely independent of the law governing the random variable on which we want to make inference.</p>
+
+<div id="permutation-space" class="section level3">
+<h3>Definition of the Permutation Sample Space</h3>
+<p>The hypothesis \(H_0: \{Y_A \stackrel{d}{=} Y_B\}\) implies the exchangeability of variables \(Y_A\) and \(Y_B\) within each unit. The sign of each difference \(X_i\) can be thought of as assigned with probability \(1/2\).</p>
+<p>Consider the test statistic \(T = \sum_i X_i\). The conditional distribution \(F_T(t|X)\) when the observed points \(X = \{X_i, i=1,\ldots,n\}\) are fixed, is obtained under \(H_0\) by randomly assigning signs + and − to each difference with equal probability.</p>
+<p>The permutation sample space \(\mathcal{X}/X\) contains \(M = 2^\nu\) points (where \(\nu\) is the number of non-zero differences).</p>
+</div>
+
+<div id="cmc" class="section level3">
+<h3>Conditional Monte Carlo (C.M.C.) Algorithm</h3>
+<p>When the permutation space is too large to enumerate exhaustively, we use the Conditional Monte Carlo method, which samples points from the conditional permutation orbit:</p>
+<ol>
+<li><strong>s.1)</strong> Compute the observed value \(T_0 = T(X)\) on the observed set \(X\)</li>
+<li><strong>s.2)</strong> For each of the \(n\) differences in \(X\), randomly assign signs to obtain \(X^*\)</li>
+<li><strong>s.3)</strong> Compute \(T^* = T(X^*)\)</li>
+<li><strong>s.4)</strong> Repeat steps s.2) and s.3) independently \(B\) times</li>
+</ol>
+<p>The \(B\) values \(T^*\) simulate the null permutation distribution of \(T\) and allow estimation of the permutation c.d.f. \(F(z|X)\). The estimated p-value from the observed value \(T_0\) is:</p>
+<p><span class="math display">\[ \hat{\lambda} = \hat{L}_B^*(T_0) = \frac{\#(T^* \geq T_0)}{B} \]</span></p>
+<p>If \(\hat{\lambda} \leq \alpha\), we reject \(H_0\) according to the usual hypothesis testing rules.</p>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

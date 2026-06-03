@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Activating the Ship Computer with Ollama</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Activating the Ship Computer with Ollama</h2>
+                        <hr class="small">
+                        <h5>MCP Series — Part 2</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>🛡️ Operational Independence: Why Local Models?</h2>
+<p>A Galaxy-class starship doesn't phone home to Starfleet Command every time it needs to make a decision. It has its own <strong>computer core</strong> — autonomous, private, and always available, even in the depths of uncharted space.</p>
+<p>Running a local LLM with <strong>Ollama</strong> gives you the same advantages:</p>
+<ul>
+<li><strong>No reliance on cloud APIs</strong> — works offline, in air-gapped environments</li>
+<li><strong>Zero data leakage</strong> — your prompts and data never leave the ship</li>
+<li><strong>No rate limits</strong> — query the computer as much as you need</li>
+<li><strong>No API costs</strong> — the computer core is already installed</li>
+<li><strong>Low latency</strong> — no subspace relay delays</li>
+</ul>
+</div>
+
+<div class="section level2">
+<h2>🔧 Installing the Computer Core</h2>
+<p>Installing Ollama is like fitting a new isolinear chip array into the main computer. One command, and the core comes online:</p>
+<pre><code class="bash"># macOS / Linux — the replicator handles everything
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Or download from https://ollama.com for all platforms
+</code></pre>
+<p>Verify the installation — run a Level 1 diagnostic:</p>
+<pre><code class="bash">ollama --version
+# ollama version is 0.x.x
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>📦 Pulling a Model: Loading the Neural Gel Packs</h2>
+<p>The computer core needs its neural pathways. Pull a model — we'll use <code>llama3.2:3b</code>, compact enough for most workstations yet surprisingly capable:</p>
+<pre><code class="bash"># Download the model weights (~2GB)
+ollama pull llama3.2:3b
+</code></pre>
+<p>This downloads the model to your local storage. Like loading a new database into the ship's memory banks — it only happens once.</p>
+</div>
+
+<div class="section level2">
+<h2>🖥️ Testing: "Computer, Status Report"</h2>
+<p>Let's make sure the computer core responds:</p>
+<pre><code class="bash"># Interactive session — like talking to the ship's computer
+ollama run llama3.2:3b
+
+>>> What is the current stardate?
+</code></pre>
+<p>If you get a coherent response, the computer core is operational. Press <code>Ctrl+D</code> to exit.</p>
+</div>
+
+<div class="section level2">
+<h2>🐍 Connecting via Python: The Bridge Console</h2>
+<p>Now we connect our bridge console (Python) to the ship's computer. We'll use <code>langchain</code> as the universal interface:</p>
+<pre><code class="bash">pip install langchain langchain-ollama</code></pre>
+
+<pre><code class="python">from langchain.chat_models import init_chat_model
+
+# Initialize the ship's computer — local, private, always ready
+ship_computer = init_chat_model('ollama:llama3.2:3b', temperature=0)
+
+# Issue a command
+response = ship_computer.invoke('Computer, status report on warp core.')
+print(response.content)
+</code></pre>
+
+<p>The <code>temperature=0</code> setting makes the computer deterministic — like switching from creative mode to precise diagnostic mode. For consistent, repeatable answers, keep it at 0.</p>
+</div>
+
+<div class="section level2">
+<h2>🧠 The Brain That Calls MCP Tools</h2>
+<p>Here's where it gets powerful. The ship's computer doesn't just answer questions — it <strong>delegates to ship systems</strong>. When you ask "Computer, scan the nearby planet", it doesn't generate a made-up scan. It routes the command to the <em>actual sensor array</em> (an MCP tool).</p>
+
+<p>The flow works like this:</p>
+<ol>
+<li>You issue a command to the ship's computer (the LLM)</li>
+<li>The computer analyzes the command and determines which <strong>ship system</strong> (MCP tool) to activate</li>
+<li>It calls the appropriate tool via MCP protocol</li>
+<li>The tool executes and returns real data</li>
+<li>The computer formats the response for the crew (you)</li>
+</ol>
+
+<pre><code class="python"># Example: the ship's computer deciding to use a tool
+from langchain.chat_models import init_chat_model
+
+ship_computer = init_chat_model('ollama:llama3.2:3b', temperature=0)
+
+# When connected to MCP tools, the computer can:
+# - Read sensor data (Resources)
+# - Fire phasers / execute actions (Tools)
+# - Run pre-programmed maneuvers (Prompts)
+#
+# The LLM is the BRAIN. MCP servers are the BODY.
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🔍 MCP Inspector: The Diagnostic Console</h2>
+<p>Before connecting the computer to live ship systems, test your MCP servers with the <strong>MCP Inspector</strong> — the engineering diagnostic console:</p>
+<pre><code class="bash"># Launch the inspector — opens a web UI for testing
+mcp dev your_server.py
+</code></pre>
+<p>The inspector lets you:</p>
+<ul>
+<li>See all available tools, resources, and prompts</li>
+<li>Call tools manually and inspect responses</li>
+<li>Debug protocol messages in real-time</li>
+<li>Verify your server before connecting it to the LLM</li>
+</ul>
+<p>Think of it as running a full systems diagnostic from Main Engineering before taking the ship to warp.</p>
+</div>
+
+<div class="section level2">
+<h2>🖖 What's Next</h2>
+<p>The computer core is online. In the next log entry, we'll <strong>initialize the warp core</strong> — build a full MCP server with FastMCP, configure transports, set up logging, and prepare for deployment. The away team is about to beam down.</p>
+<p><em>Engage.</em></p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

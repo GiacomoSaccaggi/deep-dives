@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>PCA</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Principal Component Analysis (PCA)</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Principal Component Analysis (PCA) is an unsupervised dimensionality reduction technique. Its goal is to find a low-dimensional representation of the data that captures the maximum amount of variance.</p>
+<p>Key applications include:</p>
+<ul>
+<li>Data visualization (projecting high-dimensional data to 2D or 3D)</li>
+<li>Noise reduction</li>
+<li>Preprocessing and feature extraction for downstream models</li>
+<li>Exploratory data analysis</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="the-idea" class="section level2">
+<h2>The Idea</h2>
+<p>PCA finds directions (called <strong>principal components</strong>) along which the data varies the most.</p>
+<ul>
+<li>The <strong>first PC</strong> is the direction of maximum variance in the data.</li>
+<li>The <strong>second PC</strong> is the direction of maximum variance orthogonal to the first.</li>
+<li>And so on for subsequent components.</li>
+</ul>
+<p>Each principal component is a linear combination of the original variables:</p>
+<p><span class="math display">\[ Z_k = w_{k1} X_1 + w_{k2} X_2 + \cdots + w_{kp} X_p = \mathbf{w}_k^\top \mathbf{X} \]</span></p>
+<p>The weights <span class="math inline">\(\mathbf{w}_k\)</span> (also called loadings) define the direction of the <span class="math inline">\(k\)</span>-th principal component.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="mathematical-formulation" class="section level2">
+<h2>Mathematical Formulation</h2>
+<p>Given a data matrix <span class="math inline">\(\mathbf{X}\)</span> of size <span class="math inline">\(n \times p\)</span>, first center the data by subtracting column means:</p>
+<p><span class="math display">\[ \mathbf{X}_c = \mathbf{X} - \mathbf{1}\bar{\mathbf{x}}^\top \]</span></p>
+<p>The sample covariance matrix is:</p>
+<p><span class="math display">\[ \mathbf{S} = \frac{1}{n-1} \mathbf{X}_c^\top \mathbf{X}_c \]</span></p>
+<p>The principal components are the eigenvectors of <span class="math inline">\(\mathbf{S}\)</span>, and the eigenvalues represent the variance explained by each component.</p>
+
+<div id="first-pc" class="section level3">
+<h3>First Principal Component</h3>
+<p>The first PC solves the optimization problem:</p>
+<p><span class="math display">\[ \mathbf{w}_1 = \arg\max_{\|\mathbf{w}\|=1} \mathbf{w}^\top \mathbf{S} \mathbf{w} \]</span></p>
+<p>By the method of Lagrange multipliers, the solution satisfies the eigenvalue equation:</p>
+<p><span class="math display">\[ \mathbf{S} \mathbf{w}_1 = \lambda_1 \mathbf{w}_1 \]</span></p>
+<p>where <span class="math inline">\(\mathbf{w}_1\)</span> is the eigenvector corresponding to the largest eigenvalue <span class="math inline">\(\lambda_1\)</span>.</p>
+</div>
+
+<div id="k-th-pc" class="section level3">
+<h3>k-th Principal Component</h3>
+<p>The <span class="math inline">\(k\)</span>-th PC is the eigenvector corresponding to the <span class="math inline">\(k\)</span>-th largest eigenvalue:</p>
+<p><span class="math display">\[ \mathbf{S} \mathbf{w}_k = \lambda_k \mathbf{w}_k, \quad \lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p \geq 0 \]</span></p>
+<p>The eigenvectors are orthogonal: <span class="math inline">\(\mathbf{w}_i^\top \mathbf{w}_j = 0\)</span> for <span class="math inline">\(i \neq j\)</span>.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="svd" class="section level2">
+<h2>Singular Value Decomposition (SVD)</h2>
+<p>In practice, PCA is computed via the SVD of the centered data matrix:</p>
+<p><span class="math display">\[ \mathbf{X}_c = \mathbf{U} \mathbf{D} \mathbf{V}^\top \]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{U}\)</span> is <span class="math inline">\(n \times p\)</span> with orthonormal columns (left singular vectors)</li>
+<li><span class="math inline">\(\mathbf{D}\)</span> is <span class="math inline">\(p \times p\)</span> diagonal with singular values <span class="math inline">\(d_1 \geq d_2 \geq \cdots \geq d_p \geq 0\)</span></li>
+<li><span class="math inline">\(\mathbf{V}\)</span> is <span class="math inline">\(p \times p\)</span> orthogonal (right singular vectors)</li>
+</ul>
+<p>The columns of <span class="math inline">\(\mathbf{V}\)</span> are the principal components (loadings). The relationship between singular values and eigenvalues is:</p>
+<p><span class="math display">\[ \lambda_k = \frac{d_k^2}{n-1} \]</span></p>
+<p>The <strong>scores</strong> (projections of the data onto the PCs) are:</p>
+<p><span class="math display">\[ \mathbf{Z} = \mathbf{X}_c \mathbf{V} = \mathbf{U} \mathbf{D} \]</span></p>
+<p>SVD is preferred over eigendecomposition of the covariance matrix because it is more numerically stable, especially when <span class="math inline">\(p\)</span> is large relative to <span class="math inline">\(n\)</span>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="proportion-of-variance-explained" class="section level2">
+<h2>Proportion of Variance Explained</h2>
+<p>The proportion of variance explained (PVE) by the <span class="math inline">\(k\)</span>-th component is:</p>
+<p><span class="math display">\[ \text{PVE}_k = \frac{\lambda_k}{\sum_{j=1}^{p} \lambda_j} \]</span></p>
+<p>The cumulative proportion of variance explained by the first <span class="math inline">\(K\)</span> components is:</p>
+<p><span class="math display">\[ \text{CPVE}_K = \frac{\sum_{k=1}^{K} \lambda_k}{\sum_{j=1}^{p} \lambda_j} \]</span></p>
+
+<div id="choosing-components" class="section level3">
+<h3>Choosing the Number of Components</h3>
+<p>Common criteria:</p>
+<ul>
+<li><strong>Scree plot</strong>: plot eigenvalues <span class="math inline">\(\lambda_k\)</span> vs. component number <span class="math inline">\(k\)</span>. Look for an "elbow" where the curve flattens.</li>
+<li><strong>Cumulative PVE threshold</strong>: retain enough components so that <span class="math inline">\(\text{CPVE}_K \geq 80\%\text{–}90\%\)</span>.</li>
+<li><strong>Kaiser's rule</strong>: retain components with <span class="math inline">\(\lambda_k > 1\)</span> (when using the correlation matrix).</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="loadings-and-interpretation" class="section level2">
+<h2>Loadings and Interpretation</h2>
+<p>The loading of variable <span class="math inline">\(j\)</span> on principal component <span class="math inline">\(k\)</span> is the element <span class="math inline">\(v_{jk}\)</span> of the eigenvector <span class="math inline">\(\mathbf{w}_k\)</span>:</p>
+<p><span class="math display">\[ \text{Loading}_{jk} = v_{jk} \]</span></p>
+<ul>
+<li>A high absolute loading means that variable <span class="math inline">\(j\)</span> contributes strongly to PC <span class="math inline">\(k\)</span>.</li>
+<li>The sign indicates direction of contribution.</li>
+</ul>
+
+<div id="biplot" class="section level3">
+<h3>Biplot</h3>
+<p>A biplot displays both observations and variables in the space of the first two PCs:</p>
+<ul>
+<li>Points represent observations projected onto PC1 and PC2 (scores).</li>
+<li>Arrows represent loading vectors for each original variable.</li>
+<li>The angle between arrows approximates the correlation between variables.</li>
+<li>The length of an arrow indicates how well the variable is represented in the 2D projection.</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="standardization" class="section level2">
+<h2>Standardization</h2>
+<p>If the original variables are measured on different scales, PCA on the covariance matrix will be dominated by variables with the largest variance. In this case, it is recommended to use the <strong>correlation matrix</strong> instead:</p>
+<p><span class="math display">\[ \mathbf{R} = \mathbf{D}_s^{-1} \mathbf{S} \mathbf{D}_s^{-1} \]</span></p>
+<p>where <span class="math inline">\(\mathbf{D}_s = \text{diag}(s_1, \ldots, s_p)\)</span> is the diagonal matrix of standard deviations. This is equivalent to standardizing each variable to zero mean and unit variance before applying PCA.</p>
+<p>Using the correlation matrix is generally recommended unless the variables are already on the same scale and the relative magnitudes of variance are meaningful.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<ul>
+<li><strong>Linear only</strong>: PCA can only capture linear relationships. For nonlinear structure, consider kernel PCA or autoencoders.</li>
+<li><strong>Sensitive to outliers</strong>: Outliers can dominate the covariance matrix and distort the principal components. Robust PCA methods exist for this case.</li>
+<li><strong>Interpretability</strong>: Principal components are linear combinations of all original variables, so they may not correspond to interpretable features.</li>
+<li><strong>Variance ≠ information</strong>: PCA assumes that directions of maximum variance are the most informative. This is not always true (e.g., in classification problems where discriminative directions may have low variance).</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

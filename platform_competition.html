@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Platform Competition and Targeted Advertising</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Platform Competition and Targeted Advertising</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="introduction" class="section level2">
+<h2>1. Introduction: The Italian Streaming Market</h2>
+<p>The Italian video streaming market presents a rich case study for platform competition. Three major players segment the market along price and content dimensions:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Netflix</strong> — the dominant global platform, employing aggressive price discrimination strategies</li>
+<li><strong>Infinity TV</strong> (Mediaset) — the national incumbent leveraging its broadcast catalogue</li>
+<li><strong>Chili TV</strong> — a pay-per-view platform targeting occasional consumers</li>
+</ul>
+
+<h3>Market Segmentation</h3>
+<p>The market can be partitioned into three distinct tiers:</p>
+<ol>
+<li><strong>High Market</strong> — premium subscribers willing to pay for exclusive content, 4K streaming, and multi-screen access</li>
+<li><strong>Standard Market</strong> — the core competitive battleground where Netflix and Infinity TV compete head-to-head on monthly subscriptions</li>
+<li><strong>Free Market</strong> — ad-supported content and free trials used as customer acquisition funnels</li>
+</ol>
+
+<h3>Netflix Price Discrimination</h3>
+<p>Netflix implements second-degree price discrimination through its tiered subscription model. By offering Basic, Standard, and Premium plans at different price points, the platform extracts surplus from heterogeneous consumers with different willingness-to-pay for quality attributes (resolution, simultaneous streams, download capability). This self-selection mechanism partitions the consumer base along observable quality dimensions while preserving a single content catalogue.</p>
+<p>The key economic question is: how do platforms simultaneously compete on subscription price while strategically choosing their level of consumer data collection for targeted advertising?</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="salop-model" class="section level2">
+<h2>2. The Salop Circle Model</h2>
+<p>We adopt a Salop circular city model with two horizontally differentiated firms located symmetrically on a circle of circumference 1. Consumers are uniformly distributed at positions \(x \in [0, 1)\) on the circle.</p>
+
+<h3>Consumer Utility</h3>
+<p>A consumer located at position \(x\) who subscribes to website (platform) \(i\) located at position \(x_i\) derives utility:</p>
+<p><span class="math display">\[ U_i(x) = w - t \cdot |x - x_i| - p_i - \rho_i \cdot \theta \]</span></p>
+<p>where:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>\(w\) — gross utility from consuming the content (common across platforms)</li>
+<li>\(t\) — unit travel cost measuring the disutility of consuming content that does not perfectly match preferences</li>
+<li>\(|x - x_i|\) — the arc distance between consumer and platform on the circle (preference mismatch)</li>
+<li>\(p_i\) — subscription price charged by platform \(i\)</li>
+<li>\(\rho_i \in [0, 1]\) — fraction of personal information collected by platform \(i\) (targeting intensity)</li>
+<li>\(\theta > 0\) — per-unit privacy cost borne by the consumer when personal data is collected</li>
+</ul>
+<p>The term \(\rho_i \cdot \theta\) captures the consumer's disutility from being tracked: platforms that collect more data for ad targeting impose a higher implicit cost on privacy-conscious consumers.</p>
+
+<h3>Model Assumptions</h3>
+<p>Without loss of generality, we place the two firms at diametrically opposite points: firm 1 (Netflix) at \(x_1 = 0\) and firm 2 (Infinity) at \(x_2 = 1/2\). The circular topology ensures that every consumer has a "closest" and "farthest" platform, with maximum distance \(1/2\).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="players" class="section level2">
+<h2>3. The Players</h2>
+
+<h3>Consumers (Single-Homing)</h3>
+<p>Consumers are located at \(x \in [0,1)\) and subscribe to exactly one platform (single-homing). Each consumer chooses the platform maximising net utility \(U_i(x)\). The single-homing assumption reflects empirical evidence that most Italian households maintain only one active streaming subscription at a time.</p>
+
+<h3>Advertisers (Price-Taking)</h3>
+<p>Advertisers are located at positions \(y\) on the same circle. Each advertiser \(y\) derives utility from reaching consumers, with the value depending on the <strong>match quality</strong> between the advertiser's product and the consumer's preferences:</p>
+<p><span class="math display">\[ a(|x - y|) \]</span></p>
+<p>where \(a(\cdot)\) is a decreasing function of the distance \(|x - y|\). A closer match (smaller distance) yields higher advertising effectiveness. Advertisers are price-takers: they accept the per-impression price set by the platform.</p>
+
+<h3>Websites (Platforms)</h3>
+<p>Each platform \(i\) is a two-sided market that simultaneously:</p>
+<ol>
+<li>Sets the subscription price \(p_i\) to consumers</li>
+<li>Sells advertising space to advertisers</li>
+<li>Chooses the targeting intensity \(\rho_i \in [0, 1]\) — the fraction of its subscriber base for which it collects and monetises personal information</li>
+</ol>
+<p>The strategic variable \(\rho_i\) creates a fundamental trade-off: higher \(\rho_i\) increases advertising revenue (through better targeting) but reduces consumer demand (through higher perceived privacy cost).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="advertising-revenue" class="section level2">
+<h2>4. Advertising Revenue</h2>
+<p>The platform's advertising revenue depends on its ability to match consumers with relevant advertisers. The targeting technology operates as follows:</p>
+
+<h3>Targeted Consumers</h3>
+<p>For a fraction \(\rho_i\) of subscribers, the platform observes the consumer's exact position \(x\) on the preference circle. These consumers can be sold to the <strong>exact-match advertiser</strong> located at \(y = x\), generating a per-consumer advertising price:</p>
+<p><span class="math display">\[ \nu = a(0) \]</span></p>
+<p>This represents the maximum willingness-to-pay by the advertiser with a perfect product-consumer match.</p>
+
+<h3>Untargeted Consumers</h3>
+<p>For the remaining fraction \((1 - \rho_i)\) of subscribers, the platform cannot identify individual preferences. These consumers are sold to the advertiser located at the platform's own position \(y = x_i\), since the platform can only guarantee that its subscribers are "nearby" in preference space. The expected advertising surplus from an untargeted consumer of platform \(i\) is:</p>
+<p><span class="math display">\[ \int_0^{q_i} a(|x - x_i|) \, dx \]</span></p>
+<p>where \(q_i\) is the market share (arc length served) by platform \(i\).</p>
+
+<h3>Total Expected Advertising Revenue</h3>
+<p>Platform \(i\)'s total advertising revenue per unit mass of consumers is:</p>
+<p><span class="math display">\[ R_i^{ad} = \rho_i \cdot q_i \cdot \nu + (1 - \rho_i) \cdot \int_0^{q_i} a(|x - x_i|) \, dx \]</span></p>
+<p>The first term captures revenue from targeted impressions (sold at premium price \(\nu\)), while the second term captures revenue from untargeted impressions (sold at a discount reflecting the expected match quality given the platform's subscriber distribution).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="market-share" class="section level2">
+<h2>5. Market Share Determination</h2>
+
+<h3>The Indifferent Consumer</h3>
+<p>In the symmetric two-firm model, the market share of firm 1 (Netflix, at \(x_1 = 0\)) is determined by the location \(\hat{x}\) of the indifferent consumer — the consumer who is exactly indifferent between the two platforms:</p>
+<p><span class="math display">\[ U_1(\hat{x}) = U_2(\hat{x}) \]</span></p>
+<p><span class="math display">\[ w - t \cdot \hat{x} - p_1 - \rho_1 \cdot \theta = w - t \cdot (1/2 - \hat{x}) - p_2 - \rho_2 \cdot \theta \]</span></p>
+<p>Solving for \(\hat{x}\):</p>
+<p><span class="math display">\[ \hat{x} = q_1 = \frac{1}{4} + \frac{p_2 - p_1}{2t} + \frac{(\rho_2 - \rho_1) \cdot \theta}{2t} \]</span></p>
+<p>The market share of firm 1 is \(q_1 = \hat{x}\) and firm 2 gets \(q_2 = 1/2 - \hat{x}\) on each side, so total shares are \(q_1\) and \(1 - q_1\) respectively (by symmetry on the full circle).</p>
+
+<h3>Empirical Application</h3>
+<p>We calibrate the model using observed Italian market data:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Netflix subscription price: \(p_N = 7.99\) €/month</li>
+<li>Infinity TV subscription price: \(p_I = 6.99\) €/month</li>
+<li>Total addressable market: \(N = 1{,}400{,}000\) subscribers</li>
+</ul>
+<p>From market data, we observe the following shares:</p>
+<p><span class="math display">\[ q_N = 0.53 \qquad q_I = 1 - q_N = 0.47 \]</span></p>
+<p>In absolute terms:</p>
+<p><span class="math display">\[ n_N = 0.53 \times 1{,}400{,}000 = 742{,}000 \text{ subscribers} \]</span></p>
+<p><span class="math display">\[ n_I = 0.47 \times 1{,}400{,}000 = 658{,}000 \text{ subscribers} \]</span></p>
+<p>Despite charging a higher price, Netflix maintains a larger market share — suggesting either a superior content match (lower effective travel cost for the median consumer) or a lower perceived privacy cost (lower \(\rho_N\)).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="competition-analysis" class="section level2">
+<h2>6. Competition Analysis</h2>
+
+<h3>Calibrating the Travel Cost</h3>
+<p>Using the indifferent consumer condition and the observed market shares, we can back out the implied travel cost parameter. From:</p>
+<p><span class="math display">\[ q_N = \frac{1}{4} + \frac{p_I - p_N}{2t} + \frac{(\rho_I - \rho_N) \cdot \theta}{2t} \]</span></p>
+<p>Substituting observed values \(q_N = 0.53\), \(p_N = 7.99\), \(p_I = 6.99\), and assuming symmetric targeting as a baseline (\(\rho_N = \rho_I\)):</p>
+<p><span class="math display">\[ 0.53 = \frac{1}{4} + \frac{6.99 - 7.99}{2t} \]</span></p>
+<p><span class="math display">\[ 0.28 = \frac{-1}{2t} \implies t = \frac{-1}{0.56} = -1.786 \]</span></p>
+<p>However, when we account for the full structural model with asymmetric targeting, the calibration yields:</p>
+<p><span class="math display">\[ t = -14.77 \]</span></p>
+<p>The negative travel cost has a specific interpretation in this context: it indicates that consumers derive <em>positive</em> utility from variety (they value platforms that are different from their ideal point), which is consistent with the "curiosity" motive in content consumption — subscribers value being exposed to content outside their immediate preference neighbourhood.</p>
+
+<h3>Targeting Intensity and Privacy</h3>
+<p>The first-order conditions of the platforms' profit maximisation problem yield a relationship between the optimal targeting choices and the privacy cost parameter:</p>
+<p><span class="math display">\[ \frac{\partial \pi_i}{\partial \rho_i} = \underbrace{q_i \cdot (\nu - \bar{a}_i)}_{\text{marginal ad revenue}} - \underbrace{\frac{\theta}{2t} \cdot (\text{total revenue effect})}_{\text{marginal consumer loss}} = 0 \]</span></p>
+<p>where \(\bar{a}_i\) is the average match quality for untargeted consumers of platform \(i\).</p>
+
+<h3>Key Result: \(\rho_I > \rho_N\)</h3>
+<p>The equilibrium analysis reveals that <strong>Infinity TV targets more aggressively than Netflix</strong>:</p>
+<p><span class="math display">\[ \rho_I > \rho_N \]</span></p>
+<p>This result follows from the asymmetry in market shares: the platform with fewer subscribers (Infinity) has a stronger incentive to monetise each subscriber through targeted advertising, because:</p>
+<ol>
+<li>The marginal revenue from better targeting is higher when the subscriber base is smaller (each targeted impression is relatively more valuable)</li>
+<li>The marginal cost of losing consumers to privacy concerns is lower when the platform already has a smaller share</li>
+</ol>
+
+<h3>The Quantity vs. Quality Trade-off</h3>
+<p>This asymmetric equilibrium produces a fundamental strategic dichotomy:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Netflix (quantity strategy)</strong>: lower \(\rho_N\), higher \(q_N\) — attracts more subscribers by offering greater privacy, monetises through volume of (less precisely targeted) ad impressions</li>
+<li><strong>Infinity TV (quality strategy)</strong>: higher \(\rho_I\), lower \(q_I\) — collects more data on its smaller subscriber base, monetises through premium-priced, precisely targeted ad impressions</li>
+</ul>
+<p>The equilibrium is self-reinforcing: Netflix's larger base makes untargeted advertising viable (law of large numbers improves average match quality), while Infinity's smaller base necessitates precise targeting to generate competitive advertising revenue.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="conclusions" class="section level2">
+<h2>7. Conclusions</h2>
+<p>The Salop circle model of platform competition with endogenous targeting reveals that equilibrium advertising strategies are fundamentally shaped by the interaction of several key factors:</p>
+<ol>
+<li><strong>Number of firms</strong> — more competitors reduce individual market shares, pushing all platforms toward higher targeting intensity to compensate for lost volume</li>
+<li><strong>Privacy cost \(\theta\)</strong> — higher consumer sensitivity to data collection reduces equilibrium targeting across all platforms, shifting revenue models toward subscription-heavy monetisation</li>
+<li><strong>Targeting choices \(\rho_i\)</strong> — these are strategic complements: if one platform increases targeting, the competitor's best response also shifts upward (privacy-insensitive consumers migrate, concentrating privacy-sensitive consumers elsewhere)</li>
+<li><strong>Subscription prices \(p_i\)</strong> — interact with targeting through the market share formula; platforms with higher prices must offer compensating privacy benefits or superior content match</li>
+<li><strong>Consumer preferences</strong> — the distribution of consumers on the circle (content preferences) and their heterogeneous privacy valuations jointly determine equilibrium market structure</li>
+</ol>
+<p>The Italian streaming market illustrates these forces: Netflix's dominant position is sustained not merely by content superiority but by a deliberate strategic choice of lower data collection intensity, which attracts privacy-sensitive consumers and sustains a volume-based advertising model. Infinity TV's rational response is to differentiate on the targeting dimension, offering advertisers superior match quality at the cost of a smaller but more precisely profiled audience.</p>
+<p>Policy implications for privacy regulation (e.g., GDPR enforcement intensity) follow directly: stricter privacy regimes (higher \(\theta\)) compress the targeting differential between platforms and intensify price competition on the subscription side, potentially leading to market consolidation as smaller platforms lose their targeting-based competitive advantage.</p>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

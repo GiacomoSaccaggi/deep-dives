@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Variable Selection</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Variable Selection</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>With \(p\) predictors, there are \(2^p\) possible linear models. The goal of variable selection is to find the subset of predictors that best predicts \(Y\) while avoiding overfitting. Including too many variables increases variance and reduces interpretability; including too few leads to bias.</p>
+<p>Three main approaches exist:</p>
+<ul>
+<li><strong>Filter methods</strong> — rank features independently of any model</li>
+<li><strong>Wrapper methods</strong> — use a model's predictive performance to evaluate subsets</li>
+<li><strong>Embedded methods</strong> — feature selection is built into the learning algorithm itself</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="best-subset-selection" class="section level2">
+<h2>Best Subset Selection</h2>
+<p>The most direct approach: fit all \(2^p\) possible models and choose the best one according to cross-validation error or an information criterion.</p>
+<p>For each number of predictors \(k = 0, 1, \ldots, p\):</p>
+<ol>
+<li>Fit all \(\binom{p}{k}\) models that contain exactly \(k\) predictors</li>
+<li>Pick the best among these (lowest RSS or highest \(R^2\))</li>
+</ol>
+<p>Then select the single best model across all sizes using CV, AIC, BIC, or adjusted \(R^2\).</p>
+<p><strong>Computational cost:</strong> fitting \(2^p\) models is infeasible for large \(p\). For \(p = 40\), this means over \(10^{12}\) models. Practical algorithms like <em>branch-and-bound</em> (implemented in the <code>leaps</code> R package) prune the search space but are still limited to roughly \(p \leq 40\).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="stepwise-methods" class="section level2">
+<h2>Stepwise Methods</h2>
+
+<div id="forward-stepwise" class="section level3">
+<h3>Forward Stepwise Selection</h3>
+<p>Start with the null model (intercept only). At each step, add the variable whose inclusion most improves the fit (e.g., largest reduction in RSS). Stop when no variable provides a statistically significant improvement or when the chosen criterion no longer improves.</p>
+<p>This is a greedy algorithm. It requires fitting:</p>
+<p><span class="math display">\[ 1 + \sum_{k=0}^{p-1}(p - k) = 1 + \frac{p(p+1)}{2} \in O(p^2) \text{ models}\]</span></p>
+<p>Much cheaper than best subset, but not guaranteed to find the globally optimal model.</p>
+</div>
+
+<div id="backward-stepwise" class="section level3">
+<h3>Backward Stepwise Selection</h3>
+<p>Start with the full model (all \(p\) predictors). At each step, remove the variable whose removal causes the smallest increase in RSS. Continue until a stopping rule is met.</p>
+<p><strong>Requirement:</strong> \(n > p\) (the full model must be estimable). Same \(O(p^2)\) computational cost as forward selection.</p>
+</div>
+
+<div id="bidirectional-stepwise" class="section level3">
+<h3>Bidirectional (Stepwise) Selection</h3>
+<p>Combines forward and backward steps: at each iteration, variables can be added or removed. This allows correction of earlier greedy decisions. Most implementations of <code>step()</code> in R use this approach by default.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="information-criteria" class="section level2">
+<h2>Information Criteria</h2>
+<p>These criteria penalize model complexity to avoid overfitting. They allow model comparison without a separate validation set.</p>
+
+<div id="aic" class="section level3">
+<h3>AIC (Akaike Information Criterion)</h3>
+<p><span class="math display">\[ \text{AIC} = -2 \ln \hat{L} + 2k \]</span></p>
+<p>where \(\hat{L}\) is the maximized likelihood and \(k\) is the number of estimated parameters. The AIC is asymptotically equivalent to leave-one-out cross-validation. Select the model with the <strong>lowest AIC</strong>.</p>
+</div>
+
+<div id="bic" class="section level3">
+<h3>BIC (Bayesian Information Criterion)</h3>
+<p><span class="math display">\[ \text{BIC} = -2 \ln \hat{L} + k \ln(n) \]</span></p>
+<p>Heavier penalty than AIC (since \(\ln(n) > 2\) for \(n \geq 8\)), leading to sparser models. BIC is <strong>consistent</strong>: as \(n \to \infty\), it selects the true model with probability 1 (assuming the true model is in the candidate set).</p>
+</div>
+
+<div id="adjusted-r2" class="section level3">
+<h3>Adjusted \(R^2\)</h3>
+<p><span class="math display">\[ R^2_{\text{adj}} = 1 - \frac{RSS / (n - p - 1)}{TSS / (n - 1)} \]</span></p>
+<p>Unlike raw \(R^2\), the adjusted version penalizes additional predictors. A new variable only increases \(R^2_{\text{adj}}\) if its contribution to fit outweighs the loss of a degree of freedom. Select the model with the <strong>highest</strong> adjusted \(R^2\).</p>
+</div>
+
+<div id="mallows-cp" class="section level3">
+<h3>Mallow's \(C_p\)</h3>
+<p><span class="math display">\[ C_p = \frac{RSS}{\hat{\sigma}^2} - n + 2p \]</span></p>
+<p>where \(\hat{\sigma}^2\) is estimated from the full model. \(C_p\) estimates the mean squared prediction error. For an unbiased model, \(C_p \approx p\). Select the model with the <strong>lowest \(C_p\)</strong> (or where \(C_p \approx p\)).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="filter-methods" class="section level2">
+<h2>Filter Methods</h2>
+<p>Filter methods rank features independently of any predictive model. Each feature is scored individually against the target, and a threshold or top-\(k\) rule is applied.</p>
+<p>Common scoring functions:</p>
+<ul>
+<li><strong>Pearson correlation</strong> with \(Y\) — simple, assumes linear relationship</li>
+<li><strong>Mutual information</strong> — captures non-linear dependencies: \(\displaystyle I(X; Y) = \sum_{x,y} p(x,y) \ln \frac{p(x,y)}{p(x)\,p(y)}\)</li>
+<li><strong>Chi-squared test</strong> — for categorical features vs. categorical target</li>
+<li><strong>ANOVA F-test</strong> — for continuous features vs. categorical target</li>
+</ul>
+<p><strong>Advantages:</strong> very fast, scales to high-dimensional data, model-agnostic.</p>
+<p><strong>Disadvantages:</strong> ignores feature interactions and redundancies. A feature uninformative alone may be powerful in combination with others.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="wrapper-methods" class="section level2">
+<h2>Wrapper Methods</h2>
+<p>Wrapper methods use a specific model's performance (e.g., cross-validated accuracy) to evaluate feature subsets. The model acts as a "black box" that scores each candidate subset.</p>
+<p>Examples:</p>
+<ul>
+<li><strong>Forward/Backward selection</strong> — sequential search as described above, but driven by CV error</li>
+<li><strong>Recursive Feature Elimination (RFE)</strong> — train the model, rank features by importance, remove the least important, repeat until desired number is reached</li>
+<li><strong>Genetic algorithms</strong> — evolutionary search over the space of feature subsets</li>
+</ul>
+<p><strong>Advantages:</strong> accounts for feature interactions; tailored to the specific model.</p>
+<p><strong>Disadvantages:</strong> computationally expensive (multiple model fits); risk of overfitting to the specific model choice.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="embedded-methods" class="section level2">
+<h2>Embedded Methods</h2>
+<p>Feature selection is built directly into the model training procedure.</p>
+
+<div id="lasso" class="section level3">
+<h3>LASSO (L1 Regularization)</h3>
+<p>The LASSO solves:</p>
+<p><span class="math display">\[ \min_{\beta} \left\{ \frac{1}{2n} \sum_{i=1}^{n}(y_i - x_i^T \beta)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \right\} \]</span></p>
+<p>The \(L_1\) penalty drives coefficients exactly to zero, performing automatic variable selection. The regularization parameter \(\lambda\) controls sparsity — larger \(\lambda\) means fewer selected variables. Typically chosen by cross-validation.</p>
+</div>
+
+<div id="elastic-net" class="section level3">
+<h3>Elastic Net</h3>
+<p>Combines \(L_1\) and \(L_2\) penalties:</p>
+<p><span class="math display">\[ \min_{\beta} \left\{ \frac{1}{2n} \|y - X\beta\|_2^2 + \lambda \left( \alpha \|\beta\|_1 + \frac{1-\alpha}{2}\|\beta\|_2^2 \right) \right\} \]</span></p>
+<p>When predictors are correlated, LASSO tends to select one and ignore others. Elastic Net groups correlated features together. Setting \(\alpha = 1\) gives LASSO; \(\alpha = 0\) gives Ridge (no selection).</p>
+</div>
+
+<div id="tree-based-importance" class="section level3">
+<h3>Tree-Based Feature Importance</h3>
+<p>Decision trees and ensembles (Random Forest, Gradient Boosting) naturally rank features by how much they reduce impurity (Gini, entropy) or prediction error. A common approach:</p>
+<ol>
+<li>Fit a tree-based model</li>
+<li>Rank features by importance scores</li>
+<li>Discard features below a threshold (e.g., mean importance)</li>
+</ol>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="comparison-and-practical-guidelines" class="section level2">
+<h2>Comparison and Practical Guidelines</h2>
+<table class="table table-bordered">
+<thead>
+<tr><th>Scenario</th><th>Recommended approach</th></tr>
+</thead>
+<tbody>
+<tr><td>Low \(p\) (\(< 20\))</td><td>Best subset selection or stepwise + information criteria</td></tr>
+<tr><td>Moderate \(p\) (20–100)</td><td>Stepwise with BIC/AIC, or LASSO</td></tr>
+<tr><td>High \(p\) (\(> 100\), possibly \(p > n\))</td><td>LASSO, Elastic Net, or filter + wrapper pipeline</td></tr>
+<tr><td>Correlated predictors</td><td>Elastic Net or grouped LASSO</td></tr>
+<tr><td>Non-linear relationships</td><td>Tree-based importance or mutual information filters</td></tr>
+</tbody>
+</table>
+<p><strong>Key principles:</strong></p>
+<ul>
+<li>Always validate the selected model on held-out data (test set or cross-validation). Selection criteria computed on training data are optimistic.</li>
+<li>If using stepwise methods, prefer BIC for consistency or AIC for prediction.</li>
+<li>For \(p > n\), forward stepwise, LASSO, and Elastic Net still work; backward stepwise and best subset do not.</li>
+<li>Stability selection (running LASSO on many bootstrap samples and keeping frequently selected variables) improves robustness.</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

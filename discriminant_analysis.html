@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Discriminant Analysis</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Discriminant Analysis</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Discriminant Analysis is a classification method based on the <strong>generative</strong> approach: instead of directly modeling the posterior <span class="math inline">\(P(Y=k|X)\)</span> (as discriminative methods like logistic regression do), it models the class-conditional density <span class="math inline">\(P(X|Y=k)\)</span> for each class <span class="math inline">\(k\)</span>, and then applies Bayes' theorem to obtain the posterior:</p>
+<p><span class="math display">\[ P(Y=k \mid X=x) = \frac{P(X=x \mid Y=k) \, P(Y=k)}{P(X=x)} = \frac{\pi_k \, f_k(x)}{\sum_{l=1}^{K} \pi_l \, f_l(x)} \]</span></p>
+<p>where <span class="math inline">\(\pi_k = P(Y=k)\)</span> is the prior probability of class <span class="math inline">\(k\)</span>, and <span class="math inline">\(f_k(x) = P(X=x \mid Y=k)\)</span> is the class-conditional density.</p>
+<p>The key assumption is that each class-conditional distribution is <strong>multivariate normal</strong>:</p>
+<p><span class="math display">\[ f_k(x) = \frac{1}{(2\pi)^{p/2} |\Sigma_k|^{1/2}} \exp\left( -\frac{1}{2}(x - \mu_k)^\top \Sigma_k^{-1} (x - \mu_k) \right) \]</span></p>
+<p>The classification rule assigns observation <span class="math inline">\(x\)</span> to the class <span class="math inline">\(k\)</span> that maximizes <span class="math inline">\(P(Y=k|X=x)\)</span>, or equivalently maximizes <span class="math inline">\(\pi_k \, f_k(x)\)</span>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lda" class="section level2">
+<h2>Linear Discriminant Analysis (LDA)</h2>
+<p>LDA assumes that all classes share the <strong>same covariance matrix</strong> <span class="math inline">\(\Sigma\)</span>:</p>
+<p><span class="math display">\[ X \mid Y=k \sim \mathcal{N}(\mu_k, \Sigma) \quad \text{for all } k = 1, \ldots, K \]</span></p>
+<p>By Bayes' theorem, the posterior is proportional to:</p>
+<p><span class="math display">\[ P(Y=k \mid X=x) \propto \pi_k \, f_k(x) \]</span></p>
+<p>Taking the log and dropping terms that do not depend on <span class="math inline">\(k\)</span> (since <span class="math inline">\(\Sigma\)</span> is shared), we obtain the <strong>linear discriminant function</strong>:</p>
+<p><span class="math display">\[ \delta_k(x) = x^\top \Sigma^{-1} \mu_k - \frac{1}{2} \mu_k^\top \Sigma^{-1} \mu_k + \log(\pi_k) \]</span></p>
+<p>The classification rule is: assign <span class="math inline">\(x\)</span> to the class <span class="math inline">\(k\)</span> with the largest <span class="math inline">\(\delta_k(x)\)</span>.</p>
+<p>Since <span class="math inline">\(\delta_k(x)\)</span> is a <strong>linear function</strong> of <span class="math inline">\(x\)</span>, the decision boundaries between any two classes are <strong>hyperplanes</strong> in the feature space.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lda-two-classes" class="section level2">
+<h2>LDA for Two Classes</h2>
+<p>When <span class="math inline">\(K=2\)</span>, the decision boundary is the set of points where <span class="math inline">\(\delta_1(x) = \delta_2(x)\)</span>:</p>
+<p><span class="math display">\[ \{x : \delta_1(x) = \delta_2(x)\} \]</span></p>
+<p>This defines a <strong>hyperplane</strong> in <span class="math inline">\(\mathbb{R}^p\)</span>. Classification reduces to checking the sign of <span class="math inline">\(\delta_1(x) - \delta_2(x)\)</span>.</p>
+<div id="fisher-interpretation" class="section level3">
+<h3>Fisher's Interpretation</h3>
+<p>Fisher's Linear Discriminant seeks the projection direction <span class="math inline">\(w\)</span> that maximizes the ratio of between-class variance to within-class variance:</p>
+<p><span class="math display">\[ \max_w \frac{w^\top S_B \, w}{w^\top S_W \, w} \]</span></p>
+<p>where <span class="math inline">\(S_B = (\mu_1 - \mu_2)(\mu_1 - \mu_2)^\top\)</span> is the between-class scatter matrix and <span class="math inline">\(S_W = \Sigma\)</span> is the within-class scatter (pooled covariance).</p>
+<p>The solution is:</p>
+<p><span class="math display">\[ w = \Sigma^{-1}(\mu_1 - \mu_2) \]</span></p>
+<p>This direction is the same as the one used in LDA's classification rule, confirming that LDA projects data onto the direction of maximum class separability.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+</div>
+
+<div id="qda" class="section level2">
+<h2>Quadratic Discriminant Analysis (QDA)</h2>
+<p>QDA relaxes the equal covariance assumption, allowing each class to have its <strong>own covariance matrix</strong>:</p>
+<p><span class="math display">\[ X \mid Y=k \sim \mathcal{N}(\mu_k, \Sigma_k) \]</span></p>
+<p>Since <span class="math inline">\(\Sigma_k\)</span> differs across classes, the log-likelihood terms involving the covariance no longer cancel. The <strong>quadratic discriminant function</strong> is:</p>
+<p><span class="math display">\[ \delta_k(x) = -\frac{1}{2} \log|\Sigma_k| - \frac{1}{2}(x - \mu_k)^\top \Sigma_k^{-1}(x - \mu_k) + \log(\pi_k) \]</span></p>
+<p>The classification rule remains the same: assign <span class="math inline">\(x\)</span> to the class with the largest <span class="math inline">\(\delta_k(x)\)</span>.</p>
+<p>Since <span class="math inline">\(\delta_k(x)\)</span> is now a <strong>quadratic function</strong> of <span class="math inline">\(x\)</span>, decision boundaries are <strong>quadratic surfaces</strong> (ellipses, hyperbolas, or parabolas depending on the relative geometry of the covariance matrices).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lda-vs-qda" class="section level2">
+<h2>LDA vs QDA Trade-off</h2>
+<p>The fundamental trade-off is <strong>bias vs variance</strong>:</p>
+<ul>
+<li><strong>LDA</strong> estimates a single shared covariance matrix <span class="math inline">\(\Sigma\)</span>, requiring <span class="math inline">\(\frac{p(p+1)}{2}\)</span> parameters.</li>
+<li><strong>QDA</strong> estimates a separate covariance for each class, requiring <span class="math inline">\(K \cdot \frac{p(p+1)}{2}\)</span> parameters.</li>
+</ul>
+<p>Consequences:</p>
+<ul>
+<li>When <span class="math inline">\(n\)</span> is small relative to <span class="math inline">\(p\)</span>, LDA is preferred because it has lower variance (fewer parameters to estimate).</li>
+<li>When <span class="math inline">\(n\)</span> is large, or when the true decision boundaries are genuinely non-linear, QDA can capture the additional complexity and performs better.</li>
+<li>If the equal covariance assumption holds, LDA is both simpler and optimal (lower risk).</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="estimation" class="section level2">
+<h2>Estimation</h2>
+<p>Parameters are estimated from the training data using plug-in (maximum likelihood) estimates:</p>
+<ul>
+<li><strong>Class means:</strong> <span class="math display">\[ \hat{\mu}_k = \frac{1}{n_k} \sum_{i: y_i = k} x_i \]</span></li>
+<li><strong>Pooled within-class covariance (for LDA):</strong> <span class="math display">\[ \hat{\Sigma} = \frac{1}{n - K} \sum_{k=1}^{K} \sum_{i: y_i = k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top \]</span></li>
+<li><strong>Class-specific covariance (for QDA):</strong> <span class="math display">\[ \hat{\Sigma}_k = \frac{1}{n_k - 1} \sum_{i: y_i = k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top \]</span></li>
+<li><strong>Prior probabilities:</strong> <span class="math display">\[ \hat{\pi}_k = \frac{n_k}{n} \]</span></li>
+</ul>
+<p>These estimates are plugged into the discriminant functions <span class="math inline">\(\delta_k(x)\)</span> to obtain classification rules.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="rda" class="section level2">
+<h2>Regularized Discriminant Analysis (RDA)</h2>
+<p>RDA provides a smooth interpolation between LDA and QDA by defining a regularized covariance estimate:</p>
+<p><span class="math display">\[ \hat{\Sigma}_k(\alpha) = \alpha \, \hat{\Sigma}_k + (1 - \alpha) \, \hat{\Sigma} \]</span></p>
+<p>where <span class="math inline">\(\alpha \in [0, 1]\)</span> is a tuning parameter:</p>
+<ul>
+<li><span class="math inline">\(\alpha = 0\)</span>: reduces to <strong>LDA</strong> (shared covariance)</li>
+<li><span class="math inline">\(\alpha = 1\)</span>: reduces to <strong>QDA</strong> (class-specific covariance)</li>
+</ul>
+<p>The optimal <span class="math inline">\(\alpha\)</span> is chosen by <strong>cross-validation</strong>, balancing the bias of the equal-covariance assumption against the variance of estimating separate covariance matrices.</p>
+<p>This approach is especially useful in high-dimensional settings where QDA's covariance estimates may be singular or poorly conditioned.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="connections" class="section level2">
+<h2>Connection to Other Methods</h2>
+<div id="lda-and-linear-regression" class="section level3">
+<h3>LDA and Linear Regression</h3>
+<p>For the two-class problem, LDA is equivalent to linear regression of the class indicator variable on <span class="math inline">\(X\)</span>. Both methods produce the same classification boundary (though predicted values differ in interpretation).</p>
+</div>
+<div id="lda-vs-logistic-regression" class="section level3">
+<h3>LDA vs Logistic Regression</h3>
+<p>Both LDA and logistic regression model the log-odds as a linear function of <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[ \log \frac{P(Y=1|X=x)}{P(Y=2|X=x)} = \beta_0 + \beta^\top x \]</span></p>
+<p>The difference lies in the assumptions:</p>
+<ul>
+<li><strong>LDA</strong> assumes <span class="math inline">\(X|Y=k \sim \mathcal{N}(\mu_k, \Sigma)\)</span> — the joint distribution of <span class="math inline">\((X, Y)\)</span> is fully specified. Parameters are estimated via the marginal density of <span class="math inline">\(X\)</span>.</li>
+<li><strong>Logistic regression</strong> directly parameterizes the conditional <span class="math inline">\(P(Y|X)\)</span> without assumptions on the marginal <span class="math inline">\(P(X)\)</span>.</li>
+</ul>
+<p>When the normality assumption holds, LDA is more efficient (lower asymptotic variance). When it does not hold, logistic regression is more robust.</p>
+</div>
+<div id="naive-bayes" class="section level3">
+<h3>Naive Bayes</h3>
+<p>Naive Bayes assumes that features are conditionally independent given the class, i.e., <span class="math inline">\(\Sigma_k\)</span> is diagonal. With Gaussian class-conditionals, Naive Bayes is equivalent to LDA with a <strong>diagonal covariance matrix</strong>:</p>
+<p><span class="math display">\[ \Sigma = \text{diag}(\sigma_1^2, \sigma_2^2, \ldots, \sigma_p^2) \]</span></p>
+<p>This drastically reduces the number of parameters from <span class="math inline">\(\frac{p(p+1)}{2}\)</span> to <span class="math inline">\(p\)</span>, making it suitable for high-dimensional problems where full covariance estimation is infeasible.</p>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

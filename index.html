@@ -5,10 +5,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="ML e Statistica">
+    <meta name="description" content="Articles, projects and deep dives across mathematics, statistics, economics and beyond">
     <meta name="author" content="Giacomo Saccaggi">
 
-    <title>ML e statistic</title>
+    <title>Giacomo Saccaggi - Deep Dives</title>
     <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
@@ -20,6 +20,7 @@
     </script>
 
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 
     <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -77,6 +78,9 @@
 
         /* Index Lists */
         ul { list-style-type: none; }
+
+        /* Article dates */
+        .article-date { color: #999; font-size: 11px; font-style: italic; float: right; margin-top: -18px; }
         #myUL { list-style-type: none; padding: 0; margin: 0; }
         #myUL li a {
             padding: 12px;
@@ -87,6 +91,7 @@
             display: block;
         }
         #myUL li a:hover:not(.header) { background-color: #eee; }
+        .accordion .iconify { font-size: 20px; margin-right: 8px; vertical-align: middle; color: #555; }
     </style>
 
 </head>
@@ -110,7 +115,7 @@
                 <ul class="nav navbar-nav navbar-right">
                   
                     <li>
-                        <a href="https://giacomosaccaggi.github.io/all.html">All projects</a>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
                     </li>
                     <li>
                         <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
@@ -124,14 +129,14 @@
 
     <!-- Page Header -->
     <!-- Set your background image for this header on the line below. -->
-    <header class="intro-header" style="background-image: url('sfondo.png')">
+    <header class="intro-header" style="background-image: url('sfondo2.png')">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="site-heading">
-                        <h2>Data Science</h2>
+                        <h2>"If you can't explain it simply, you don't understand it well enough"<br>Albert Einstein</h2>
                         <hr class="small">
-                        <h5>In-depth Articles</h5>
+                        <h5>A collection of personal notes, projects and deep dives across mathematics, statistics, economics and beyond.<br><br>Structured to be readable by anyone curious enough to explore.</h5>
                     </div>
                 </div>
             </div>
@@ -141,270 +146,138 @@
     <div class="container">
             
         <br>
-        <p>Often when talking about Machine learning or statistics, there is a perception that people can solve all the world's problems with magic boxes called algorithms that no one really knows how they work.<br></p>
-        <img src="algoritmopercezione.png" width="100%">
-        <p>This collection of articles does not aim to explain all the knowledge of statistics and Machine learning, nor to explain the main topics that make up this vast world, but simply encompasses some topics that I consider important and interesting. Some of these will be more discursive, some more computational, and others more mathematical-statistical, but each article will try to maintain an applied approach to make the explanation clearer.</p>
+        <div class="intro-section">
+            <p>
+                This is a collection of articles, experiments, and projects that I enjoy exploring and taking notes on—spanning statistics, machine learning, economics, mathematics, and other fields that catch my curiosity. Some of these will be more discursive, some more computational, and others more mathematical, but each piece tries to maintain an applied approach to make explanations clearer.
+            </p>
 
+            <p>As J.R.R. Tolkien once wrote:</p>
 
+            <blockquote style="font-style: italic; border-left: 4px solid #ccc; margin-left: 0; padding-left: 15px;">
+                "It is not our part to master all the tides of the world, but to do what is in us [...] uprooting the evil in the fields that we know, so that those who live after may have clean earth to till."
+            </blockquote>
+
+            <p>
+                <strong>Sharing these notes and striving for clarity is simply my own way of trying to leave behind a clean, cultivated earth for whoever comes next.</strong>
+            </p>
+        </div>
 
 
         <br>
-            <h2>Articles</h2>
+            <h2>Articles & Projects</h2>
             <br>
 
             <input type=text id="myInput" onkeyup="myFunction()" placeholder= " Search for a topic "  title="Type in a name"><div id="myUL">
             <ul>
-                <button class=accordion><li><a href="#f36">Pseudo-random number generation</a></li></button>
+                <button class=accordion><li><a href="#anomaly"><span class="iconify" data-icon="mdi:shield-search"></span>Anomaly Detection with scomp-link (Wheel of Time Edition)</a></li></button>
                 <div class=panel><p>
-                This article covers the basic methods of random and pseudo-random number generation.
+                Sensing the Pattern: Multi-method anomaly detection for tabular and time series data using consensus voting. Narrated through the lore of The Wheel of Time.
                 <br>
-                <a href="genum.html">Article link</a>
+                <a href="anomaly_detection_scomp_link.html">Article link</a><span class="article-date">March 2026</span>
                 </p></div>
             </ul>
             <ul>
-                <button class=accordion><li><a href="#f1">Evolution of statistics and data</a></li></button>
+                <button class=accordion><li><a href="#celebrimbot"><span class="iconify" data-icon="mdi:robot-happy-outline"></span>Celebrimbot</a></li></button>
                 <div class=panel><p>
-                From classical statistics to Machine Learning evolution of data.
+                An autonomous AI coding agent embedded directly into your JetBrains IDE. Multi-agent architecture with offline-first local LLM and cloud fallback.
                 <br>
-                <a href="Evoluzione_della_statistica.html">Article link</a>
+                <a href="https://giacomosaccaggi.github.io/celebrimbot.html">Project link</a>
                 </p></div>
             </ul>
             <ul>
-                <button class=accordion><li><a href="#f38">Time series</a></li></button>
+                <button class=accordion><li><a href="#mcp"><span class="iconify" data-icon="mdi:satellite-uplink"></span>Starfleet Engineering: Building an MCP Server from Scratch</a></li></button>
                 <div class=panel><p>
-                Stationarity and non-stationarity of a time series
-                <br>
-                <a href="stazionarieta.html">Article link</a>
+                A complete guide to the Model Context Protocol — the Universal Translator for AI systems. Build your own MCP Server, Starfleet Academy style.
                 <br><br>
-                
-                Multivariate stochastic processes: VARMA and VAR models
+                1. First Contact: What is the Model Context Protocol
                 <br>
-                <a href="proc_stoc_multivariati.html">Article link</a>
+                <a href="mcp_first_contact.html">Article link</a>
                 <br><br>
-                
-                Cointegration
+                2. Activating the Ship Computer with Ollama
                 <br>
-                <a href="cointegrazione.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f37">Monte Carlo Method</a></li></button>
-                <div class=panel><p>
-                This article covers the Monte Carlo Method, also analyzing variance reduction methods such as: Control variables method and antithetic variables method.
-                <br>
-                <a href="MC.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f2">Data science?</a></li></button>
-                <div class=panel><p>
-                What is data science.
-                <br>
-                <a href="Datascience.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f3">Ensemble learning</a></li></button>
-                <div class=panel><p>
-                Stacked models.
-                <br>
-                <a href="Ensemblelearning.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f4">Fisher's exact test</a></li></button>
-                <div class=panel><p>
-                Fisher's exact test is a hypothesis testing test used in non-parametric statistics in situations with two dichotomous nominal variables.
-                <br>
-                <a href="Test_esatto_fisher.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#35">Network analysis</a></li></button>
-                <div class=panel><p>
-                The measures underlying Network analysis in R
-                <br>
-                <a href="networkR.html">Article link</a>
+                <a href="mcp_ollama.html">Article link</a>
                 <br><br>
-
-                The measures underlying Network analysis in Python
+                3. Initializing the Warp Core: Server Setup
                 <br>
-                <a href="networkPy.html">Article link</a>
-
+                <a href="mcp_warp_core.html">Article link</a>
                 <br><br>
-                
-                <a href="info.csv">Download dataset from_to.csv</a><br>
-                <a href="from_to.csv">Download dataset info.csv</a>
-
+                4. Sensor Array Active: Exposing Resources
+                <br>
+                <a href="mcp_resources.html">Article link</a>
                 <br><br>
-                Work in progress: Dynamic network representation<br>
-                Work in progress: Cluster and community analysis<br>
-                </p></div>
-            </ul>
-            
-            <ul>
-                <button class=accordion><li><a href="#f27">Forecasting theory</a></li></button>
-                <div class=panel><p>
-                Forecasting theory
+                5. Armory and Replicators: Creating Tools
                 <br>
-                <a href="Teoria_della_previsione.html">Article link</a>
-                </p></div>
-            </ul>
-            
-            <ul>
-                <button class=accordion><li><a href="#40">Convolutional Neural Network</a></li></button>
-                <div class=panel><p>
-                Convolutional neural networks: definition and elements.
-                <br>
-                <a href="CNN.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#41">Correlation vs causation</a></li></button>
-                <div class=panel><p>
-                Correlation vs causality
-                <br>
-                <a href="corr_vs_caus.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#39">Market analysis and Marketing</a></li></button>
-                <div class=panel><p>
-                Schematic notions on the steps in market research
-                <br>
-                <a href="Ricerche_di_mercato.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f5">Large scale testing</a></li></button>
-                <div class=panel><p>
-                The multiple testing problem.
-                <br>
-                <a href="Large_scale_testing.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f6">UCM components</a></li></button>
-                <div class=panel><p>
-                Four basic components of these models: Trend, Cycle, Seasonality, Noise (WN).<br>Also included a small insight on the use of regressors in these models.
-                <br>
-                <a href="UCM.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f7">Boosting</a></li></button>
-                <div class=panel><p>
-                Boosting is a machine learning technique that falls into the ensemble learning category. The idea of Boosting is to combine "weak" classifiers in order to create a classifier with better accuracy.
-                <br>
-                <a href="boosting.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f40">Neural Network and Multi-Layer Perceptron (MLP)</a></li></button>
-                <div class=panel><p>
-                This article explains in an introductory way the concept of neural network and introduces the Multi-Layer Perceptron (MLP)<br>
-                <a href="MLP.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f8">Regression Splines</a></li></button>
-                <div class=panel><p>
-                It is a non-parametric regression technique and can be seen as an extension of linear models that automatically models non-linearities and interactions between variables
-                <br>
-                <a href="splines.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f12">Record Linkage</a></li></button>
-                <div class=panel><p>
-                Record Linkage and Knowledge Discovery
-                <br>
-                <a href="Record_linkage.html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f32">Bayesian Statistics</a></li></button>
-                <div class=panel><p>
-                Introduction to the Bayesian approach
-                <br>
-                <a href="introbayesiana.html">Article link</a>
-
+                <a href="mcp_tools.html">Article link</a>
                 <br><br>
-                Prior selection:<br>
-                a) Direct assignment<br>
-                b) Conjugate distributions to the Model<br>
-                c) Non-informative distributions<br>
-
-                <a href="sceltaprior.html">Article link</a>
-                <br><br>
-                Hyperparameter selection methods
+                6. Subspace Communications: Managing Prompts
                 <br>
-                <a href="sceltaiperpar.html">Article link</a>
-
+                <a href="mcp_prompts.html">Article link</a>
                 <br><br>
-                Predictive inference with the Bayesian approach:<br>
-                a) Point estimation<br>
-                b) Interval estimation<br>
-                c) Hypothesis testing
-
+                7. The Kobayashi Maru: Testing and Deployment
                 <br>
-                <a href="inferenzaprevbayes.html">Article link</a>
-
-                
-                <br><br>
-                Posterior synthesis
-
-                <br>
-                <a href="sintesiposterior.html">Article link</a>
-                
+                <a href="mcp_kobayashi_maru.html">Article link</a><span class="article-date">January 2026</span>
                 </p></div>
             </ul>
             <ul>
-                <button class=accordion><li><a href="#f29">UCM models in State Space form</a></li></button>
+                <button class=accordion><li><a href="#p1"><span class="iconify" data-icon="mdi:fingerprint"></span>CardinalityKit</a></li></button>
                 <div class=panel><p>
-                1. Introduction to State Space models
+                Advanced Cardinality Estimation for Privacy-Preserving Analytics.
                 <br>
-                <a href="SSMintro.html">Article link</a>
-                </p><p>
-                2. Introduction to UCM models in State Space form with the KFAS library
-                <br>
-                <a href="SSMKFAS.html">Article link</a>
-                </p><p>
-                3. State Space models estimation of unknown parameters
-                <br>
-                <a href="SSMinf.html">Article link</a>
-                </p><p>
-                4. Application of State Space models estimation of unknown parameters and auxiliary residuals
-                <br>
-                <a href="SSMinfapp.html">Article link</a>
-                </p><p>
-                5. Forecasting, filtering and smoothing
-                <br>
-                <a href="SSMffs.html">Article link</a>
+                <a href="https://giacomosaccaggi.github.io/CardinalityKit">Project link</a><span class="article-date">December 2025</span>
                 </p></div>
             </ul>
             <ul>
-                <button class=accordion>
-                    <li><a href="#f10">The steps of an analysis</a></li>
-                </button>
-                <div class=panel>
-                    <p>
-                        Summary of the steps of an analysis, from data to prediction.
-                        <br>
-                        <a href="steps_analisi.html">Article link</a>
-                    </p>
-                </div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#30">Psychometrics: Myers Briggs personality test</a></li></button>
+                <button class=accordion><li><a href="#p2"><span class="iconify" data-icon="mdi:robot-outline"></span>Scomp Link</a></li></button>
                 <div class=panel><p>
-                Psychometrics and the Myers Briggs personality test as used in market analysis
+                The Astromech Arm for Your Python Projects. May the code be with you.
                 <br>
-                <a href="TestMyersBriggs.html">Article link</a>
+                <a href="https://giacomosaccaggi.github.io/scomp_link/index.html">Project link</a><span class="article-date">March 2024</span>
                 </p></div>
             </ul>
             <ul>
-                <button class=accordion><li><a href="#f33">From Spatial Statistics to geostatistics</a></li></button>
+                <button class=accordion><li><a href="#pytest"><span class="iconify" data-icon="mdi:magic-staff"></span>Expecto Pytest: Defense Against the Dark Bugs</a></li></button>
+                <div class=panel><p>
+                A complete pytest course, Hogwarts-style. From marks to plugins, learn to protect your code from the Dementors of Production.
+                <br><br>
+                1. The Time-Turner: Marks &amp; Parametrization
+                <br>
+                <a href="pytest_marks.html">Article link</a>
+                <br><br>
+                2. The Room of Requirement: Fixtures Basics
+                <br>
+                <a href="pytest_fixtures.html">Article link</a>
+                <br><br>
+                3. The Room of Requirement: Advanced Magic
+                <br>
+                <a href="pytest_fixtures_advanced.html">Article link</a>
+                <br><br>
+                4. Ministry-Issued Spells: Built-in Fixtures
+                <br>
+                <a href="pytest_builtins.html">Article link</a>
+                <br><br>
+                5. Riddikulus! Defeating the Boggart of Dependencies
+                <br>
+                <a href="pytest_mocking.html">Article link</a>
+                <br><br>
+                6. Lumos! Illuminating Failing Tests
+                <br>
+                <a href="pytest_debugging.html">Article link</a>
+                <br><br>
+                7. Weasleys' Wizard Wheezes: The Plugin Ecosystem
+                <br>
+                <a href="pytest_plugins.html">Article link</a>
+                <br><br>
+                8. The Imperius Curse: Property-Based Testing with Hypothesis
+                <br>
+                <a href="pytest_hypothesis.html">Article link</a>
+                <br><br>
+                9. Becoming a Wandmaker: Writing Custom Plugins
+                <br>
+                <a href="pytest_writing_plugins.html">Article link</a><span class="article-date">December 2023</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f33"><span class="iconify" data-icon="mdi:map-marker-radius"></span>From Spatial Statistics to geostatistics</a></li></button>
                 <div class=panel><p>
                 0. Introduction to geostatistical data.
                 <br>
@@ -444,160 +317,523 @@
                 <br><br>
                 9. Theoretical introduction to spatial prediction and kriging and application in R on Ordinary and Universal Kriging.
                 <br>
-                <a href="kriging.html">Article link</a>
+                <a href="kriging.html">Article link</a><span class="article-date">April 2023</span>
                 </p></div>
             </ul>
-            
+            <ul>
+                <button class=accordion>
+                    <li><a href="#f10"><span class="iconify" data-icon="mdi:clipboard-list-outline"></span>The steps of an analysis</a></li>
+                </button>
+                <div class=panel>
+                    <p>
+                        Summary of the steps of an analysis, from data to prediction.
+                        <br>
+                        <a href="steps_analisi.html">Article link</a><span class="article-date">November 2022</span>
+                    </p>
+                </div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f2"><span class="iconify" data-icon="mdi:chart-bubble"></span>Data science?</a></li></button>
+                <div class=panel><p>
+                What is data science.
+                <br>
+                <a href="Datascience.html">Article link</a><span class="article-date">August 2022</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f12"><span class="iconify" data-icon="mdi:link-variant"></span>Record Linkage</a></li></button>
+                <div class=panel><p>
+                Record Linkage and Knowledge Discovery
+                <br>
+                <a href="Record_linkage.html">Article link</a><span class="article-date">April 2022</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f18"><span class="iconify" data-icon="mdi:filter-variant"></span>Variable Selection</a></li></button>
+                <div class=panel><p>
+                Best subset, stepwise methods, information criteria (AIC, BIC), filter/wrapper/embedded approaches.
+                <br>
+                <a href="variable_selection.html">Article link</a><span class="article-date">February 2022</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f17"><span class="iconify" data-icon="mdi:weight-lifter"></span>Variable importance</a></li></button>
+                <div class=panel><p>
+                Quantifying feature contributions: model-specific methods, permutation importance, SHAP values, and drop-column importance.
+                <br>
+                <a href="variable_importance.html">Article link</a><span class="article-date">January 2022</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f29"><span class="iconify" data-icon="mdi:sine-wave"></span>UCM models in State Space form</a></li></button>
+                <div class=panel><p>
+                1. Introduction to State Space models
+                <br>
+                <a href="SSMintro.html">Article link</a><span class="article-date">September 2021</span>
+                </p><p>
+                2. Introduction to UCM models in State Space form with the KFAS library
+                <br>
+                <a href="SSMKFAS.html">Article link</a>
+                </p><p>
+                3. State Space models estimation of unknown parameters
+                <br>
+                <a href="SSMinf.html">Article link</a>
+                </p><p>
+                4. Application of State Space models estimation of unknown parameters and auxiliary residuals
+                <br>
+                <a href="SSMinfapp.html">Article link</a>
+                </p><p>
+                5. Forecasting, filtering and smoothing
+                <br>
+                <a href="SSMffs.html">Article link</a><span class="article-date">November 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#40"><span class="iconify" data-icon="mdi:grid"></span>Convolutional Neural Network</a></li></button>
+                <div class=panel><p>
+                Convolutional neural networks: definition and elements.
+                <br>
+                <a href="CNN.html">Article link</a><span class="article-date">October 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p3"><span class="iconify" data-icon="mdi:tag-multiple"></span>Easy tagging and automatic tagging</a></li></button>
+                <div class=panel><p>
+                A Python package to speed up any image and text tagging procedures.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/tagginggs.html">Project link</a><span class="article-date">October 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f22"><span class="iconify" data-icon="mdi:lasso"></span>LASSO</a></li></button>
+                <div class=panel><p>
+                Least Absolute Shrinkage and Selection Operator: L1 sparsity, coordinate descent, regularization path, and variants.
+                <br>
+                <a href="lasso.html">Article link</a><span class="article-date">June 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f23"><span class="iconify" data-icon="mdi:mountain"></span>Ridge Regression</a></li></button>
+                <div class=panel><p>
+                L2 regularization: closed-form solution, SVD interpretation, multicollinearity, Bayesian connection.
+                <br>
+                <a href="ridge_regression.html">Article link</a><span class="article-date">June 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f16"><span class="iconify" data-icon="mdi:compress"></span>Shrinkage Methods</a></li></button>
+                <div class=panel><p>
+                Ridge (L2), LASSO (L1), and Elastic Net regularization. Bias-variance tradeoff and choosing lambda via cross-validation.
+                <br>
+                <a href="shrinkage_methods.html">Article link</a><span class="article-date">May 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#35"><span class="iconify" data-icon="mdi:graph-outline"></span>Network analysis</a></li></button>
+                <div class=panel><p>
+                The measures underlying Network analysis in R
+                <br>
+                <a href="networkR.html">Article link</a><span class="article-date">March 2021</span>
+                <br><br>
+
+                The measures underlying Network analysis in Python
+                <br>
+                <a href="networkPy.html">Article link</a><span class="article-date">March 2021</span>
+
+                <br><br>
+                
+                <a href="info.csv">Download dataset from_to.csv</a><br>
+                <a href="from_to.csv">Download dataset info.csv</a>
+
+                <br><br>
+                Work in progress: Dynamic network representation<br>
+                Work in progress: Cluster and community analysis<br>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f40"><span class="iconify" data-icon="mdi:brain"></span>Neural Network and Multi-Layer Perceptron (MLP)</a></li></button>
+                <div class=panel><p>
+                This article explains in an introductory way the concept of neural network and introduces the Multi-Layer Perceptron (MLP)<br>
+                <a href="MLP.html">Article link</a><span class="article-date">January 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p4"><span class="iconify" data-icon="mdi:email-search-outline"></span>Getting emails from Yellow Pages</a></li></button>
+                <div class=panel><p>
+                Web Scraping procedures with R and Python to get emails from the Yellow Pages website.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/getmailsfromPagineGialle/">Project link</a><span class="article-date">January 2021</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f20"><span class="iconify" data-icon="mdi:scatter-plot"></span>Cluster</a></li></button>
+                <div class=panel><p>
+                K-Means, hierarchical clustering, DBSCAN. Distance measures, silhouette scores, and practical guidelines.
+                <br>
+                <a href="cluster_analysis.html">Article link</a><span class="article-date">November 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f19"><span class="iconify" data-icon="mdi:vector-difference"></span>Discriminant analysis</a></li></button>
+                <div class=panel><p>
+                LDA, QDA, Fisher's criterion, regularized discriminant analysis, and connections to logistic regression.
+                <br>
+                <a href="discriminant_analysis.html">Article link</a><span class="article-date">September 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f21"><span class="iconify" data-icon="mdi:axis-arrow"></span>Factor analysis: PCA</a></li></button>
+                <div class=panel><p>
+                Principal Component Analysis: eigenvalue decomposition, SVD, proportion of variance explained, loadings, and biplots.
+                <br>
+                <a href="pca.html">Article link</a><span class="article-date">August 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f8"><span class="iconify" data-icon="mdi:chart-bell-curve-cumulative"></span>Regression Splines</a></li></button>
+                <div class=panel><p>
+                It is a non-parametric regression technique and can be seen as an extension of linear models that automatically models non-linearities and interactions between variables
+                <br>
+                <a href="splines.html">Article link</a><span class="article-date">July 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f6"><span class="iconify" data-icon="mdi:chart-timeline-variant"></span>UCM components</a></li></button>
+                <div class=panel><p>
+                Four basic components of these models: Trend, Cycle, Seasonality, Noise (WN).<br>Also included a small insight on the use of regressors in these models.
+                <br>
+                <a href="UCM.html">Article link</a><span class="article-date">June 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f5"><span class="iconify" data-icon="mdi:test-tube"></span>Large scale testing</a></li></button>
+                <div class=panel><p>
+                The multiple testing problem.
+                <br>
+                <a href="Large_scale_testing.html">Article link</a><span class="article-date">May 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f7"><span class="iconify" data-icon="mdi:rocket-launch"></span>Boosting</a></li></button>
+                <div class=panel><p>
+                Boosting is a machine learning technique that falls into the ensemble learning category. The idea of Boosting is to combine "weak" classifiers in order to create a classifier with better accuracy.
+                <br>
+                <a href="boosting.html">Article link</a><span class="article-date">April 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f3"><span class="iconify" data-icon="mdi:layers-triple"></span>Ensemble learning</a></li></button>
+                <div class=panel><p>
+                Stacked models.
+                <br>
+                <a href="Ensemblelearning.html">Article link</a><span class="article-date">March 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p5"><span class="iconify" data-icon="mdi:recycle"></span>Recycling, a statistical classification problem</a></li></button>
+                <div class=panel><p>
+                Using Machine Learning, Deep Learning and Ensemble Learning to create a bin that understands waste type through image recognition and sensor data.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/Recycling-bin/">Project link</a><span class="article-date">March 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f14"><span class="iconify" data-icon="mdi:forest"></span>Random Forest</a></li></button>
+                <div class=panel><p>
+                Ensemble method combining bagging with random feature selection for decorrelation. OOB error, feature importance.
+                <br>
+                <a href="random_forest.html">Article link</a><span class="article-date">March 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f13"><span class="iconify" data-icon="mdi:file-tree"></span>Decision trees</a></li></button>
+                <div class=panel><p>
+                Non-parametric supervised learning with recursive binary splitting, Gini index, entropy, and cost-complexity pruning.
+                <br>
+                <a href="decision_trees.html">Article link</a><span class="article-date">February 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f15"><span class="iconify" data-icon="mdi:package-variant-closed"></span>Bagging</a></li></button>
+                <div class=panel><p>
+                Bootstrap Aggregating: reducing variance of high-variance models through averaging bootstrap replications.
+                <br>
+                <a href="bagging.html">Article link</a><span class="article-date">February 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f43"><span class="iconify" data-icon="mdi:dice-multiple"></span>Bootstrap and Resampling Methods</a></li></button>
+                <div class=panel><p>
+                Bootstrap (parametric and nonparametric), Jackknife, bootstrap for regression, and bootstrap confidence intervals (Normal, Studentized, Basic, Percentile, BC, BCa).
+                <br>
+                <a href="bootstrap_resampling.html">Article link</a><span class="article-date">January 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f11"><span class="iconify" data-icon="mdi:school-outline"></span>Supervised and unsupervised methods, what does it mean?</a></li></button>
+                <div class=panel><p>
+                The three main learning paradigms: supervised (classification, regression), unsupervised (clustering, dimensionality reduction), and reinforcement learning.
+                <br>
+                <a href="supervised_unsupervised.html">Article link</a><span class="article-date">January 2020</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f42"><span class="iconify" data-icon="mdi:swap-vertical"></span>Nonparametric Statistics</a></li></button>
+                <div class=panel><p>
+                Introduction to nonparametric methods: sign test, Wilcoxon signed-rank test, McNemar test, and permutation tests with the Conditional Monte Carlo algorithm.
+                <br>
+                <a href="nonparametric_statistics.html">Article link</a><span class="article-date">December 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f32"><span class="iconify" data-icon="mdi:bell-curve"></span>Bayesian Statistics</a></li></button>
+                <div class=panel><p>
+                Introduction to the Bayesian approach
+                <br>
+                <a href="introbayesiana.html">Article link</a><span class="article-date">September 2019</span>
+
+                <br><br>
+                Prior selection:<br>
+                a) Direct assignment<br>
+                b) Conjugate distributions to the Model<br>
+                c) Non-informative distributions<br>
+
+                <a href="sceltaprior.html">Article link</a>
+                <br><br>
+                Hyperparameter selection methods
+                <br>
+                <a href="sceltaiperpar.html">Article link</a>
+
+                <br><br>
+                Predictive inference with the Bayesian approach:<br>
+                a) Point estimation<br>
+                b) Interval estimation<br>
+                c) Hypothesis testing
+
+                <br>
+                <a href="inferenzaprevbayes.html">Article link</a>
+
+                
+                <br><br>
+                Posterior synthesis
+
+                <br>
+                <a href="sintesiposterior.html">Article link</a><span class="article-date">November 2019</span>
+                
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f46"><span class="iconify" data-icon="mdi:arrow-decision"></span>Causal Inference for Data Science</a></li></button>
+                <div class=panel><p>
+                Correlation vs causality, causal vs predictive models, Rubin's causal model, Difference-in-Differences, Matching, Regression Discontinuity, Instrumental Variables, and Structural Models.
+                <br>
+                <a href="economics_for_data_science.html">Article link</a><span class="article-date">October 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f1"><span class="iconify" data-icon="mdi:history"></span>Evolution of statistics and data</a></li></button>
+                <div class=panel><p>
+                From classical statistics to Machine Learning evolution of data.
+                <br>
+                <a href="Evoluzione_della_statistica.html">Article link</a><span class="article-date">September 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p6"><span class="iconify" data-icon="mdi:hospital-box-outline"></span>Analysis of risk factors for an injury</a></li></button>
+                <div class=panel><p>
+                Analyzing which risk factors most influence healing time and which factors can determine non-healing of an injury.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/health/">Project link</a><span class="article-date">September 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f38"><span class="iconify" data-icon="mdi:chart-line"></span>Time series</a></li></button>
+                <div class=panel><p>
+                Stationarity and non-stationarity of a time series
+                <br>
+                <a href="stazionarieta.html">Article link</a>
+                <br><br>
+                
+                Multivariate stochastic processes: VARMA and VAR models
+                <br>
+                <a href="proc_stoc_multivariati.html">Article link</a>
+                <br><br>
+                
+                Cointegration
+                <br>
+                <a href="cointegrazione.html">Article link</a><span class="article-date">May 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#41"><span class="iconify" data-icon="mdi:not-equal-variant"></span>Correlation vs causation</a></li></button>
+                <div class=panel><p>
+                Correlation vs causality
+                <br>
+                <a href="corr_vs_caus.html">Article link</a><span class="article-date">May 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f45"><span class="iconify" data-icon="mdi:transition"></span>Markov Chains</a></li></button>
+                <div class=panel><p>
+                Stochastic processes, Markov property, discrete-time Markov chains, Chapman-Kolmogorov equations, state classification, limiting distributions, and the Gambler's Ruin problem.
+                <br>
+                <a href="markov_chains.html">Article link</a><span class="article-date">April 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f27"><span class="iconify" data-icon="mdi:crystal-ball"></span>Forecasting theory</a></li></button>
+                <div class=panel><p>
+                Forecasting theory
+                <br>
+                <a href="Teoria_della_previsione.html">Article link</a><span class="article-date">March 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f44"><span class="iconify" data-icon="mdi:trophy-outline"></span>Bee Viva Data Mining Competitions</a></li></button>
+                <div class=panel><p>
+                Ames House Price prediction
+                <br>
+                <a href="https://giacomosaccaggi.github.io/DMcompetitions/AmesHousePrice_RandomForest_512_Giacomo_Saccaggi.html">Article link</a>
+                <br><br>
+                OK Cupid profile analysis
+                <br>
+                <a href="https://giacomosaccaggi.github.io/DMcompetitions/OKCupid_RandomForest_512_Giacomo_Saccaggi.html">Article link</a>
+                <br><br>
+                Bike sharing demand prediction
+                <br>
+                <a href="https://giacomosaccaggi.github.io/DMcompetitions/Bikesharing_Random_Forest_512_Giacomo_Saccaggi.html">Article link</a><span class="article-date">March 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f4"><span class="iconify" data-icon="mdi:fishbowl-outline"></span>Fisher's exact test</a></li></button>
+                <div class=panel><p>
+                Fisher's exact test is a hypothesis testing test used in non-parametric statistics in situations with two dichotomous nominal variables.
+                <br>
+                <a href="Test_esatto_fisher.html">Article link</a><span class="article-date">January 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p7"><span class="iconify" data-icon="mdi:filmstrip"></span>Film history analysis</a></li></button>
+                <div class=panel><p>
+                Exploratory analysis of the film industry to identify interesting elements.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/Films/">Project link</a><span class="article-date">January 2019</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f37"><span class="iconify" data-icon="mdi:slot-machine"></span>Monte Carlo Method</a></li></button>
+                <div class=panel><p>
+                This article covers the Monte Carlo Method, also analyzing variance reduction methods such as: Control variables method and antithetic variables method.
+                <br>
+                <a href="MC.html">Article link</a><span class="article-date">November 2018</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f36"><span class="iconify" data-icon="mdi:numeric-random"></span>Pseudo-random number generation</a></li></button>
+                <div class=panel><p>
+                This article covers the basic methods of random and pseudo-random number generation.
+                <br>
+                <a href="genum.html">Article link</a><span class="article-date">October 2018</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#p8"><span class="iconify" data-icon="mdi:soccer"></span>Predicting the result of a football match</a></li></button>
+                <div class=panel><p>
+                A Bayesian model to predict football match results using 25 years of data from 5 European leagues, combined with Machine Learning to identify high-confidence predictions.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/scoresforecasting/">Project link</a><span class="article-date">July 2018</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f44"><span class="iconify" data-icon="mdi:function-variant"></span>Statistical Inference Theory</a></li></button>
+                <div class=panel><p>
+                Likelihood, sufficiency, exponential family, Fisher information, Cramér-Rao inequality, Rao-Blackwell theorem, Lehmann-Scheffé theorem, MLE, Delta method, and Wald test.
+                <br>
+                <a href="statistical_inference.html">Article link</a><span class="article-date">June 2018</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#30"><span class="iconify" data-icon="mdi:head-cog-outline"></span>Psychometrics: Myers Briggs personality test</a></li></button>
+                <div class=panel><p>
+                Psychometrics and the Myers Briggs personality test as used in market analysis
+                <br>
+                <a href="TestMyersBriggs.html">Article link</a><span class="article-date">December 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#39"><span class="iconify" data-icon="mdi:store-search"></span>Market analysis and Marketing</a></li></button>
+                <div class=panel><p>
+                Schematic notions on the steps in market research
+                <br>
+                <a href="Ricerche_di_mercato_ita.html">Article link</a><span class="article-date">November 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f28"><span class="iconify" data-icon="mdi:scale-balance"></span>Fishbein model: Evaluation VS Performance</a></li></button>
+                <div class=panel><p>
+                Multi-attribute attitude model: A = sum(b_i * e_i). Importance-Performance Analysis matrix and Theory of Reasoned Action.
+                <br>
+                <a href="fishbein_model.html">Article link</a><span class="article-date">November 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f26"><span class="iconify" data-icon="mdi:ruler-square"></span>Torgerson method: psychometric scale</a></li></button>
+                <div class=panel><p>
+                Psychometric scaling from paired comparisons: Thurstone's law, Z-score transformation, and interval scale construction.
+                <br>
+                <a href="torgerson_method.html">Article link</a><span class="article-date">October 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f42"><span class="iconify" data-icon="mdi:database-search"></span>SQL: the foundation of databases</a></li></button>
+                <div class=panel><p>
+                SQL (Structured Query Language) is a language for interacting with data stored in a relational database. A collection of articles on querying and managing relational data.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/SQL/">Article link</a><span class="article-date">September 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f43"><span class="iconify" data-icon="mdi:microsoft-excel"></span>Excel data analysis</a></li></button>
+                <div class=panel><p>
+                Excel is a very popular tool but many of its functions are often unknown to the average user. Articles to consolidate knowledge on advanced Excel topics.
+                <br>
+                <a href="https://giacomosaccaggi.github.io/Excel/">Article link</a><span class="article-date">September 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f47"><span class="iconify" data-icon="mdi:television-play"></span>Platform Competition and Targeted Advertising</a></li></button>
+                <div class=panel><p>
+                Game theory applied to streaming platform competition (Netflix vs Infinity TV): Salop circle model, targeted advertising, privacy costs, and market share equilibrium.
+                <br>
+                <a href="platform_competition.html">Article link</a><span class="article-date">February 2017</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f49"><span class="iconify" data-icon="mdi:bank-outline"></span>Economic Policy</a></li></button>
+                <div class=panel><p>
+                Economic systems, Pareto efficiency, Walrasian equilibrium, welfare theorems, market failures, financial crises (1929 vs 2008), and policy instruments.
+                <br>
+                <a href="economic_policy.html">Article link</a><span class="article-date">May 2016</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f48"><span class="iconify" data-icon="mdi:book-open-page-variant"></span>History of Economic Thought</a></li></button>
+                <div class=panel><p>
+                From antiquity to modern economics: Mercantilism, Physiocracy, Adam Smith, Ricardo, Marx, Marginalist Revolution, Keynes, Monetarism, and modern synthesis.
+                <br>
+                <a href="history_economic_thought.html">Article link</a><span class="article-date">January 2016</span>
+                </p></div>
+            </ul>
+            <ul>
+                <button class=accordion><li><a href="#f50"><span class="iconify" data-icon="mdi:factory"></span>The ILVA Case: Health vs Work</a></li></button>
+                <div class=panel><p>
+                The ILVA steelworks case study: history of Italy's largest steel plant, environmental crisis, constitutional court balancing of rights (work vs health), and the re-engineering plan.
+                <br>
+                <a href="ilva_case_study.html">Article link</a><span class="article-date">June 2014</span>
+                </p></div>
+            </ul>
 
 
-
-
-
-            <br>
-            
-            <br>
-            
-            <ul>
-                <button class=accordion><li><a href="#workinpro"><h2>Work in progress</h2></a></li></button>
-                <div class=panel><p>
-            <ul>
-                <button class=accordion><li><a href="#f9">What is Machine Learning?</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f10">The steps of an analysis</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f11">Supervised and unsupervised methods, what does it mean?</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f13">Decision trees</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f14">Random Forest</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f15">Bagging</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f16">Shrinkage Methods</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f17">Variable importance</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f18">Variable Selection</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f19">Discriminant analysis</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f20">Cluster</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f21">Factor analysis: PCA</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f22">LASSO</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f23">Ridge Regression</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f26">Torgerson method: psychometric scale</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#f28">Fishbein model: Evaluation VS Performance</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-            <ul>
-                <button class=accordion><li><a href="#31">Discriminant analysis</a></li></button>
-                <div class=panel><p>
-                Text
-                <br>
-                <a href=".html">Article link</a>
-                </p></div>
-            </ul>
-</p></div>
-            </ul>
             <script>
             function myFunction() {
                 
@@ -676,6 +912,27 @@
             </div>
         </div>
     </footer>
+
+<script>
+(function() {
+  var palettes = [
+    {name:'neutri', colors:['#F9F9F7','#EAEAE6','#D5CFC4']},
+    {name:'verdi', colors:['#C2D3C1','#D4E4D3','#B8CFBA','#8EAE9D']},
+    {name:'blu', colors:['#D3E0EA','#E0EBF3','#9FB4C7','#B8CFDD']},
+    {name:'terra', colors:['#F4E7C5','#F8EDD5','#F0DFB0','#EACBA0']},
+    {name:'accenti', colors:['#E3CBC8','#EDD9D7','#D9B8B5','#C9B3C4']}
+  ];
+  var palette = palettes[Math.floor(Math.random() * palettes.length)];
+  var buttons = document.querySelectorAll('.accordion');
+  buttons.forEach(function(btn) {
+    var c = palette.colors[Math.floor(Math.random() * palette.colors.length)];
+    btn.style.backgroundColor = c;
+    // contrast: dark bg -> white text, light bg -> dark text
+    var r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    btn.style.color = (r*0.299 + g*0.587 + b*0.114) > 150 ? '#2D3032' : '#F9F9F7';
+  });
+})();
+</script>
 </body>
 
 </html>

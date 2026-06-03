@@ -22,7 +22,7 @@
 
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link rel="stylesheet" mean="screen and (min-width:481px)" href="cv.css">
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/clean-blog.min.css" rel="stylesheet">
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -114,10 +114,9 @@
                 <ul class="nav navbar-nav navbar-right">
                   
                     <li>
-                        <a href="https://giacomosaccaggi.github.io/articoli/">Data Science articles</a>
                     </li>
                     <li>
-                        <a href="https://giacomosaccaggi.github.io/all.html">All projects</a>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
                     </li>
                     <li>
                         <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
@@ -150,18 +149,18 @@
     <div class="container">
  
 
-<div id="modelli-state-space-in-kfas" class="section level1">
+<div id="models-state-space-in-kfas" class="section level1">
 <h1>State Space Models in KFAS</h1>
 <div id="definizione-generale" class="section level2">
 <h2>General Definition</h2>
-<p>The state space form used by KFAS is slightly different from what we have used so far. In particular, it is not possible to use the vectors ct and dt, and the covariance matrix of the state vector disturbances is specified using the product of two different matrices. KFAS uses the following state space form:</p>
+<p>The state space form used by KFAS is slightly different from what we have used so far. In particular, it is not possible to use the vectors ct and dt, and the covariance matrix of the state vector disturbances is specified using the product of two different matrixs. KFAS uses the following state space form:</p>
 <ul>
 <li><strong>Measurement (or Observation) Equations</strong>: establish a linear relationship between a time series (or a vector of time series) and <span class="math inline">\(m\)</span> state variables that contain the unobservable components in the case of UCMs and other components that help construct them.<span class="math display">\[ \underline{Y}_t =  \underline{Z}_t \space \underline{\alpha}_t + \underline{\epsilon}_t \space, \space \space con \space \space \underline{\epsilon}_t \sim WN(\underline{0}, H_t) \]</span> where <span class="math inline">\(\alpha_t\)</span> is a state vector that does not necessarily have to have the same dimension as the time series.</li>
 <li><strong>State (or Transition) Equations</strong>: inform about the law of motion, that is, how <span class="math inline">\(\alpha_t\)</span> evolves over time (it is a VAR(1) with coefficients that can evolve over time).<span class="math display">\[ \underline{\alpha}_{t+1} =  \underline{T}_t \space \underline{\alpha}_t + \underline{\nu}_t \space, \space \space con \space \space \underline{\nu}_t = \underline{R}_t  \underline{\eta}_t \sim WN(\underline{0}, Q_t) \]</span>This form is called the future form because on the left there is only time <span class="math inline">\(t+1\)</span> and on the right time <span class="math inline">\(t\)</span>. Usually one writes <span class="math inline">\(\ni_{t+1}\)</span> but since it is a WN it doesn't change anything. The task of matrix <span class="math inline">\(R\)</span> is to assign the two disturbances to the correct transition equations: for example, associating the first disturbance with the second equation and the second disturbance with the third equation.</li>
 </ul>
-<p>La forma state-space è completata dalla specificazione dei primi due momenti di <span class="math inline">\(\alpha_1\)</span>: <span class="math display">\[ \underline{a}_{1|0} = E(\underline\alpha_1) \\
+<p>La forma state-space is completata from the specificazione of the primi due momenti di <span class="math inline">\(\alpha_1\)</span>: <span class="math display">\[ \underline{a}_{1|0} = E(\underline\alpha_1) \\
 P_{1|0}=E[(\underline\alpha_1-\underline\alpha_{1|0})(\underline\alpha_1-\underline\alpha_{1|0})^T \space]\]</span></p>
-<p>Nel caso di componenti stazionarie si inseriscono la media e la varianza di tali componenti, nel caso invece di componenti non stazionarie (come trend o la stagionalità) si possono inserire condizioni diffuse, cioè una media arbitraria e delle varianze infinite (c’è infinita incertezza rispetto al valore che la v.c. puÃ² assumere). La possibilità di porre condizioni diffuse garantisce che definire <span class="math inline">\(\alpha_{1|0}\)</span> e <span class="math inline">\(P_{1|0}\)</span> non sia un limite ma anche l’algoritmo usato non lo consente si puÃ² fissare una varianza così alta da esse indistinguibile da infinito da punto di vista pratico.</p>
+<p>Nel caso di components stazionarie it inseriscono the mean e the variance di tali components, nel caso invece di components not stazionarie (come trend o the seasonaltà) it possono inserire condizioni diffuse, i.e. a mean arbitraria e of the varianze infinite (c’è infinita incertezza with respect al value che the v.c. puÃ² assumere). La possibilità di porre condizioni diffuse garantisce che definire <span class="math inline">\(\alpha_{1|0}\)</span> e <span class="math inline">\(P_{1|0}\)</span> not sia a limite ma also l’algoritmo usato not the consente it puÃ² fissare a variance così alta da esse indistinguibile da infinito da punto di vista pratico.</p>
 <p>Technical conditions:</p>
 <ul>
 <li>First condition: <span class="math inline">\(E(\underline\epsilon_t \space \underline\nu_t^T)=G_t\)</span> and it is assumed that <span class="math inline">\(G_t=0\)</span> for simplicity;</li>
@@ -173,12 +172,12 @@ P_{1|0}=E[(\underline\alpha_1-\underline\alpha_{1|0})(\underline\alpha_1-\underl
 </div>
 <div id="definizione-ucm-in-kfas" class="section level1">
 <h1>UCM Definition in KFAS</h1>
-<p>The <em>R</em> package that we will use for estimating models in state space form is <em>KFAS</em>, which you can download from CRAN like all major R packages. The package contains excellent algorithms for performing inference on state variables (Kalman filter and smoothers). The KFAS package defines a class of objects called <em>SSModel</em>, which is in fact a list containing all the information of the state space form. The constructor, that is the function that generates objects of type SSModel, is itself called <strong><em>SSModel()</em></strong> and, for our purposes, requires only three formal parameters: formula, data, and H. Therefore, to generate a state space form and assign it to the model variable we will write:</p>
-<p><strong><em>modello &lt;- SSModel(formula, data, H)</em></strong></p>
-<p>Il secondo e il terzo parametro formale sono molto banali: <em>data</em> deve contenere un data.frame con i dati necessarialmodello,cioè la o le variabili dipendenti e gli eventuali regressori(se le variabili sono disponibili nel global environment il parametro formale data puÃ² essere omesso); H deve contenere la matrice di covarianza (o l’array di matrici di covarianza se queste evolvono nel tempo) dell’errore di osservazione. Al parametro formale <em>formula</em> deve essere passato un oggetto di tipo formula comune in R per gestire variabili esogene ed endogene. Per generare una forma state space partendo direttamente dalle matrici di sistema si deve utilizzare all’interno del parametro formula la funzione:</p>
+<p>The <em>R</em> package that we will use for eestimateting models in state space form is <em>KFAS</em>, which you can download from CRAN like all major R packages. The package contains excellent algorithms for performing inference on state variables (Kalman filter and smoothers). The KFAS package defines a class of objects called <em>SSModel</em>, which is in fact a list containing all the information of the state space form. The constructor, that is the function that generates objects of type SSModel, is itself called <strong><em>SSModel()</em></strong> and, for our purposes, requires only three formal parameters: formula, data, and H. Therefore, to generate a state space form and assign it to the model variable we will write:</p>
+<p><strong><em>model &lt;- SSModel(formula, data, H)</em></strong></p>
+<p>Il according to e the terzo parameter formale are very banali: <em>data</em> deve contenere a data.frame con the dati necessarialmodel,cioè the o the variables dependent e the eventuali regressori(se the variables are disponibili nel global environment the parameter formale data puÃ² essere omesso); H deve contenere the matrix di covariance (o l’array di matrici di covariance if these evolvono nel tempo) dell’error di observation. Al parameter formale <em>formula</em> deve essere passato a oggetto di tipo formula comune in R per gestire variables esogene ed endogene. Per generare a forma state space partendo direttamente from the matrici di sistema it deve utilizzare all’interno del parameter formula the function:</p>
 <p><strong><em>SSMcustom(Z, T, R, Q, a1, P1, P1inf)</em></strong></p>
-<p>In KFAS esistono diverse funzioni utilizzabili additivamente per creare le componenti più comuni dei modelli a componenti non osservabili. Per i dettagli delle funzioni si consiglia di riferirsi alla documentazione del pacchetto KFAS, qui ci limitiamo a mostrare degli esempi per l’utilizzo in modello univariati. SSMarima(ar, ma, d = 0, Q) produce la forma state space di un modello ARIMA(p,d,q) con i coefficienti della parte AR e MA specificati nei vettori ar e ma, rispettivamente.</p>
-<p>Nella prossima parte vedremo nel dettaglio la specificazione delle varie componenti dei modelli UCM nello specifico.</p>
+<p>In KFAS esistono diverse functions utilizzabili additivamente per creare the components more comuni of the models a components not osservabili. Per the dettagli of the functions it consiglia di riferirsi to the documentazione del pacchetto KFAS, qui ci limitiamo a mostrare of the esempi per l’utilizzo in model univariati. SSMarima(ar, ma, d = 0, Q) produce the forma state space di a model ARIMA(p,d,q) con the coefficients of the parte AR e MA specificati in the vettori ar e ma, rispettivamente.</p>
+<p>Nella prossima parte vedremo nel dettaglio the specificazione of the varie components of the models UCM nello specifico.</p>
 <div id="rw-noise" class="section level2">
 <h2>RW + noise</h2>
 <p><span class="math display">\[T=1, \space \space Q=\sigma_\eta^2, \space \space H=\sigma_\epsilon^2, \space \space Z=1 \]</span> Therefore the state space model becomes:</p>
@@ -192,25 +191,25 @@ y&lt;-AirPassengers
 sigma2_eta=10
 sigma2_epsilon=2
 
-modelloRW&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta), H= sigma2_epsilon)
+modelRW&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta), H= sigma2_epsilon)
 
 
-modelloRW$T</code></pre>
+modelRW$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##       level
 ## level     1</code></pre>
-<pre class="r"><code>modelloRW$Z</code></pre>
+<pre class="r"><code>modelRW$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level
 ## [1,]     1</code></pre>
-<pre class="r"><code>modelloRW$H</code></pre>
+<pre class="r"><code>modelRW$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    2</code></pre>
-<pre class="r"><code>modelloRW$Q</code></pre>
+<pre class="r"><code>modelRW$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
@@ -229,26 +228,26 @@ y&lt;-AirPassengers
 sigma2_eta=10
 sigma2_epsilon=2
 
-modelloRWD&lt;-SSModel(y~0+SSMtrend(degree = 2,Q=list(sigma2_eta,0)), H= 1)
+modelRWD&lt;-SSModel(y~0+SSMtrend(degree = 2,Q=list(sigma2_eta,0)), H= 1)
 
 
-modelloRWD$T</code></pre>
+modelRWD$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##       level slope
 ## level     1     1
 ## slope     0     1</code></pre>
-<pre class="r"><code>modelloRWD$Z</code></pre>
+<pre class="r"><code>modelRWD$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level slope
 ## [1,]     1     0</code></pre>
-<pre class="r"><code>modelloRWD$H</code></pre>
+<pre class="r"><code>modelRWD$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    1</code></pre>
-<pre class="r"><code>modelloRWD$Q</code></pre>
+<pre class="r"><code>modelRWD$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1] [,2]
@@ -270,26 +269,26 @@ sigma2_epsilon=2
 sigma2_k=0.1
 
 periodo=11
-modelloRWcycle&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMcycle(period =periodo,Q= sigma2_k ), H= 0)
+modelRWcycle&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMcycle(period =periodo,Q= sigma2_k ), H= 0)
 
-modelloRWcycle$T</code></pre>
+modelRWcycle$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##        level      cycle    cycle*
 ## level      1  0.0000000 0.0000000
 ## cycle      0  0.8412535 0.5406408
 ## cycle*     0 -0.5406408 0.8412535</code></pre>
-<pre class="r"><code>modelloRWcycle$Z</code></pre>
+<pre class="r"><code>modelRWcycle$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level cycle cycle*
 ## [1,]     1     1      0</code></pre>
-<pre class="r"><code>modelloRWcycle$H</code></pre>
+<pre class="r"><code>modelRWcycle$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    0</code></pre>
-<pre class="r"><code>modelloRWcycle$Q</code></pre>
+<pre class="r"><code>modelRWcycle$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1] [,2] [,3]
@@ -300,7 +299,7 @@ modelloRWcycle$T</code></pre>
 <div id="rwd-ciclo" class="section level2">
 <h2>RWD + ciclo</h2>
 <p><span class="math display">\[T=\begin{bmatrix} 1  &amp;1&amp;0 &amp;0 \\ 0&amp;1&amp;0&amp;0 \\0&amp;0&amp; \cos \frac{2 \space \pi}{periodo} &amp; \sin \frac{2 \space \pi}{periodo}   \\0&amp;0 &amp; -\sin \frac{2 \space \pi}{periodo} &amp; \cos \frac{2 \space \pi}{periodo}\end{bmatrix} , \space \space Q=\begin{bmatrix} \sigma_\eta^2&amp;0&amp;0&amp;0\\0&amp;0&amp;0&amp;0\\0&amp;0&amp; \sigma_k^2&amp;0\\0&amp;0&amp;0&amp; \sigma_k^2 \end{bmatrix} , \space \space H=0, \space \space Z=\big[\begin{array}{cc} 1&amp;0&amp;1&amp;0\end{array} \big] \]</span></p>
-<p>N.B. La matrice <span class="math inline">\(T\)</span> contiene al suo interno la matrice di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
+<p>N.B. La matrix <span class="math inline">\(T\)</span> contiene al suo interno the matrix di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
 <ul>
 <li><strong>Measurement (or Observation) Equations</strong>:</li>
 </ul>
@@ -313,9 +312,9 @@ sigma2_epsilon=2
 sigma2_k=0.1
 
 periodo=11
-modelloRWDcycle&lt;-SSModel(y~0+SSMtrend(degree = 2,Q=list(sigma2_eta,0))+SSMcycle(period =periodo,Q= sigma2_k ), H= 0)
+modelRWDcycle&lt;-SSModel(y~0+SSMtrend(degree = 2,Q=list(sigma2_eta,0))+SSMcycle(period =periodo,Q= sigma2_k ), H= 0)
 
-modelloRWDcycle$T</code></pre>
+modelRWDcycle$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##        level slope      cycle    cycle*
@@ -323,17 +322,17 @@ modelloRWDcycle$T</code></pre>
 ## slope      0     1  0.0000000 0.0000000
 ## cycle      0     0  0.8412535 0.5406408
 ## cycle*     0     0 -0.5406408 0.8412535</code></pre>
-<pre class="r"><code>modelloRWDcycle$Z</code></pre>
+<pre class="r"><code>modelRWDcycle$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level slope cycle cycle*
 ## [1,]     1     0     1      0</code></pre>
-<pre class="r"><code>modelloRWDcycle$H</code></pre>
+<pre class="r"><code>modelRWDcycle$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    0</code></pre>
-<pre class="r"><code>modelloRWDcycle$Q</code></pre>
+<pre class="r"><code>modelRWDcycle$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1] [,2] [,3] [,4]
@@ -342,11 +341,11 @@ modelloRWDcycle$T</code></pre>
 ## [3,]    0    0  0.1  0.0
 ## [4,]    0    0  0.0  0.1</code></pre>
 </div>
-<div id="rw-stagionalita-a-dummy" class="section level2">
-<h2>RW + stagionalità a dummy</h2>
-<p>Con le dummy vengono delle matrici impegnative perche lunghe quanto il numero dell dummy meno uno piu gli altri elementi del modello, quindi faremo solo l’esempio con 4 dummy stagionali e un random wlak cosi da semplificare la comprensione della componente stagionale nei modelli state space.</p>
+<div id="rw-seasonalta-a-dummy" class="section level2">
+<h2>RW + seasonaltà a dummy</h2>
+<p>Con the dummy are of the matrici impegnative perche lunghe quanto the numero dell dummy less uno piu the altri elementi del model, therefore faremo only l’esempio con 4 dummy seasonal e a random wlak cosi da semplificare the comprensione of the component seasonal in the models state space.</p>
 <p><span class="math display">\[T=\begin{bmatrix} 1  &amp;0&amp;0 &amp;0  \\0&amp;-1&amp; -1 &amp; -1  \\0&amp;1 &amp; 0 &amp; 0\\ 0&amp;0&amp;1&amp;0\end{bmatrix} , \space \space Q=\begin{bmatrix} \sigma_\eta^2&amp;0\\0&amp;\sigma_\gamma^2  \end{bmatrix} , \space \space H=0, \space \space Z=\big[\begin{array}{cc} 1&amp;1&amp;0&amp;0\end{array} \big] \]</span></p>
-<p>N.B. La matrice <span class="math inline">\(T\)</span> contiene al suo interno la matrice di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
+<p>N.B. La matrix <span class="math inline">\(T\)</span> contiene al suo interno the matrix di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
 <ul>
 <li><strong>Measurement (or Observation) Equations</strong>:</li>
 </ul>
@@ -360,9 +359,9 @@ sigma2_k=0.1
 sigma2_gamma=1
 
 periodo=4
-modelloRWdummy&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMseasonal(period =periodo,Q= sigma2_gamma, sea.type = &quot;dummy&quot; ), H= 0)
+modelRWdummy&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMseasonal(period =periodo,Q= sigma2_gamma, sea.type = &quot;dummy&quot; ), H= 0)
 
-modelloRWdummy$T</code></pre>
+modelRWdummy$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##            level sea_dummy1 sea_dummy2 sea_dummy3
@@ -370,28 +369,28 @@ modelloRWdummy$T</code></pre>
 ## sea_dummy1     0         -1         -1         -1
 ## sea_dummy2     0          1          0          0
 ## sea_dummy3     0          0          1          0</code></pre>
-<pre class="r"><code>modelloRWdummy$Z</code></pre>
+<pre class="r"><code>modelRWdummy$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level sea_dummy1 sea_dummy2 sea_dummy3
 ## [1,]     1          1          0          0</code></pre>
-<pre class="r"><code>modelloRWdummy$H</code></pre>
+<pre class="r"><code>modelRWdummy$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    0</code></pre>
-<pre class="r"><code>modelloRWdummy$Q</code></pre>
+<pre class="r"><code>modelRWdummy$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1] [,2]
 ## [1,]   10    0
 ## [2,]    0    1</code></pre>
 </div>
-<div id="rw-stagionalita-trigonometrica-stocastica" class="section level2">
-<h2>RW + stagionalità trigonometrica stocastica</h2>
-<p>Con le dummy vengono delle matrici impegnative perche lunghe quanto il numero dell dummy meno uno piu gli altri elementi del modello, quindi faremo solo l’esempio con 6 dummy stagionali e un random wlak cosi da semplificare la comprensione della componente stagionale nei modelli state space.</p>
+<div id="rw-seasonalta-trigonometrica-stocastica" class="section level2">
+<h2>RW + seasonaltà trigonometrica stocastica</h2>
+<p>Con the dummy are of the matrici impegnative perche lunghe quanto the numero dell dummy less uno piu the altri elementi del model, therefore faremo only l’esempio con 6 dummy seasonal e a random wlak cosi da semplificare the comprensione of the component seasonal in the models state space.</p>
 <p><span class="math display">\[T=\begin{bmatrix} 1  &amp;0&amp;0 &amp;0&amp;0&amp;0  \\0&amp;\cos\bigg(\frac{2\pi}{periodo} \bigg)&amp; \sin\bigg(\frac{2\pi}{periodo} \bigg) &amp; 0&amp;0&amp;0  \\0&amp;\sin\bigg(\frac{2\pi}{periodo} \bigg) &amp; \cos\bigg(\frac{2\pi}{periodo} \bigg) &amp; 0&amp;0&amp;0\\0&amp;0&amp;0&amp;\cos\bigg(\frac{4\pi}{periodo} \bigg)&amp; \sin\bigg(\frac{4\pi}{periodo} \bigg) &amp; 0  \\0&amp;0&amp;0&amp;\sin\bigg(\frac{4\pi}{periodo} \bigg) &amp; \cos\bigg(\frac{4\pi}{periodo} \bigg) &amp; 0\\ 0&amp;0&amp;0&amp;0&amp;0&amp;\cos\bigg(\frac{6\pi}{periodo} \bigg)\end{bmatrix} ,\\ \space \space Q=\begin{bmatrix} \sigma_\eta^2&amp;0&amp;0&amp;0&amp;0&amp;0\\0&amp;\sigma_\gamma^2&amp;0&amp;0&amp;0&amp;0 \\0&amp;0&amp;\sigma_\gamma^2&amp;0&amp;0&amp;0\\0&amp;0&amp;0&amp;\sigma_\gamma^2&amp;0&amp;0\\0&amp;0&amp;0&amp;0&amp;\sigma_\gamma^2&amp;0\\0&amp;0&amp;0&amp;0&amp;0&amp;\sigma_\gamma^2 \end{bmatrix} , \space \space H=0, \space \space Z=\big[\begin{array}{cc}  1&amp;1&amp;0&amp;1&amp;0 \end{array} \big] \]</span></p>
-<p>N.B. La matrice <span class="math inline">\(T\)</span> contiene al suo interno la matrice di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
+<p>N.B. La matrix <span class="math inline">\(T\)</span> contiene al suo interno the matrix di rotazione:<span class="math inline">\(R(y)\)</span> Therefore the state space model becomes:</p>
 <ul>
 <li><strong>Measurement (or Observation) Equations</strong>:</li>
 </ul>
@@ -409,14 +408,14 @@ f1&lt;-cos(serie_di_Furier)
 f2&lt;-sin(serie_di_Furier)
 
 periodo=6
-modelloRWsinus&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMseasonal(period =periodo,Q= sigma2_gamma, sea.type = &quot;trigonometric&quot; ), H= 0)
+modelRWsinus&lt;-SSModel(y~0+SSMtrend(degree = 1,Q=sigma2_eta)+SSMseasonal(period =periodo,Q= sigma2_gamma, sea.type = &quot;trigonometric&quot; ), H= 0)
 
 print(&quot;coseno&quot;);f1;print(&quot;seno&quot;);f2</code></pre>
 <pre><code>## [1] &quot;coseno&quot;</code></pre>
 <pre><code>## [1]  0.5 -0.5 -1.0</code></pre>
 <pre><code>## [1] &quot;seno&quot;</code></pre>
 <pre><code>## [1] 8.660254e-01 8.660254e-01 1.224606e-16</code></pre>
-<pre class="r"><code>modelloRWsinus$T</code></pre>
+<pre class="r"><code>modelRWsinus$T</code></pre>
 <pre><code>## , , 1
 ## 
 ##            level  sea_trig1 sea_trig*1  sea_trig2 sea_trig*2 sea_trig3
@@ -426,17 +425,17 @@ print(&quot;coseno&quot;);f1;print(&quot;seno&quot;);f2</code></pre>
 ## sea_trig2      0  0.0000000  0.0000000 -0.5000000  0.8660254         0
 ## sea_trig*2     0  0.0000000  0.0000000 -0.8660254 -0.5000000         0
 ## sea_trig3      0  0.0000000  0.0000000  0.0000000  0.0000000        -1</code></pre>
-<pre class="r"><code>modelloRWsinus$Z</code></pre>
+<pre class="r"><code>modelRWsinus$Z</code></pre>
 <pre><code>## , , 1
 ## 
 ##      level sea_trig1 sea_trig*1 sea_trig2 sea_trig*2 sea_trig3
 ## [1,]     1         1          0         1          0         1</code></pre>
-<pre class="r"><code>modelloRWsinus$H</code></pre>
+<pre class="r"><code>modelRWsinus$H</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1]
 ## [1,]    0</code></pre>
-<pre class="r"><code>modelloRWsinus$Q</code></pre>
+<pre class="r"><code>modelRWsinus$Q</code></pre>
 <pre><code>## , , 1
 ## 
 ##      [,1] [,2] [,3] [,4] [,5] [,6]

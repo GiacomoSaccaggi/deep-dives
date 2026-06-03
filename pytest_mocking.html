@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="pytest Mocking">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Riddikulus! Defeating the Boggart of Dependencies</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-147261423-1'); </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i></button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="site-heading">
+                <h2>Riddikulus! Defeating the Boggart of Dependencies</h2>
+                <hr class="small">
+                <h5>pytest Deep-Dives — Hogwarts Edition</h5>
+            </div>
+        </div></div></div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>👻 Why Mock? — The Boggart Problem</h2>
+<p>A Boggart is a shape-shifting creature that takes the form of your worst fear. External dependencies (APIs, databases, owl-post services) are the Boggarts of testing: <strong>unpredictable, slow, and terrifying</strong>.</p>
+<p>Mocking transforms the Boggart into something harmless — <em>Riddikulus!</em> — letting you test YOUR code in isolation.</p>
+
+<pre><code class="python"># The "real" dependency — an owl post service that's slow and unreliable
+class OwlPostService:
+    def send_letter(self, recipient: str, content: str) -> bool:
+        """Sends an owl across Britain. Takes hours. Might fail in storms."""
+        # ... actual network call to the Owl Post Office ...
+        raise NotImplementedError("Real owls needed!")
+
+# Our code that USES the dependency
+class HogwartsNotifier:
+    def __init__(self, post_service: OwlPostService):
+        self.post_service = post_service
+
+    def notify_acceptance(self, student_name: str) -> bool:
+        letter = f"Dear {student_name}, you have been accepted to Hogwarts!"
+        return self.post_service.send_letter(student_name, letter)
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🐒 monkeypatch.setattr — Simple Spell Replacement</h2>
+<pre><code class="python">def test_notify_with_monkeypatch(monkeypatch):
+    """Replace the method directly — like Polyjuice for functions."""
+    service = OwlPostService()
+
+    # Replace the scary method with a tame one
+    monkeypatch.setattr(service, "send_letter", lambda recipient, content: True)
+
+    notifier = HogwartsNotifier(post_service=service)
+    result = notifier.notify_acceptance("Harry Potter")
+    assert result is True
+</code></pre>
+<p>Simple and clean, but you can't easily verify <em>how</em> the method was called.</p>
+</div>
+
+<div class="section level2">
+<h2>🎭 Fake Objects — Manual Test Doubles (Decoy Detonators)</h2>
+<pre><code class="python">class FakeOwlPostService:
+    """A hand-crafted fake — like a Decoy Detonator from Weasleys'."""
+    def __init__(self):
+        self.letters_sent = []
+
+    def send_letter(self, recipient: str, content: str) -> bool:
+        self.letters_sent.append({"to": recipient, "content": content})
+        return True
+
+def test_notify_with_fake():
+    fake_service = FakeOwlPostService()
+    notifier = HogwartsNotifier(post_service=fake_service)
+
+    result = notifier.notify_acceptance("Hermione Granger")
+
+    assert result is True
+    assert len(fake_service.letters_sent) == 1
+    assert "Hermione" in fake_service.letters_sent[0]["content"]
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🃏 unittest.mock.Mock &amp; MagicMock — Shape-Shifting Boggarts Under Control</h2>
+<pre><code class="python">from unittest.mock import Mock, MagicMock
+
+def test_notify_with_mock():
+    """Mock objects auto-create attributes and track calls."""
+    mock_service = Mock(spec=OwlPostService)
+    mock_service.send_letter.return_value = True
+
+    notifier = HogwartsNotifier(post_service=mock_service)
+    result = notifier.notify_acceptance("Ron Weasley")
+
+    assert result is True
+    # Verify HOW the mock was called — the Boggart reveals itself!
+    mock_service.send_letter.assert_called_once_with(
+        "Ron Weasley",
+        "Dear Ron Weasley, you have been accepted to Hogwarts!"
+    )
+
+def test_magic_mock_dunder_methods():
+    """MagicMock supports __len__, __iter__, etc. — full shapeshifter."""
+    mock_spellbook = MagicMock()
+    mock_spellbook.__len__.return_value = 42
+    mock_spellbook.__getitem__.return_value = "Expelliarmus"
+
+    assert len(mock_spellbook) == 42
+    assert mock_spellbook[0] == "Expelliarmus"
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🧙‍♂️ pytest-mock's mocker Fixture — The Patronus of Mocking</h2>
+<p><code>pytest-mock</code> wraps <code>unittest.mock</code> in a fixture called <code>mocker</code> that automatically cleans up patches after each test — no manual stop needed.</p>
+
+<pre><code class="python"># pip install pytest-mock
+
+def test_notify_with_mocker(mocker):
+    """mocker.patch replaces at the MODULE level — like Obliviate on an import."""
+    # Patch where it's USED, not where it's defined
+    mock_send = mocker.patch.object(OwlPostService, "send_letter", return_value=True)
+
+    service = OwlPostService()
+    notifier = HogwartsNotifier(post_service=service)
+    result = notifier.notify_acceptance("Neville Longbottom")
+
+    assert result is True
+    mock_send.assert_called_once()
+    # Check the content argument
+    call_args = mock_send.call_args
+    assert "Neville Longbottom" in call_args[1].get("content", call_args[0][1])
+
+def test_spy_on_real_method(mocker):
+    """mocker.spy wraps the real method — observes without replacing."""
+    # Like an Invisibility Cloak: watch without interfering
+    spy = mocker.spy(HogwartsNotifier, "notify_acceptance")
+
+    fake_service = Mock(spec=OwlPostService)
+    fake_service.send_letter.return_value = True
+    notifier = HogwartsNotifier(post_service=fake_service)
+
+    notifier.notify_acceptance("Luna Lovegood")
+
+    spy.assert_called_once_with(notifier, "Luna Lovegood")
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>⚔️ mock.patch vs monkeypatch — Duel of the Patchers</h2>
+<table class="table table-condensed">
+<tr><th>Feature</th><th>monkeypatch</th><th>mock.patch / mocker</th></tr>
+<tr><td>Cleanup</td><td>Automatic (fixture)</td><td>Automatic (fixture/context mgr)</td></tr>
+<tr><td>Call tracking</td><td>❌ Not built-in</td><td>✅ assert_called_once_with, call_count</td></tr>
+<tr><td>Return values</td><td>Manual lambda/function</td><td>return_value, side_effect</td></tr>
+<tr><td>Best for</td><td>Env vars, simple attrs</td><td>Complex interactions, verifying calls</td></tr>
+<tr><td>Dependency</td><td>Built into pytest</td><td>pytest-mock (external)</td></tr>
+</table>
+</div>
+
+<div class="section level2">
+<h2>✅ Asserting Calls — Verifying the Spell Was Cast Correctly</h2>
+<pre><code class="python">from unittest.mock import Mock, call
+
+def test_multiple_notifications():
+    """Verify a sequence of calls — like checking the Marauder's Map trail."""
+    mock_service = Mock(spec=OwlPostService)
+    mock_service.send_letter.return_value = True
+
+    notifier = HogwartsNotifier(post_service=mock_service)
+    notifier.notify_acceptance("Harry")
+    notifier.notify_acceptance("Ron")
+    notifier.notify_acceptance("Hermione")
+
+    # Total calls
+    assert mock_service.send_letter.call_count == 3
+
+    # Verify specific call order
+    mock_service.send_letter.assert_any_call("Hermione", 
+        "Dear Hermione, you have been accepted to Hogwarts!")
+
+    # Verify ALL calls in order
+    expected_calls = [
+        call("Harry", "Dear Harry, you have been accepted to Hogwarts!"),
+        call("Ron", "Dear Ron, you have been accepted to Hogwarts!"),
+        call("Hermione", "Dear Hermione, you have been accepted to Hogwarts!"),
+    ]
+    mock_service.send_letter.assert_has_calls(expected_calls, any_order=False)
+</code></pre>
+</div>
+
+    </div>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+        </div></div></div>
+    </footer>
+</body>
+</html>

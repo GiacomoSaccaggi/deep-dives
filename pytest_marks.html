@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="pytest Marks & Parametrization">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>The Time-Turner: Marks &amp; Parametrization</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>The Time-Turner: Marks &amp; Parametrization</h2>
+                        <hr class="small">
+                        <h5>pytest Deep-Dives — Hogwarts Edition</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>⚡ What Are Marks? — Enchanting Your Tests</h2>
+<p>Just as Hogwarts students receive marks on their O.W.L.s, pytest lets you <em>mark</em> your tests with magical decorators that control <strong>when</strong> and <strong>how</strong> they run. Marks are metadata labels attached to test functions.</p>
+
+<h3>Built-in Marks — The Unforgivable (Skippable) Curses</h3>
+<pre><code class="python">import pytest
+
+# Skip — like casting Obliviate on a test
+@pytest.mark.skip(reason="Dumbledore said not to use this spell yet")
+def test_elder_wand_power():
+    assert elder_wand.power_level > 9000
+
+# Skipif — conditional skip, like the Trace on underage wizards
+import sys
+@pytest.mark.skipif(sys.platform == "win32", reason="No Hogwarts Express on Windows")
+def test_platform_nine_three_quarters():
+    assert platform.enter() == "Hogwarts Express"
+
+# Xfail — we EXPECT this to fail (like Neville's first potion)
+@pytest.mark.xfail(reason="Voldemort's horcrux makes this unstable")
+def test_destroy_horcrux_without_sword():
+    assert horcrux.destroy(method="bare_hands")
+</code></pre>
+
+<h3>Custom Marks — Creating Your Own Spells</h3>
+<pre><code class="python"># Register in pytest.ini or pyproject.toml:
+# [pytest]
+# markers =
+#     dark_arts: marks tests involving Dark Arts (deselect with '-m "not dark_arts"')
+#     quidditch: marks tests for Quidditch module
+
+@pytest.mark.dark_arts
+def test_avada_kedavra_is_unforgivable():
+    assert "Avada Kedavra" in UNFORGIVABLE_CURSES
+
+@pytest.mark.quidditch
+def test_snitch_catch_ends_game():
+    game = QuidditchMatch(seeker="Harry Potter")
+    game.catch_snitch()
+    assert game.is_over
+</code></pre>
+<p>Run only Quidditch tests: <code>pytest -m quidditch</code></p>
+</div>
+
+<div class="section level2">
+<h2>🔄 Parametrize — The Time-Turner of Testing</h2>
+<p>Just as Hermione used the Time-Turner to attend multiple classes simultaneously, <code>@pytest.mark.parametrize</code> lets a single test function run multiple scenarios without duplicating code.</p>
+
+<h3>Basic Parametrization — Testing Multiple Spells</h3>
+<pre><code class="python">@pytest.mark.parametrize("spell, damage", [
+    ("Expelliarmus", 10),
+    ("Stupefy", 25),
+    ("Avada Kedavra", 100),
+])
+def test_spell_damage(spell, damage):
+    """Each spell inflicts the correct amount of damage."""
+    wand = Wand(owner="Harry Potter", core="phoenix_feather")
+    result = wand.cast(spell)
+    assert result.damage == damage
+</code></pre>
+<p>This generates <strong>3 separate tests</strong>, each with its own pass/fail status.</p>
+
+<h3>Stacking Parametrize — Cartesian Product (Every Wizard × Every Spell)</h3>
+<pre><code class="python">@pytest.mark.parametrize("wizard", ["Harry", "Hermione", "Ron"])
+@pytest.mark.parametrize("spell", ["Lumos", "Expelliarmus", "Patronus"])
+def test_wizard_can_cast(wizard, spell):
+    """Generates 3×3 = 9 test cases automatically."""
+    hogwarts_student = Wizard(name=wizard)
+    result = hogwarts_student.cast(spell)
+    assert result.success is True
+</code></pre>
+
+<h3>Parametrize with Dataclasses — The Pensieve Pattern</h3>
+<pre><code class="python">from dataclasses import dataclass
+
+@dataclass
+class SpellScenario:
+    spell_name: str
+    caster_house: str
+    expected_power: int
+    description: str  # used as test ID
+
+SPELL_SCENARIOS = [
+    SpellScenario("Expecto Patronum", "Gryffindor", 95, "harry_patronus"),
+    SpellScenario("Sectumsempra", "Slytherin", 80, "draco_dark_spell"),
+    SpellScenario("Wingardium Leviosa", "Ravenclaw", 30, "flitwick_basics"),
+]
+
+@pytest.mark.parametrize("scenario", SPELL_SCENARIOS, ids=lambda s: s.description)
+def test_spell_power_by_house(scenario):
+    wizard = Wizard(house=scenario.caster_house)
+    result = wizard.cast(scenario.spell_name)
+    assert result.power >= scenario.expected_power
+</code></pre>
+
+<h3>Marks on Specific Cases — Cursed Parameters</h3>
+<pre><code class="python">@pytest.mark.parametrize("potion, effect", [
+    ("Polyjuice", "transformation"),
+    ("Felix Felicis", "luck"),
+    pytest.param("Draught of Living Death", "sleep",
+                 marks=pytest.mark.xfail(reason="Slughorn's recipe is incomplete")),
+    pytest.param("Elixir of Life", "immortality",
+                 marks=pytest.mark.skip(reason="Philosopher's Stone destroyed")),
+])
+def test_potion_effect(potion, effect):
+    cauldron = Cauldron(temperature=100)
+    result = cauldron.brew(potion)
+    assert result.effect == effect
+</code></pre>
+
+<h3>Custom IDs — Readable Test Names in the Marauder's Map</h3>
+<pre><code class="python">@pytest.mark.parametrize(
+    "house, founder",
+    [
+        ("Gryffindor", "Godric"),
+        ("Slytherin", "Salazar"),
+        ("Hufflepuff", "Helga"),
+        ("Ravenclaw", "Rowena"),
+    ],
+    ids=["lion_house", "serpent_house", "badger_house", "eagle_house"]
+)
+def test_house_founder(house, founder):
+    """IDs appear in pytest output instead of param values."""
+    hogwarts = Hogwarts()
+    assert hogwarts.get_founder(house).first_name == founder
+</code></pre>
+<p>Output: <code>test_houses.py::test_house_founder[lion_house] PASSED</code></p>
+
+</div>
+    </div>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Supervised and Unsupervised Learning</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Supervised and Unsupervised Learning</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Machine Learning (ML) is a branch of Artificial Intelligence (AI) concerned with building systems that learn from data without being explicitly programmed. Rather than following hard-coded rules, ML algorithms identify patterns and relationships within data to make predictions or decisions.</p>
+<p>The field is broadly divided into three main paradigms:</p>
+<ul>
+<li><strong>Supervised Learning</strong> — learning from labeled examples</li>
+<li><strong>Unsupervised Learning</strong> — discovering hidden structure in unlabeled data</li>
+<li><strong>Reinforcement Learning</strong> — learning through interaction and rewards</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="supervised-learning" class="section level2">
+<h2>Supervised Learning</h2>
+<p>Supervised learning consists of learning a mapping <span class="math inline">\(f: X \rightarrow Y\)</span> from a set of labeled training examples <span class="math inline">\(\{(x_i, y_i)\}_{i=1}^{n}\)</span>, where <span class="math inline">\(x_i \in X\)</span> is an input (feature vector) and <span class="math inline">\(y_i \in Y\)</span> is the corresponding output (label or target).</p>
+<p>The goal is to find the function <span class="math inline">\(f\)</span> that minimizes the expected loss:</p>
+<p><span class="math display">\[ \min_f \; \mathbb{E}[L(Y, f(X))] \]</span></p>
+<p>where <span class="math inline">\(L\)</span> is a loss function measuring the discrepancy between the true value <span class="math inline">\(Y\)</span> and the prediction <span class="math inline">\(f(X)\)</span>.</p>
+
+<div id="classification" class="section level3">
+<h3>Classification (<span class="math inline">\(Y\)</span> discrete)</h3>
+<p>In classification, the target variable <span class="math inline">\(Y\)</span> takes values in a finite set of class labels, e.g. <span class="math inline">\(Y \in \{0, 1, \ldots, K-1\}\)</span>. The goal is to assign each input to the correct class.</p>
+<p>Common loss functions include:</p>
+<ul>
+<li><strong>0-1 Loss:</strong> <span class="math display">\[ L(y, \hat{y}) = \mathbb{1}(y \neq \hat{y}) \]</span></li>
+<li><strong>Cross-Entropy Loss</strong> (for probabilistic classifiers): <span class="math display">\[ L(y, \hat{p}) = -\sum_{k=0}^{K-1} \mathbb{1}(y=k) \log \hat{p}_k \]</span></li>
+</ul>
+<p><strong>Examples:</strong> spam detection (spam vs. not spam), image classification (cat, dog, bird, …), medical diagnosis (disease present vs. absent).</p>
+</div>
+
+<div id="regression" class="section level3">
+<h3>Regression (<span class="math inline">\(Y\)</span> continuous)</h3>
+<p>In regression, the target variable <span class="math inline">\(Y\)</span> is continuous (real-valued). The goal is to predict a numerical quantity as accurately as possible.</p>
+<p>The most common loss function is the Mean Squared Error (MSE):</p>
+<p><span class="math display">\[ \text{MSE} = \mathbb{E}\left[(Y - f(X))^2\right] \]</span></p>
+<p><strong>Examples:</strong> predicting house prices, stock price forecasting, estimating patient recovery time.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="key-concepts-supervised" class="section level2">
+<h2>Key Concepts in Supervised Learning</h2>
+
+<div id="train-test-split" class="section level3">
+<h3>Training/Test Split</h3>
+<p>The available data is split into a training set (used to fit the model) and a test set (used to evaluate generalization performance). A typical split is 70-80% training and 20-30% test.</p>
+</div>
+
+<div id="bias-variance" class="section level3">
+<h3>Bias-Variance Tradeoff</h3>
+<p>The expected prediction error of an estimator <span class="math inline">\(\hat{f}\)</span> can be decomposed as:</p>
+<p><span class="math display">\[ \mathbb{E}\left[(Y - \hat{f}(X))^2\right] = \text{Bias}^2(\hat{f}) + \text{Var}(\hat{f}) + \sigma^2 \]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\text{Bias}^2(\hat{f}) = \left(\mathbb{E}[\hat{f}(X)] - f(X)\right)^2\)</span> — error from erroneous assumptions in the model</li>
+<li><span class="math inline">\(\text{Var}(\hat{f}) = \mathbb{E}\left[(\hat{f}(X) - \mathbb{E}[\hat{f}(X)])^2\right]\)</span> — sensitivity to fluctuations in the training set</li>
+<li><span class="math inline">\(\sigma^2\)</span> — irreducible error (noise in the data)</li>
+</ul>
+</div>
+
+<div id="overfitting-underfitting" class="section level3">
+<h3>Overfitting vs Underfitting</h3>
+<ul>
+<li><strong>Overfitting:</strong> the model is too complex, captures noise in the training data, and performs poorly on unseen data (low bias, high variance).</li>
+<li><strong>Underfitting:</strong> the model is too simple and fails to capture the underlying pattern (high bias, low variance).</li>
+</ul>
+</div>
+
+<div id="cross-validation" class="section level3">
+<h3>Cross-Validation (k-fold)</h3>
+<p>The dataset is partitioned into <span class="math inline">\(k\)</span> equally-sized folds. The model is trained on <span class="math inline">\(k-1\)</span> folds and validated on the remaining fold, rotating <span class="math inline">\(k\)</span> times. The final performance estimate is the average across all folds:</p>
+<p><span class="math display">\[ \text{CV}(k) = \frac{1}{k}\sum_{i=1}^{k} L_i \]</span></p>
+</div>
+
+<div id="regularization" class="section level3">
+<h3>Regularization</h3>
+<p>Regularization adds a penalty term to the loss function to discourage overly complex models:</p>
+<p><span class="math display">\[ \min_f \; \mathbb{E}[L(Y, f(X))] + \lambda \, \Omega(f) \]</span></p>
+<p>where <span class="math inline">\(\lambda > 0\)</span> controls the strength of regularization and <span class="math inline">\(\Omega(f)\)</span> penalizes complexity (e.g. <span class="math inline">\(\|\beta\|_2^2\)</span> for Ridge, <span class="math inline">\(\|\beta\|_1\)</span> for Lasso).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="unsupervised-learning" class="section level2">
+<h2>Unsupervised Learning</h2>
+<p>In unsupervised learning there are no labels. The algorithm receives only input data <span class="math inline">\(\{x_i\}_{i=1}^{n}\)</span> and must discover hidden structure, patterns, groups, or compact representations within the data.</p>
+
+<div id="clustering" class="section level3">
+<h3>Clustering</h3>
+<p>The goal is to partition data points into groups (clusters) such that points within the same cluster are more similar to each other than to points in other clusters.</p>
+<ul>
+<li><strong>K-Means:</strong> partitions data into <span class="math inline">\(K\)</span> clusters by minimizing within-cluster variance: <span class="math display">\[ \min_{C_1,\ldots,C_K} \sum_{k=1}^{K} \sum_{x_i \in C_k} \|x_i - \mu_k\|^2 \]</span> where <span class="math inline">\(\mu_k\)</span> is the centroid of cluster <span class="math inline">\(C_k\)</span>.</li>
+<li><strong>Hierarchical Clustering:</strong> builds a tree (dendrogram) of nested clusters using agglomerative (bottom-up) or divisive (top-down) strategies.</li>
+<li><strong>DBSCAN:</strong> density-based clustering that identifies clusters as dense regions separated by sparse regions. Does not require specifying the number of clusters a priori.</li>
+</ul>
+</div>
+
+<div id="dimensionality-reduction" class="section level3">
+<h3>Dimensionality Reduction</h3>
+<p>The goal is to represent high-dimensional data in a lower-dimensional space while preserving as much information as possible.</p>
+<ul>
+<li><strong>PCA (Principal Component Analysis):</strong> finds orthogonal directions of maximum variance. The first <span class="math inline">\(d\)</span> principal components are the eigenvectors corresponding to the <span class="math inline">\(d\)</span> largest eigenvalues of the covariance matrix <span class="math inline">\(\Sigma\)</span>: <span class="math display">\[ \Sigma = \frac{1}{n-1} X^T X, \quad \Sigma v_k = \lambda_k v_k \]</span></li>
+<li><strong>t-SNE:</strong> non-linear technique that preserves local neighborhood structure, particularly effective for visualizing high-dimensional data in 2D or 3D.</li>
+</ul>
+</div>
+
+<div id="association-rules" class="section level3">
+<h3>Association Rules</h3>
+<p>Discovers interesting relationships between variables in large datasets. Classical application: market basket analysis (e.g. "customers who buy bread also tend to buy butter"). Key metrics include support, confidence, and lift.</p>
+</div>
+
+<div id="density-estimation" class="section level3">
+<h3>Density Estimation</h3>
+<p>Estimates the underlying probability density function <span class="math inline">\(p(x)\)</span> from observed data. Methods include kernel density estimation (KDE) and Gaussian mixture models (GMM):</p>
+<p><span class="math display">\[ \hat{p}(x) = \frac{1}{nh}\sum_{i=1}^{n} K\left(\frac{x - x_i}{h}\right) \]</span></p>
+<p>where <span class="math inline">\(K\)</span> is a kernel function and <span class="math inline">\(h\)</span> is the bandwidth.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="semi-supervised-reinforcement" class="section level2">
+<h2>Semi-supervised and Reinforcement Learning</h2>
+
+<div id="semi-supervised" class="section level3">
+<h3>Semi-supervised Learning</h3>
+<p>Combines a small amount of labeled data with a large amount of unlabeled data. The idea is that the structure of the unlabeled data (clusters, manifolds) provides useful information for learning. This is especially valuable when labeling is expensive or time-consuming.</p>
+</div>
+
+<div id="reinforcement-learning" class="section level3">
+<h3>Reinforcement Learning</h3>
+<p>An agent interacts with an environment, taking actions and receiving rewards (or penalties). The goal is to learn a policy <span class="math inline">\(\pi(a|s)\)</span> that maximizes the expected cumulative reward:</p>
+<p><span class="math display">\[ \max_\pi \; \mathbb{E}\left[\sum_{t=0}^{\infty} \gamma^t \, r_t\right] \]</span></p>
+<p>where <span class="math inline">\(\gamma \in [0,1)\)</span> is a discount factor and <span class="math inline">\(r_t\)</span> is the reward at time step <span class="math inline">\(t\)</span>. Applications include game playing, robotics, and autonomous driving.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="how-to-choose" class="section level2">
+<h2>How to Choose</h2>
+<p>A simple decision flowchart for selecting the appropriate learning paradigm:</p>
+<pre>
+Do you have labeled data?
+│
+├── YES → Supervised Learning
+│         │
+│         ├── Is Y continuous? → Regression
+│         │
+│         └── Is Y discrete?   → Classification
+│
+└── NO  → Unsupervised Learning
+          │
+          ├── Want to find groups?           → Clustering
+          │
+          └── Want to reduce dimensions?     → Dimensionality Reduction
+</pre>
+<p>In practice, the choice also depends on the amount of available data, computational resources, interpretability requirements, and the specific problem domain.</p>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

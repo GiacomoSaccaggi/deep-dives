@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Variable Importance</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Variable Importance</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>After building a model, understanding which features matter most is crucial for interpretation, feature engineering, and model simplification. Variable importance quantifies each feature's contribution to predictive performance.</p>
+<p>There is no single "correct" way to measure importance — different methods answer different questions and may yield different rankings. Below we survey the most common approaches, from model-specific to fully model-agnostic.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="model-specific-methods" class="section level2">
+<h2>Model-Specific Methods</h2>
+
+<div id="linear-models" class="section level3">
+<h3>Linear Models</h3>
+<p>In a linear regression <span class="math inline">\(y = \beta_0 + \beta_1 x_1 + \dots + \beta_p x_p + \varepsilon\)</span>, the natural measure of importance for feature \(j\) is the absolute value of the t-statistic:</p>
+<p><span class="math display">\[ \text{Importance}(j) = \left| \frac{\hat\beta_j}{\text{SE}(\hat\beta_j)} \right| = |t_j| \]</span></p>
+<p>To compare coefficients across features measured on different scales, use <strong>standardized coefficients</strong>:</p>
+<p><span class="math display">\[ \hat\beta_j^{\text{std}} = \hat\beta_j \cdot \frac{s_{x_j}}{s_y} \]</span></p>
+<p>where \(s_{x_j}\) and \(s_y\) are the sample standard deviations of feature \(j\) and the response, respectively.</p>
+</div>
+
+<div id="tree-based-models" class="section level3">
+<h3>Tree-Based Models — Mean Decrease in Impurity (MDI)</h3>
+<p>For tree-based models (CART, Random Forest, Gradient Boosting), <strong>Mean Decrease in Impurity</strong> measures the total reduction in the splitting criterion (Gini impurity for classification, RSS for regression) attributed to splits on variable \(j\), averaged over all trees:</p>
+<p><span class="math display">\[ \text{Imp}(j) = \sum_{t:\, \text{split on } j} \Delta I(t) \cdot p(t) \]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\Delta I(t)\)</span> = reduction in impurity at node \(t\)</li>
+<li><span class="math inline">\(p(t) = n_t / N\)</span> = proportion of samples reaching node \(t\)</li>
+</ul>
+<p>For an ensemble of \(B\) trees, the final importance is averaged: <span class="math inline">\(\text{Imp}(j) = \frac{1}{B} \sum_{b=1}^{B} \text{Imp}_b(j)\)</span>.</p>
+<p><strong>Caveat:</strong> MDI is biased towards high-cardinality features and features with many possible split points.</p>
+</div>
+
+<div id="random-forest-mda" class="section level3">
+<h3>Random Forest — Mean Decrease Accuracy (MDA)</h3>
+<p>Also known as <em>permutation importance</em> computed on the Out-of-Bag (OOB) samples:</p>
+<ol>
+<li>For each tree \(b\), compute OOB accuracy \(\text{Acc}_b\)</li>
+<li>Permute feature \(j\) in the OOB samples, recompute accuracy \(\text{Acc}_b^{(\pi_j)}\)</li>
+<li>Importance: <span class="math display">\[ \text{MDA}(j) = \frac{1}{B} \sum_{b=1}^{B} \left( \text{Acc}_b - \text{Acc}_b^{(\pi_j)} \right) \]</span></li>
+</ol>
+<p>This is more reliable than MDI as it uses OOB data (unseen by each tree) and is less biased by cardinality.</p>
+</div>
+
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="permutation-importance" class="section level2">
+<h2>Permutation Importance (Model-Agnostic)</h2>
+<p>Permutation importance generalizes the Random Forest MDA idea to <em>any</em> model. The algorithm:</p>
+<ol>
+<li>Train model \(f\) on training data. Compute baseline score on the <strong>test set</strong>: <span class="math inline">\(s_0 = \text{Score}(f, X_{\text{test}}, y_{\text{test}})\)</span></li>
+<li>For each feature \(j = 1, \dots, p\):
+    <ul>
+    <li>Randomly shuffle (permute) column \(j\) in \(X_{\text{test}}\)</li>
+    <li>Recompute score: <span class="math inline">\(s_j = \text{Score}(f, X_{\text{test}}^{(\pi_j)}, y_{\text{test}})\)</span></li>
+    </ul>
+</li>
+<li>Importance of feature \(j\): <span class="math display">\[ \text{PI}(j) = s_0 - s_j \]</span></li>
+</ol>
+<p>A large drop in performance indicates high importance.</p>
+
+<h4>Advantages</h4>
+<ul>
+<li>Works for <em>any</em> model (linear, tree, neural network, etc.)</li>
+<li>Computed on held-out test data — reflects generalization, not training fit</li>
+<li>Captures interaction effects (shuffling a feature breaks all its interactions)</li>
+</ul>
+
+<h4>Disadvantages</h4>
+<ul>
+<li><strong>Correlated features:</strong> if features \(j\) and \(k\) are highly correlated, permuting \(j\) alone may not degrade performance much (because \(k\) carries similar information), leading to underestimation of both</li>
+<li>Stochastic — results vary across random permutations (repeat and average)</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="shap-values" class="section level2">
+<h2>SHAP Values</h2>
+<p>SHAP (SHapley Additive exPlanations) is based on <strong>Shapley values</strong> from cooperative game theory. The Shapley value of feature \(j\) for observation \(i\) represents the average marginal contribution of that feature across all possible coalitions of features.</p>
+
+<p><span class="math inline">\(\phi_j^{(i)}\)</span> = contribution of feature \(j\) to the prediction for observation \(i\).</p>
+
+<p>The formula:</p>
+<p><span class="math display">\[ \phi_j = \sum_{S \subseteq F \setminus \{j\}} \frac{|S|!\;(|F| - |S| - 1)!}{|F|!} \left[ f(S \cup \{j\}) - f(S) \right] \]</span></p>
+<p>where \(F\) is the full feature set, \(S\) is a subset not containing \(j\), and \(f(S)\) denotes the model prediction using only features in \(S\) (with the remaining features marginalized out).</p>
+
+<h4>Key Properties</h4>
+<ul>
+<li><strong>Local explanation:</strong> each prediction gets its own feature attributions</li>
+<li><strong>Additivity:</strong> <span class="math display">\[ f(x) = \phi_0 + \sum_{j=1}^{p} \phi_j \]</span> where \(\phi_0 = E[f(X)]\) is the baseline (average prediction)</li>
+<li><strong>Consistency:</strong> if a feature's marginal contribution increases in a new model, its SHAP value does not decrease</li>
+<li><strong>Symmetry:</strong> features that contribute equally get equal SHAP values</li>
+</ul>
+
+<p>For global importance, aggregate across observations:</p>
+<p><span class="math display">\[ \text{SHAP Importance}(j) = \frac{1}{n} \sum_{i=1}^{n} |\phi_j^{(i)}| \]</span></p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="drop-column-importance" class="section level2">
+<h2>Drop-Column Importance</h2>
+<p>The most straightforward (and most computationally expensive) approach:</p>
+<ol>
+<li>Train the full model with all features: <span class="math inline">\(s_{\text{full}} = \text{Score}(f_{\text{all}})\)</span></li>
+<li>For each feature \(j\): retrain the model <em>without</em> feature \(j\): <span class="math inline">\(s_{-j} = \text{Score}(f_{-j})\)</span></li>
+<li>Importance: <span class="math display">\[ \text{DCI}(j) = s_{\text{full}} - s_{-j} \]</span></li>
+</ol>
+
+<h4>Why it's the gold standard</h4>
+<ul>
+<li>Fully accounts for correlations — if \(j\) is redundant with \(k\), the model without \(j\) will still use \(k\)</li>
+<li>No permutation artifacts</li>
+<li>Reflects the model's ability to compensate for a missing feature</li>
+</ul>
+
+<h4>Main drawback</h4>
+<p>Requires \(p + 1\) full model trainings. For large \(p\) or expensive models, this is often infeasible.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="caveats-and-best-practices" class="section level2">
+<h2>Caveats and Best Practices</h2>
+<ul>
+<li><strong>Correlated features split importance:</strong> with any method, two correlated features will each appear less important than they truly are (their combined effect is shared). Consider grouping or removing one.</li>
+<li><strong>Use permutation importance on test data:</strong> training-set importance can be inflated by overfitting.</li>
+<li><strong>Combine multiple methods:</strong> MDI, permutation, and SHAP may disagree. Use them together for a more robust picture.</li>
+<li><strong>Importance ≠ causality:</strong> a feature can be highly important for prediction without being a causal driver of the outcome. Observational importance reflects association, not mechanism.</li>
+<li><strong>Scale matters:</strong> for coefficient-based methods, always standardize or use t-statistics rather than raw coefficients.</li>
+<li><strong>Stability:</strong> repeat permutation-based methods multiple times and report mean ± standard deviation.</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

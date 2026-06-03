@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>LASSO Regression</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>LASSO Regression</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <strong>Least Absolute Shrinkage and Selection Operator</strong> (LASSO) was introduced by Tibshirani (1996). It is a regularization technique that performs both <em>continuous shrinkage</em> and <em>automatic variable selection</em>, producing sparse, interpretable models.</p>
+<p>LASSO is particularly useful when:</p>
+<ul>
+<li>The number of predictors \(p\) greatly exceeds the number of observations \(n\) (high-dimensional setting, \(p \gg n\))</li>
+<li>Many coefficients are believed to be exactly zero (true sparsity)</li>
+<li>Interpretability and parsimony are desired</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lasso-objective" class="section level2">
+<h2>The LASSO Objective</h2>
+<p>The LASSO estimator is defined as the solution to the following penalized least squares problem:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{lasso}} = \arg\min_{\beta} \left\{ \frac{1}{2n} \|y - X\beta\|_2^2 + \lambda \|\beta\|_1 \right\} \]</span></p>
+<p>Expanding:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{lasso}} = \arg\min_{\beta} \left\{ \frac{1}{2n} \sum_{i=1}^{n} \left( y_i - x_i'\beta \right)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \right\} \]</span></p>
+<p>where:</p>
+<ul>
+<li>\(\|\beta\|_1 = \sum_{j=1}^{p} |\beta_j|\) is the \(L_1\) norm penalty</li>
+<li>\(\lambda \geq 0\) is the regularization parameter controlling sparsity</li>
+<li>\(\lambda = 0\): ordinary least squares (OLS)</li>
+<li>\(\lambda \to \infty\): all \(\hat{\beta}_j = 0\) (null model)</li>
+</ul>
+<p>The equivalent constrained formulation is:</p>
+<p><span class="math display">\[ \min_{\beta} \frac{1}{2n} \|y - X\beta\|_2^2 \quad \text{subject to} \quad \sum_{j=1}^{p} |\beta_j| \leq t \]</span></p>
+<p>where \(t\) is in one-to-one correspondence with \(\lambda\).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="why-l1-sparsity" class="section level2">
+<h2>Why L1 Gives Sparsity</h2>
+
+<div id="geometric-argument" class="section level3">
+<h3>Geometric Argument</h3>
+<p>The \(L_1\) ball \(\{\ \beta : \|\beta\|_1 \leq t\ \}\) is a diamond (in 2D) with <em>corners on the coordinate axes</em>. The contours of the RSS loss function are ellipses centered at the OLS solution. The constrained optimum occurs where the ellipse first touches the constraint region. Because the \(L_1\) ball has corners, this contact point is likely to occur at a corner, where one or more coordinates are exactly zero.</p>
+<p>In contrast, the \(L_2\) ball (Ridge) is smooth — contact points generically have all coordinates nonzero.</p>
+</div>
+
+<div id="subdifferential" class="section level3">
+<h3>Subdifferential and Subgradient Condition</h3>
+<p>The \(L_1\) norm is not differentiable at zero. The subdifferential of \(|\beta_j|\) is:</p>
+<p><span class="math display">\[ \partial |\beta_j| = \begin{cases} \{+1\} & \text{if } \beta_j > 0 \\ \{-1\} & \text{if } \beta_j < 0 \\ [-1, +1] & \text{if } \beta_j = 0 \end{cases} \]</span></p>
+<p>The optimality (KKT) condition for the LASSO is:</p>
+<p><span class="math display">\[ -\frac{1}{n} x_j'(y - X\beta) + \lambda \cdot s_j = 0, \quad s_j \in \partial|\beta_j| \]</span></p>
+<p>When \(\beta_j = 0\), this requires \(\left| \frac{1}{n} x_j'(y - X\beta) \right| \leq \lambda\), which is satisfiable — hence exact zeros are possible.</p>
+</div>
+
+<div id="soft-thresholding" class="section level3">
+<h3>Soft-Thresholding Operator</h3>
+<p>For orthonormal design (\(X'X = nI\)), the LASSO solution has a closed form via the soft-thresholding operator:</p>
+<p><span class="math display">\[ \hat{\beta}_j = S_\lambda(\hat{\beta}_j^{\text{OLS}}) = \text{sign}(z_j)(|z_j| - \lambda)_+ \]</span></p>
+<p>where \(z_j = \hat{\beta}_j^{\text{OLS}}\) and \((x)_+ = \max(0, x)\). Coefficients with \(|z_j| \leq \lambda\) are set exactly to zero; others are shrunk toward zero by \(\lambda\).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="coordinate-descent" class="section level2">
+<h2>Coordinate Descent Algorithm</h2>
+<p>The standard algorithm for solving the LASSO is <strong>coordinate descent</strong> (Friedman, Hastie, Tibshirani, 2010):</p>
+<p><strong>Algorithm:</strong></p>
+<ol>
+<li>Initialize \(\beta^{(0)}\) (e.g., zeros or warm start from previous \(\lambda\))</li>
+<li>For each coordinate \(j = 1, \ldots, p\):
+<p><span class="math display">\[ \tilde{\beta}_j \leftarrow S_\lambda\left( \frac{1}{n} x_j'(y - X_{-j}\beta_{-j}) \right) \bigg/ \left( \frac{1}{n} x_j'x_j \right) \]</span></p>
+where \(X_{-j}\beta_{-j}\) is the partial residual excluding predictor \(j\).</li>
+<li>Repeat step 2 (cycling through all \(j\)) until convergence: \(\max_j |\beta_j^{(k+1)} - \beta_j^{(k)}| < \epsilon\)</li>
+</ol>
+<p><strong>Key properties:</strong></p>
+<ul>
+<li>Each coordinate update is cheap: \(O(n)\)</li>
+<li>Exploits sparsity — skip updates for coefficients known to be zero (active set strategy)</li>
+<li><strong>Warm starts</strong>: solve for a decreasing sequence of \(\lambda\) values, using the solution at \(\lambda_k\) as initialization for \(\lambda_{k+1}\). This makes computing the full regularization path very efficient.</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="regularization-path" class="section level2">
+<h2>The Regularization Path</h2>
+<p>The LASSO regularization path traces the solutions \(\hat{\beta}(\lambda)\) as \(\lambda\) varies from \(\lambda_{\max}\) down to 0:</p>
+<p><span class="math display">\[ \lambda_{\max} = \frac{1}{n} \|X'y\|_\infty = \max_j \left| \frac{1}{n} x_j'y \right| \]</span></p>
+<p>This is the smallest \(\lambda\) for which all coefficients are zero. As \(\lambda\) decreases:</p>
+<ul>
+<li>Coefficients enter the model one (or a few) at a time</li>
+<li>The LASSO path is <strong>piecewise linear</strong> — a unique property of the \(L_1\) penalty</li>
+</ul>
+
+<div id="lars" class="section level3">
+<h3>LARS (Least Angle Regression)</h3>
+<p>Efron et al. (2004) showed that the entire LASSO path can be computed efficiently using the LARS algorithm:</p>
+<ul>
+<li>Start with all coefficients at zero</li>
+<li>Find the predictor most correlated with the residual</li>
+<li>Move \(\beta_j\) in the direction of correlation until another predictor has equal correlation</li>
+<li>Move jointly in the equiangular direction</li>
+<li>If a coefficient hits zero, drop it (LASSO modification of LARS)</li>
+</ul>
+<p>The computational cost is similar to a single OLS fit: \(O(np \cdot \min(n,p))\) for the entire path.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="choosing-lambda" class="section level2">
+<h2>Choosing \(\lambda\)</h2>
+
+<div id="cross-validation" class="section level3">
+<h3>K-Fold Cross-Validation</h3>
+<p>The standard approach is K-fold CV (typically \(K=10\)):</p>
+<ol>
+<li>For each \(\lambda\) in a grid, compute the CV error: <span class="math display">\[ \text{CV}(\lambda) = \frac{1}{K} \sum_{k=1}^{K} \frac{1}{|D_k|} \sum_{i \in D_k} (y_i - x_i'\hat{\beta}^{(-k)}(\lambda))^2 \]</span></li>
+<li>Two common choices:
+<ul>
+<li>\(\lambda_{\min}\): the \(\lambda\) minimizing CV error</li>
+<li>\(\lambda_{1\text{se}}\): the largest \(\lambda\) within one standard error of the minimum — the most regularized (parsimonious) model whose performance is statistically indistinguishable from the best</li>
+</ul></li>
+</ol>
+</div>
+
+<div id="information-criteria" class="section level3">
+<h3>Information Criteria</h3>
+<p>Alternatives to CV:</p>
+<ul>
+<li><strong>BIC</strong>: \(\text{BIC}(\lambda) = n \log(\text{RSS}/n) + \log(n) \cdot \text{df}(\lambda)\)</li>
+<li><strong>AIC</strong>: \(\text{AIC}(\lambda) = n \log(\text{RSS}/n) + 2 \cdot \text{df}(\lambda)\)</li>
+</ul>
+<p>where \(\text{df}(\lambda) = |\{j : \hat{\beta}_j(\lambda) \neq 0\}|\) (number of nonzero coefficients).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="properties-theory" class="section level2">
+<h2>Properties and Theory</h2>
+
+<div id="sign-consistency" class="section level3">
+<h3>Sign Consistency (Variable Selection)</h3>
+<p>Under the <strong>irrepresentable condition</strong> (a requirement on the correlation structure between relevant and irrelevant predictors):</p>
+<p><span class="math display">\[ \|X_{\mathcal{S}^c}'X_{\mathcal{S}}(X_{\mathcal{S}}'X_{\mathcal{S}})^{-1} \text{sign}(\beta_{\mathcal{S}}^*)\|_\infty < 1 \]</span></p>
+<p>the LASSO consistently selects the true support \(\mathcal{S} = \{j : \beta_j^* \neq 0\}\) as \(n \to \infty\).</p>
+</div>
+
+<div id="oracle-property" class="section level3">
+<h3>Oracle Property (Adaptive LASSO)</h3>
+<p>The standard LASSO does not satisfy the oracle property in general. The <strong>adaptive LASSO</strong> (Zou, 2006) uses data-dependent weights and achieves:</p>
+<ul>
+<li>Consistent variable selection</li>
+<li>Asymptotic normality of the nonzero estimates (as if the true support were known a priori)</li>
+</ul>
+</div>
+
+<div id="prediction-bounds" class="section level3">
+<h3>Prediction Error Bounds</h3>
+<p>Under restricted eigenvalue conditions, the LASSO achieves the near-minimax prediction error rate:</p>
+<p><span class="math display">\[ \frac{1}{n}\|X(\hat{\beta} - \beta^*)\|_2^2 = O_P\left( s \frac{\log p}{n} \right) \]</span></p>
+<p>where \(s = |\mathcal{S}|\) is the true sparsity level.</p>
+</div>
+
+<div id="degrees-of-freedom" class="section level3">
+<h3>Degrees of Freedom</h3>
+<p>For the LASSO with fixed \(\lambda\) (Zou, Hastie, Tibshirani, 2007):</p>
+<p><span class="math display">\[ \text{df}(\hat{\beta}^{\text{lasso}}) = E\left[ |\{j : \hat{\beta}_j \neq 0\}| \right] \]</span></p>
+<p>An unbiased estimate of df is simply the number of nonzero coefficients.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="variants" class="section level2">
+<h2>Variants</h2>
+
+<div id="adaptive-lasso" class="section level3">
+<h3>Adaptive LASSO</h3>
+<p>Uses weighted penalties to achieve the oracle property:</p>
+<p><span class="math display">\[ \min_{\beta} \frac{1}{2n}\|y - X\beta\|_2^2 + \lambda \sum_{j=1}^{p} w_j |\beta_j| \]</span></p>
+<p>with weights \(w_j = 1/|\hat{\beta}_j^{\text{init}}|^\gamma\), where \(\hat{\beta}^{\text{init}}\) is a \(\sqrt{n}\)-consistent initial estimator (e.g., OLS or Ridge) and \(\gamma > 0\).</p>
+</div>
+
+<div id="group-lasso" class="section level3">
+<h3>Group LASSO</h3>
+<p>For grouped predictors (e.g., dummy variables from a factor), groups enter or leave the model together:</p>
+<p><span class="math display">\[ \min_{\beta} \frac{1}{2n}\|y - X\beta\|_2^2 + \lambda \sum_{g=1}^{G} \sqrt{p_g} \|\beta_g\|_2 \]</span></p>
+<p>where \(\beta_g\) is the subvector for group \(g\) and \(p_g\) its size.</p>
+</div>
+
+<div id="fused-lasso" class="section level3">
+<h3>Fused LASSO</h3>
+<p>Penalizes differences between adjacent coefficients (useful for ordered/spatial data):</p>
+<p><span class="math display">\[ \min_{\beta} \frac{1}{2n}\|y - X\beta\|_2^2 + \lambda_1 \sum_{j=1}^{p} |\beta_j| + \lambda_2 \sum_{j=2}^{p} |\beta_j - \beta_{j-1}| \]</span></p>
+</div>
+
+<div id="lasso-glm" class="section level3">
+<h3>LASSO for GLMs</h3>
+<p>The \(L_1\) penalty extends naturally to generalized linear models. For example, the <strong>logistic LASSO</strong>:</p>
+<p><span class="math display">\[ \min_{\beta} \left\{ -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i x_i'\beta - \log(1 + e^{x_i'\beta}) \right] + \lambda \|\beta\|_1 \right\} \]</span></p>
+<p>Similarly for Poisson regression, Cox proportional hazards, and other exponential family models. Coordinate descent adapts via iteratively reweighted least squares (IRLS) within each coordinate update.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lasso-vs-ridge" class="section level2">
+<h2>LASSO vs Ridge</h2>
+<p>A comparison of the two most common regularization approaches:</p>
+
+<table class="table table-condensed">
+<thead>
+<tr><th></th><th>LASSO (\(L_1\))</th><th>Ridge (\(L_2\))</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Penalty</strong></td><td>\(\lambda \sum |\beta_j|\)</td><td>\(\lambda \sum \beta_j^2\)</td></tr>
+<tr><td><strong>Sparsity</strong></td><td>Produces exact zeros</td><td>Shrinks toward zero, never exactly zero</td></tr>
+<tr><td><strong>Variable selection</strong></td><td>Yes (built-in)</td><td>No</td></tr>
+<tr><td><strong>Correlated predictors</strong></td><td>Tends to select one, discard others</td><td>Shrinks correlated predictors together</td></tr>
+<tr><td><strong>Best when</strong></td><td>True model is sparse; many irrelevant features</td><td>Many correlated, relevant features</td></tr>
+<tr><td><strong>Unique solution</strong></td><td>Not guaranteed when \(p > n\)</td><td>Always unique (\(X'X + \lambda I\) invertible)</td></tr>
+<tr><td><strong>Computational</strong></td><td>Coordinate descent / LARS</td><td>Closed form: \((X'X + \lambda I)^{-1}X'y\)</td></tr>
+</tbody>
+</table>
+
+<p><strong>Elastic Net</strong> — when in doubt, combine both penalties:</p>
+<p><span class="math display">\[ \min_{\beta} \frac{1}{2n}\|y - X\beta\|_2^2 + \lambda \left[ \alpha \|\beta\|_1 + \frac{1-\alpha}{2} \|\beta\|_2^2 \right] \]</span></p>
+<p>with \(\alpha \in [0,1]\). The Elastic Net inherits sparsity from LASSO and the grouping effect from Ridge, making it robust in practice when the true model structure is unknown.</p>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

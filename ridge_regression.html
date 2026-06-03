@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Ridge Regression</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Ridge Regression</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Ridge regression, also known as <strong>Tikhonov regularization</strong> or <strong>L2 regularization</strong>, was proposed by Hoerl and Kennard (1970). It addresses two fundamental problems in linear regression: <strong>multicollinearity</strong> and <strong>overfitting</strong>, by adding an L2 penalty term to the ordinary least squares objective.</p>
+<p>Ridge regression is particularly useful when the number of predictors \(p\) is close to or larger than the number of observations \(n\), a setting where OLS either becomes unstable or is undefined altogether.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="ridge-objective" class="section level2">
+<h2>The Ridge Objective</h2>
+<p>The ridge estimator minimizes the penalized residual sum of squares:</p>
+<p><span class="math display">\[ \hat{\beta}_{ridge} = \arg\min_{\beta} \left\{ \|y - X\beta\|^2 + \lambda \|\beta\|_2^2 \right\} \]</span></p>
+<p>Expanding:</p>
+<p><span class="math display">\[ \sum_{i=1}^{n} (y_i - x_i'\beta)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \]</span></p>
+<p>The penalty term <span class="math inline">\(\lambda \|\beta\|_2^2\)</span> penalizes large coefficients, shrinking them toward zero. The regularization parameter <span class="math inline">\(\lambda \geq 0\)</span> controls the trade-off:</p>
+<ul>
+<li><span class="math inline">\(\lambda = 0\)</span>: reduces to ordinary least squares (OLS)</li>
+<li><span class="math inline">\(\lambda \to \infty\)</span>: shrinks all coefficients to zero</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="closed-form-solution" class="section level2">
+<h2>Closed-Form Solution</h2>
+<p>Taking the derivative and setting it to zero yields the closed-form solution:</p>
+<p><span class="math display">\[ \hat{\beta}_{ridge} = (X'X + \lambda I)^{-1} X'y \]</span></p>
+<p>This solution <strong>always exists</strong> for <span class="math inline">\(\lambda > 0\)</span>. The matrix <span class="math inline">\(X'X + \lambda I\)</span> is always invertible because adding <span class="math inline">\(\lambda > 0\)</span> to the diagonal ensures all eigenvalues are strictly positive, even when <span class="math inline">\(X'X\)</span> is singular.</p>
+<p>Contrast with OLS:</p>
+<p><span class="math display">\[ \hat{\beta}_{OLS} = (X'X)^{-1} X'y \]</span></p>
+<p>which fails when <span class="math inline">\(X'X\)</span> is singular (i.e., when columns of <span class="math inline">\(X\)</span> are linearly dependent or <span class="math inline">\(p > n\)</span>).</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="bias-variance-decomposition" class="section level2">
+<h2>Bias-Variance Decomposition</h2>
+<p>The mean squared error of the ridge estimator decomposes as:</p>
+<p><span class="math display">\[ E\left[\|\hat{\beta}_{ridge} - \beta_{true}\|^2\right] = \text{Bias}^2 + \text{Variance} \]</span></p>
+
+<div id="bias" class="section level3">
+<h3>Bias</h3>
+<p><span class="math display">\[ \text{Bias}(\hat{\beta}_{ridge}) = E[\hat{\beta}_{ridge}] - \beta_{true} = -\lambda(X'X + \lambda I)^{-1}\beta_{true} \]</span></p>
+<p>The bias <strong>increases</strong> with <span class="math inline">\(\lambda\)</span>: larger penalty means more shrinkage away from the true value.</p>
+</div>
+
+<div id="variance" class="section level3">
+<h3>Variance</h3>
+<p><span class="math display">\[ \text{Var}(\hat{\beta}_{ridge}) = \sigma^2 \, \text{tr}\left[(X'X + \lambda I)^{-1} X'X (X'X + \lambda I)^{-1}\right] \]</span></p>
+<p>The variance <strong>decreases</strong> with <span class="math inline">\(\lambda\)</span>: the penalty stabilizes the estimates.</p>
+</div>
+
+<div id="optimal-lambda" class="section level3">
+<h3>Optimal Trade-off</h3>
+<p>There exists an optimal <span class="math inline">\(\lambda^*\)</span> that minimizes total MSE — the point where the decrease in variance outweighs the increase in bias.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="svd-interpretation" class="section level2">
+<h2>SVD Interpretation</h2>
+<p>Let the Singular Value Decomposition of <span class="math inline">\(X\)</span> be:</p>
+<p><span class="math display">\[ X = UDV' \]</span></p>
+<p>where <span class="math inline">\(D = \text{diag}(d_1, \ldots, d_p)\)</span> contains the singular values. Then the ridge estimator can be written as:</p>
+<p><span class="math display">\[ \hat{\beta}_{ridge} = V \, \text{diag}\!\left(\frac{d_j^2}{d_j^2 + \lambda}\right) V' \hat{\beta}_{OLS} \]</span></p>
+<p>Each OLS coefficient (in the rotated coordinate system) is shrunk by a factor:</p>
+<p><span class="math display">\[ \frac{d_j^2}{d_j^2 + \lambda} \]</span></p>
+<p>Directions with <strong>small singular values</strong> (high variance directions) are shrunk the most. Directions with large singular values are barely affected.</p>
+
+<div id="effective-dof" class="section level3">
+<h3>Effective Degrees of Freedom</h3>
+<p><span class="math display">\[ \text{df}(\lambda) = \sum_{j=1}^{p} \frac{d_j^2}{d_j^2 + \lambda} \]</span></p>
+<p>When <span class="math inline">\(\lambda = 0\)</span>, <span class="math inline">\(\text{df} = p\)</span> (full OLS). As <span class="math inline">\(\lambda \to \infty\)</span>, <span class="math inline">\(\text{df} \to 0\)</span>.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="choosing-lambda" class="section level2">
+<h2>Choosing \(\lambda\)</h2>
+
+<div id="gcv" class="section level3">
+<h3>Generalized Cross-Validation (GCV)</h3>
+<p><span class="math display">\[ \text{GCV}(\lambda) = \frac{\frac{1}{n}\|y - X\hat{\beta}_{ridge}\|^2}{\left(1 - \frac{\text{df}(\lambda)}{n}\right)^2} \]</span></p>
+<p>GCV is computationally efficient as it avoids refitting for each fold.</p>
+</div>
+
+<div id="kfold-cv" class="section level3">
+<h3>K-Fold Cross-Validation</h3>
+<p>Split data into <span class="math inline">\(K\)</span> folds, fit ridge on <span class="math inline">\(K-1\)</span> folds, evaluate prediction error on the held-out fold. Choose <span class="math inline">\(\lambda\)</span> that minimizes average CV error.</p>
+</div>
+
+<div id="ridge-trace" class="section level3">
+<h3>Ridge Trace</h3>
+<p>Plot the coefficient values <span class="math inline">\(\hat{\beta}_j(\lambda)\)</span> as a function of <span class="math inline">\(\lambda\)</span>. Look for a region where coefficients stabilize — this indicates an appropriate level of regularization.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="multicollinearity" class="section level2">
+<h2>Multicollinearity</h2>
+<p>When predictors are highly correlated, the matrix <span class="math inline">\(X'X\)</span> has near-zero eigenvalues. This makes OLS coefficients <strong>unstable</strong>: small changes in the data lead to large changes in estimates (huge variance).</p>
+<p>Ridge regression stabilizes by adding <span class="math inline">\(\lambda\)</span> to every eigenvalue:</p>
+<p><span class="math display">\[ \text{eigenvalues of } (X'X + \lambda I) = d_j^2 + \lambda \]</span></p>
+<p>Even if <span class="math inline">\(d_j^2 \approx 0\)</span>, the term <span class="math inline">\(d_j^2 + \lambda\)</span> remains bounded away from zero, preventing the explosion of the inverse.</p>
+
+<div id="vif" class="section level3">
+<h3>Variance Inflation Factor (VIF)</h3>
+<p>A common diagnostic for multicollinearity:</p>
+<p><span class="math display">\[ \text{VIF}_j = \frac{1}{1 - R_j^2} \]</span></p>
+<p>where <span class="math inline">\(R_j^2\)</span> is the <span class="math inline">\(R^2\)</span> from regressing predictor <span class="math inline">\(j\)</span> on all other predictors. A VIF > 10 suggests problematic multicollinearity.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="bayesian-connection" class="section level2">
+<h2>Connection to Bayesian Estimation</h2>
+<p>Ridge regression is equivalent to the <strong>Maximum A Posteriori (MAP)</strong> estimate under a Gaussian prior on the coefficients:</p>
+<p><span class="math display">\[ \beta \sim \mathcal{N}\!\left(0, \, \frac{\sigma^2}{\lambda} I\right) \]</span></p>
+<p>The prior precision (inverse variance) is <span class="math inline">\(\frac{\lambda}{\sigma^2}\)</span>. A larger <span class="math inline">\(\lambda\)</span> corresponds to a tighter prior around zero — encoding the belief that coefficients should be small.</p>
+<p>The posterior mode of:</p>
+<p><span class="math display">\[ p(\beta | y, X) \propto \exp\!\left( -\frac{1}{2\sigma^2} \|y - X\beta\|^2 \right) \cdot \exp\!\left( -\frac{\lambda}{2\sigma^2} \|\beta\|^2 \right) \]</span></p>
+<p>is exactly <span class="math inline">\(\hat{\beta}_{ridge}\)</span>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="practical-considerations" class="section level2">
+<h2>Practical Considerations</h2>
+<ul>
+<li><strong>Always standardize predictors</strong>: Ridge regression is <em>not</em> scale-invariant. If predictors are on different scales, the penalty will disproportionately shrink coefficients of large-scale variables.</li>
+<li><strong>Do NOT penalize the intercept</strong>: The intercept should be estimated freely (center <span class="math inline">\(y\)</span> or exclude the intercept from the penalty).</li>
+<li><strong>Ridge does NOT produce sparse models</strong>: All coefficients remain non-zero. For variable selection (sparsity), use LASSO (L1 penalty) or Elastic Net.</li>
+<li><strong>Computationally very fast</strong>: The closed-form solution requires only a matrix inversion of size <span class="math inline">\(p \times p\)</span>, making ridge much faster than iterative methods like LASSO.</li>
+</ul>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

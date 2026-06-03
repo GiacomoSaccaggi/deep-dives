@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Markov Chains</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        ul { list-style-type: none; }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Markov Chains</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div id="stochastic-processes" class="section level2">
+<h2>Introduction to Stochastic Processes</h2>
+<p>A <strong>stochastic process</strong> is a family of random variables \(\{X_t, t \in T\}\) defined on a common probability space, indexed by a parameter \(t\) (usually representing time). The index set \(T\) can be discrete (\(T = \{0, 1, 2, \ldots\}\)) or continuous (\(T = [0, \infty)\)).</p>
+<p>The fundamental challenge in studying stochastic processes lies in understanding three key aspects:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Dependence structure</strong>: How do the random variables at different times relate to each other?</li>
+<li><strong>Prediction</strong>: Given observations up to time \(n\), what can we say about future values?</li>
+<li><strong>Uncertainty control</strong>: How does uncertainty propagate and can we bound it?</li>
+</ul>
+<p>The full joint distribution of a stochastic process is specified by all finite-dimensional distributions:</p>
+<p><span class="math display">\[ P(X_{t_1} \leq x_1, X_{t_2} \leq x_2, \ldots, X_{t_k} \leq x_k) \quad \text{for all } k \geq 1 \text{ and } t_1 < t_2 < \cdots < t_k \]</span></p>
+<p>In general, characterising these distributions is intractable. Markov chains offer a powerful simplification by imposing a specific dependence structure that makes the analysis feasible.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="markov-property" class="section level2">
+<h2>The Markov Property</h2>
+<p>The <strong>Markov property</strong> (or memoryless property) states that the conditional distribution of the future state, given the entire past and present, depends <em>only</em> on the present state. Formally, for all \(n \geq 0\) and all states \(i_0, i_1, \ldots, i_n, j\):</p>
+<p><span class="math display">\[ P(X_{n+1} = j \mid X_n = i_n, X_{n-1} = i_{n-1}, \ldots, X_0 = i_0) = P(X_{n+1} = j \mid X_n = i_n) \]</span></p>
+<p>This means that once we know the present state \(X_n\), the past history \(X_0, X_1, \ldots, X_{n-1}\) provides no additional information for predicting the future. The process "forgets" how it arrived at its current state.</p>
+<p><strong>Intuition:</strong> Think of a chess game — the next move depends on the current board position, not on the sequence of moves that led to it. Or consider the weather: a simple Markov model would predict tomorrow's weather based solely on today's, ignoring last week's pattern.</p>
+<p>The Markov property dramatically simplifies analysis: instead of needing all finite-dimensional distributions, the entire process is determined by the <strong>initial distribution</strong> and the <strong>one-step transition probabilities</strong>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="dtmc" class="section level2">
+<h2>Discrete-Time Markov Chains</h2>
+<p>A <strong>discrete-time Markov chain (DTMC)</strong> is a stochastic process \(\{X_n, n = 0, 1, 2, \ldots\}\) satisfying the Markov property, where the state space \(S\) is countable (finite or countably infinite).</p>
+
+<div id="transition-matrix" class="section level3">
+<h3>Transition Matrix</h3>
+<p>The <strong>transition probability</strong> from state \(i\) to state \(j\) is:</p>
+<p><span class="math display">\[ p_{ij} = P(X_{n+1} = j \mid X_n = i) \]</span></p>
+<p>When these probabilities do not depend on \(n\), the chain is called <strong>time-homogeneous</strong> (we assume this throughout). The transition probabilities are collected in the <strong>transition matrix</strong> \(\mathbf{P}\):</p>
+<p><span class="math display">\[ \mathbf{P} = \begin{pmatrix} p_{00} & p_{01} & p_{02} & \cdots \\ p_{10} & p_{11} & p_{12} & \cdots \\ p_{20} & p_{21} & p_{22} & \cdots \\ \vdots & \vdots & \vdots & \ddots \end{pmatrix} \]</span></p>
+<p>This is a <strong>stochastic matrix</strong>: all entries are non-negative and each row sums to 1:</p>
+<p><span class="math display">\[ p_{ij} \geq 0 \quad \text{and} \quad \sum_{j \in S} p_{ij} = 1 \quad \text{for all } i \in S \]</span></p>
+</div>
+
+<div id="chain-description" class="section level3">
+<h3>Complete Description of a Chain</h3>
+<p>A discrete-time Markov chain is fully specified by two objects:</p>
+<ol>
+<li>The <strong>initial distribution</strong> \(\boldsymbol{\mu}\): a probability vector where \(\mu_i = P(X_0 = i)\)</li>
+<li>The <strong>transition matrix</strong> \(\mathbf{P}\)</li>
+</ol>
+<p>From these, any finite-dimensional distribution can be computed:</p>
+<p><span class="math display">\[ P(X_0 = i_0, X_1 = i_1, \ldots, X_n = i_n) = \mu_{i_0} \cdot p_{i_0 i_1} \cdot p_{i_1 i_2} \cdots p_{i_{n-1} i_n} \]</span></p>
+</div>
+
+<div id="example-two-state" class="section level3">
+<h3>Example: Two-State Chain</h3>
+<p>Consider a simple weather model with states \(S = \{0 \text{ (Rain)}, 1 \text{ (Sun)}\}\) and transition matrix:</p>
+<p><span class="math display">\[ \mathbf{P} = \begin{pmatrix} 0.7 & 0.3 \\ 0.4 & 0.6 \end{pmatrix} \]</span></p>
+<p>If it's raining today, there is a 70% chance of rain tomorrow and 30% chance of sun. If it's sunny, there is a 40% chance of rain tomorrow and 60% chance of sun.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="chapman-kolmogorov" class="section level2">
+<h2>Chapman-Kolmogorov Equations</h2>
+<p>The <strong>\(n\)-step transition probability</strong> is the probability of going from state \(i\) to state \(j\) in exactly \(n\) steps:</p>
+<p><span class="math display">\[ p_{ij}^{(n)} = P(X_{m+n} = j \mid X_m = i) \]</span></p>
+<p>The <strong>Chapman-Kolmogorov equations</strong> express how multi-step transitions decompose. For any \(0 \leq r \leq n\):</p>
+<p><span class="math display">\[ p_{ij}^{(n)} = \sum_{k \in S} p_{ik}^{(r)} \cdot p_{kj}^{(n-r)} \]</span></p>
+<p>This says: to go from \(i\) to \(j\) in \(n\) steps, we can go from \(i\) to some intermediate state \(k\) in \(r\) steps, then from \(k\) to \(j\) in the remaining \(n-r\) steps, and sum over all possible intermediates.</p>
+<p>In <strong>matrix form</strong>, this takes the elegant form:</p>
+<p><span class="math display">\[ \mathbf{P}^{(n)} = \mathbf{P}^n \]</span></p>
+<p>That is, the \(n\)-step transition matrix is simply the \(n\)-th power of the one-step transition matrix. This is one of the most useful computational results in the theory.</p>
+
+<div id="ck-example" class="section level3">
+<h3>Example</h3>
+<p>For our two-state weather chain, the 2-step transition matrix is:</p>
+<p><span class="math display">\[ \mathbf{P}^2 = \mathbf{P} \cdot \mathbf{P} = \begin{pmatrix} 0.7 & 0.3 \\ 0.4 & 0.6 \end{pmatrix} \begin{pmatrix} 0.7 & 0.3 \\ 0.4 & 0.6 \end{pmatrix} = \begin{pmatrix} 0.61 & 0.39 \\ 0.52 & 0.48 \end{pmatrix} \]</span></p>
+<p>So if it rains today, the probability of rain two days from now is 0.61.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="state-classification" class="section level2">
+<h2>State Classification</h2>
+
+<div id="communication" class="section level3">
+<h3>Communicating States</h3>
+<p>State \(j\) is <strong>accessible</strong> from state \(i\) (written \(i \to j\)) if there exists \(n \geq 0\) such that \(p_{ij}^{(n)} > 0\). Two states \(i\) and \(j\) <strong>communicate</strong> (written \(i \leftrightarrow j\)) if \(i \to j\) and \(j \to i\).</p>
+<p>Communication is an equivalence relation, partitioning the state space into <strong>communicating classes</strong>. A chain is <strong>irreducible</strong> if there is only one communicating class — i.e., every state can reach every other state.</p>
+</div>
+
+<div id="recurrence-transience" class="section level3">
+<h3>Recurrent vs. Transient States</h3>
+<p>Let \(f_i\) denote the probability of ever returning to state \(i\), starting from \(i\):</p>
+<p><span class="math display">\[ f_i = P(\text{return to } i \mid X_0 = i) = P\left(\bigcup_{n=1}^{\infty} \{X_n = i\} \mid X_0 = i\right) \]</span></p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>State \(i\) is <strong>recurrent</strong> if \(f_i = 1\) (the chain returns to \(i\) with certainty)</li>
+<li>State \(i\) is <strong>transient</strong> if \(f_i < 1\) (there is a positive probability of never returning)</li>
+</ul>
+<p>An equivalent characterisation uses the expected number of visits:</p>
+<p><span class="math display">\[ \sum_{n=0}^{\infty} p_{ii}^{(n)} = \begin{cases} \infty & \text{if } i \text{ is recurrent} \\ < \infty & \text{if } i \text{ is transient} \end{cases} \]</span></p>
+<p><strong>Key facts:</strong></p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Recurrence and transience are class properties: if \(i \leftrightarrow j\), then \(i\) and \(j\) are both recurrent or both transient.</li>
+<li>In a <strong>finite</strong> irreducible chain, all states are recurrent.</li>
+<li>A recurrent state is <strong>positive recurrent</strong> if the expected return time \(E[T_i \mid X_0 = i]\) is finite, and <strong>null recurrent</strong> otherwise.</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="periodicity" class="section level2">
+<h2>Periodic and Aperiodic Chains</h2>
+<p>The <strong>period</strong> of state \(i\) is defined as:</p>
+<p><span class="math display">\[ d(i) = \gcd\{n \geq 1 : p_{ii}^{(n)} > 0\} \]</span></p>
+<p>where \(\gcd\) denotes the greatest common divisor. If \(d(i) = 1\), the state is <strong>aperiodic</strong>; if \(d(i) > 1\), it is <strong>periodic</strong> with period \(d(i)\).</p>
+<p><strong>Intuition:</strong> A periodic chain with period \(d\) can only return to a state at times that are multiples of \(d\). For example, in a random walk on a bipartite graph, the chain alternates between two sets of states, giving period 2.</p>
+<p>Periodicity is a class property: all states in a communicating class share the same period. A chain is <strong>aperiodic</strong> if all its states are aperiodic.</p>
+<p><strong>Sufficient condition for aperiodicity:</strong> If \(p_{ii} > 0\) for some state \(i\), then \(d(i) = 1\). Self-loops guarantee aperiodicity.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="limiting-distributions" class="section level2">
+<h2>Limiting Distributions</h2>
+<p>The central question in Markov chain theory: does the chain settle into a long-run equilibrium? The answer is given by the <strong>Ergodic Theorem</strong>.</p>
+
+<div id="ergodic-theorem" class="section level3">
+<h3>Ergodic Theorem</h3>
+<p>For an <strong>irreducible, aperiodic, positive recurrent</strong> Markov chain, the limit:</p>
+<p><span class="math display">\[ \lim_{n \to \infty} p_{ij}^{(n)} = \pi_j \]</span></p>
+<p>exists and is <strong>independent of the initial state</strong> \(i\). The limiting distribution \(\boldsymbol{\pi} = (\pi_1, \pi_2, \ldots)\) is the unique probability distribution satisfying:</p>
+<p><span class="math display">\[ \boldsymbol{\pi} \mathbf{P} = \boldsymbol{\pi} \qquad \text{and} \qquad \sum_{j \in S} \pi_j = 1 \]</span></p>
+<p>Such \(\boldsymbol{\pi}\) is called the <strong>stationary distribution</strong> (or equilibrium distribution, or invariant measure).</p>
+</div>
+
+<div id="stationary-interpretation" class="section level3">
+<h3>Interpretation</h3>
+<p>\(\pi_j\) represents the long-run proportion of time the chain spends in state \(j\). It is also the reciprocal of the mean return time:</p>
+<p><span class="math display">\[ \pi_j = \frac{1}{E[T_j \mid X_0 = j]} \]</span></p>
+<p>If a chain starts with distribution \(\boldsymbol{\pi}\) (i.e., \(P(X_0 = j) = \pi_j\)), then \(P(X_n = j) = \pi_j\) for all \(n\) — the distribution is preserved over time.</p>
+</div>
+
+<div id="stationary-example" class="section level3">
+<h3>Example: Weather Chain</h3>
+<p>For our two-state chain, we solve \(\boldsymbol{\pi} \mathbf{P} = \boldsymbol{\pi}\):</p>
+<p><span class="math display">\[ (\pi_0, \pi_1) \begin{pmatrix} 0.7 & 0.3 \\ 0.4 & 0.6 \end{pmatrix} = (\pi_0, \pi_1) \]</span></p>
+<p>This gives \(0.7\pi_0 + 0.4\pi_1 = \pi_0\) and \(\pi_0 + \pi_1 = 1\). Solving: \(\pi_0 = 4/7 \approx 0.571\) and \(\pi_1 = 3/7 \approx 0.429\). In the long run, it rains about 57% of the time.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="gamblers-ruin" class="section level2">
+<h2>Gambler's Ruin</h2>
+<p>The <strong>Gambler's Ruin</strong> is a classic application of Markov chains. A gambler starts with \(i\) dollars and repeatedly bets \$1. At each play, they win with probability \(p\) and lose with probability \(q = 1 - p\). The game ends when the gambler's capital reaches \(0\) (ruin) or \(N\) (target).</p>
+
+<div id="gr-formulation" class="section level3">
+<h3>Markov Chain Formulation</h3>
+<p>Let \(X_n\) denote the gambler's capital at time \(n\). Then \(\{X_n\}\) is a Markov chain on \(S = \{0, 1, 2, \ldots, N\}\) with transition probabilities:</p>
+<p><span class="math display">\[ P(X_{n+1} = i+1 \mid X_n = i) = p, \quad P(X_{n+1} = i-1 \mid X_n = i) = 1-p \quad \text{for } 1 \leq i \leq N-1 \]</span></p>
+<p>States 0 and \(N\) are <strong>absorbing</strong>: once reached, the chain stays there forever (\(p_{00} = p_{NN} = 1\)).</p>
+</div>
+
+<div id="gr-ruin-probability" class="section level3">
+<h3>Ruin Probability</h3>
+<p>Let \(r_i = P(\text{ruin} \mid X_0 = i)\) be the probability of reaching 0 starting from \(i\). By first-step analysis:</p>
+<p><span class="math display">\[ r_i = p \cdot r_{i+1} + (1-p) \cdot r_{i-1}, \quad 1 \leq i \leq N-1 \]</span></p>
+<p>with boundary conditions \(r_0 = 1\) and \(r_N = 0\). Solving this second-order linear recurrence:</p>
+<p><span class="math display">\[ r_i = \begin{cases} \dfrac{(q/p)^i - (q/p)^N}{1 - (q/p)^N} & \text{if } p \neq 1/2 \\[12pt] 1 - \dfrac{i}{N} & \text{if } p = 1/2 \end{cases} \]</span></p>
+<p>When the game is fair (\(p = 1/2\)), ruin probability decreases linearly with initial capital. When \(p < 1/2\) (unfair game), ruin is almost certain as \(N \to \infty\).</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="ctmc" class="section level2">
+<h2>Continuous-Time Markov Chains</h2>
+<p>In a <strong>continuous-time Markov chain (CTMC)</strong>, transitions can occur at any time \(t \in [0, \infty)\). The Markov property becomes:</p>
+<p><span class="math display">\[ P(X(t+s) = j \mid X(s) = i, \{X(u), 0 \leq u < s\}) = P(X(t+s) = j \mid X(s) = i) \]</span></p>
+
+<div id="ctmc-holding" class="section level3">
+<h3>Holding Times and Jump Chain</h3>
+<p>A CTMC can be decomposed into:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li><strong>Holding times</strong>: the time spent in each state before transitioning. Due to the memoryless property, these are exponentially distributed with rate \(q_i\) (depending on the current state).</li>
+<li><strong>Jump chain</strong>: the embedded discrete-time chain describing which state is visited next.</li>
+</ul>
+<p>The dynamics are governed by the <strong>generator matrix</strong> (or rate matrix) \(\mathbf{Q}\):</p>
+<p><span class="math display">\[ q_{ij} \geq 0 \text{ for } i \neq j, \qquad q_{ii} = -\sum_{j \neq i} q_{ij} \]</span></p>
+<p>The relationship between \(\mathbf{Q}\) and the transition function \(\mathbf{P}(t)\) is given by the <strong>Kolmogorov forward equation</strong>:</p>
+<p><span class="math display">\[ \mathbf{P}'(t) = \mathbf{P}(t) \mathbf{Q} \]</span></p>
+</div>
+
+<div id="birth-death" class="section level3">
+<h3>Birth-Death Processes</h3>
+<p>A <strong>birth-death process</strong> is a CTMC on \(S = \{0, 1, 2, \ldots\}\) where transitions only occur between neighbouring states:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Birth rate (transition \(i \to i+1\)): \(\lambda_i\)</li>
+<li>Death rate (transition \(i \to i-1\)): \(\mu_i\)</li>
+</ul>
+<p>Applications include queueing systems (M/M/1 queue: \(\lambda_i = \lambda\), \(\mu_i = \mu\)), population dynamics, and chemical kinetics.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="extensions" class="section level2">
+<h2>Connection to Poisson Process and Brownian Motion</h2>
+<p>Markov chains are the foundation for several fundamental stochastic processes:</p>
+
+<div id="poisson" class="section level3">
+<h3>Poisson Process</h3>
+<p>The <strong>Poisson process</strong> \(\{N(t), t \geq 0\}\) is a continuous-time Markov chain counting events that occur at a constant rate \(\lambda\). It is a pure birth process with \(\lambda_i = \lambda\) for all \(i\). Key properties:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+<li>Independent and stationary increments</li>
+<li>\(N(t) \sim \text{Poisson}(\lambda t)\)</li>
+<li>Inter-arrival times are i.i.d. \(\text{Exponential}(\lambda)\)</li>
+</ul>
+</div>
+
+<div id="brownian" class="section level3">
+<h3>Brownian Motion</h3>
+<p><strong>Brownian motion</strong> (Wiener process) can be viewed as the continuous-state, continuous-time limit of a random walk — itself a discrete Markov chain. If \(X_n\) is a symmetric random walk with step size \(\Delta x\) and time step \(\Delta t\), then as \(\Delta x, \Delta t \to 0\) with \((\Delta x)^2 / \Delta t \to \sigma^2\):</p>
+<p><span class="math display">\[ X_{\lfloor t/\Delta t \rfloor} \xrightarrow{d} B(t) \]</span></p>
+<p>where \(B(t)\) is a Brownian motion with variance \(\sigma^2 t\). Brownian motion satisfies the (continuous) Markov property and is the basis for stochastic calculus, diffusion processes, and financial mathematics.</p>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Random Forest</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Random Forest</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Random Forest is an ensemble learning method that builds many decision trees and aggregates their predictions to produce a more accurate and stable result. It combines <strong>Bagging</strong> (Bootstrap Aggregating) with <strong>random feature selection</strong> at each split. The method was formally proposed by Leo Breiman in 2001.</p>
+<p>The key insight is that by introducing randomness in both the data (bootstrap) and the features (random subspace), the individual trees become decorrelated, and their aggregation yields a powerful reduction in variance without increasing bias.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="the-algorithm" class="section level2">
+<h2>The Algorithm</h2>
+<p>The Random Forest algorithm proceeds as follows:</p>
+
+<div id="bootstrap-sampling" class="section level3">
+<h3>1. Bootstrap Sampling</h3>
+<p>Draw \(B\) bootstrap samples (sampling with replacement, same size as original) from the training data \(\{(x_i, y_i)\}_{i=1}^n\).</p>
+</div>
+
+<div id="tree-growing" class="section level3">
+<h3>2. Tree Growing with Random Feature Selection</h3>
+<p>For each bootstrap sample, grow an unpruned decision tree. At each node split, instead of considering all \(p\) features, randomly select \(m\) features and find the best split among those only.</p>
+<p>Typical choices for \(m\):</p>
+<ul>
+<li><strong>Classification:</strong> \(m = \lfloor\sqrt{p}\rfloor\)</li>
+<li><strong>Regression:</strong> \(m = \lfloor p/3 \rfloor\)</li>
+</ul>
+</div>
+
+<div id="aggregation" class="section level3">
+<h3>3. Aggregation</h3>
+<p>Combine the predictions of all \(B\) trees:</p>
+<ul>
+<li><strong>Classification:</strong> majority vote across all trees</li>
+<li><strong>Regression:</strong> average of predictions</li>
+</ul>
+<p><span class="math display">\[\hat{f}(x) = \frac{1}{B}\sum_{b=1}^{B} T_b(x)\]</span></p>
+<p>where \(T_b(x)\) is the prediction of the \(b\)-th tree.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="why-random-feature-selection" class="section level2">
+<h2>Why Random Feature Selection?</h2>
+<p>The purpose of the random feature restriction is to <strong>decorrelate</strong> the individual trees. Consider a dataset where one feature is a very strong predictor. In standard Bagging, every tree would use that strong predictor at or near the root, making all trees structurally similar — i.e., highly correlated.</p>
+<p>When trees are correlated, averaging them provides limited variance reduction. By forcing each split to choose from a random subset of features, we ensure that different trees explore different parts of the feature space, breaking the dominance of any single strong predictor.</p>
+<p>The smaller \(m\) is, the more decorrelated the trees become (but each individual tree becomes weaker). The default values (\(\sqrt{p}\) or \(p/3\)) strike an effective balance.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="variance-reduction" class="section level2">
+<h2>Variance Reduction</h2>
+<p>The variance of the average of \(B\) identically distributed (but not independent) random variables, each with variance \(\sigma^2\) and pairwise correlation \(\rho\), is:</p>
+<p><span class="math display">\[\text{Var}\left(\frac{1}{B}\sum_{b=1}^B T_b(x)\right) = \rho\,\sigma^2 + \frac{1-\rho}{B}\,\sigma^2\]</span></p>
+<p>As \(B \to \infty\), the second term vanishes, leaving \(\rho\,\sigma^2\) as the irreducible lower bound. Random Forests reduce \(\rho\) (the pairwise correlation between trees) through the random feature selection mechanism, thereby achieving lower ensemble variance than standard Bagging.</p>
+<p>This explains why:</p>
+<ul>
+<li>Increasing \(B\) always helps (reduces the second term) and never causes overfitting</li>
+<li>Decreasing \(m\) reduces \(\rho\) but may increase \(\sigma^2\) (individual tree variance)</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="oob-error" class="section level2">
+<h2>Out-of-Bag (OOB) Error</h2>
+<p>Each bootstrap sample includes approximately 63.2% of the original observations (since \(P(\text{observation included}) = 1 - (1-1/n)^n \approx 1 - e^{-1} \approx 0.632\)).</p>
+<p>The remaining ~36.8% not selected in a given bootstrap sample are called <strong>Out-of-Bag</strong> (OOB) samples for that tree. For each observation \(x_i\), we can form its OOB prediction by averaging only the trees for which \(x_i\) was OOB:</p>
+<p><span class="math display">\[\hat{f}^{\text{OOB}}(x_i) = \frac{1}{|S_i|}\sum_{b \in S_i} T_b(x_i)\]</span></p>
+<p>where \(S_i = \{b : x_i \notin \text{bootstrap sample } b\}\).</p>
+<p>The OOB error is computed from these predictions and provides a nearly unbiased estimate of the test error — <strong>no separate cross-validation is needed</strong>. This is a significant practical advantage of Random Forests.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="hyperparameters" class="section level2">
+<h2>Hyperparameters</h2>
+
+<div id="number-of-trees" class="section level3">
+<h3>Number of Trees \(B\)</h3>
+<p>More trees are always better — Random Forests do not overfit as \(B\) increases (the variance formula shows the second term shrinks monotonically). Typical values: 500–1000+. The only cost is computational.</p>
+</div>
+
+<div id="features-per-split" class="section level3">
+<h3>Features per Split \(m\)</h3>
+<p>Controls the correlation-variance trade-off. Smaller \(m\) means more decorrelated but individually weaker trees. Defaults: \(\sqrt{p}\) (classification), \(p/3\) (regression). Can be tuned via OOB error.</p>
+</div>
+
+<div id="other-parameters" class="section level3">
+<h3>Other Parameters</h3>
+<ul>
+<li><strong>min_samples_leaf:</strong> minimum number of observations in a terminal node. Larger values produce smaller trees and act as regularisation.</li>
+<li><strong>max_depth:</strong> maximum depth of each tree. By default trees are grown fully (until leaves are pure or contain min_samples_leaf observations).</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="feature-importance" class="section level2">
+<h2>Feature Importance</h2>
+
+<div id="mdi" class="section level3">
+<h3>Mean Decrease in Impurity (MDI)</h3>
+<p>For each feature, sum the impurity reductions (e.g., Gini or RSS decrease) at every node where that feature is used for splitting, weighted by the proportion of samples reaching that node, and averaged across all trees:</p>
+<p><span class="math display">\[\text{Importance}(x_j) = \frac{1}{B}\sum_{b=1}^B \sum_{t \in T_b} \mathbb{1}(v(t)=j)\;\frac{n_t}{n}\;\Delta i(t)\]</span></p>
+<p>where \(v(t)\) is the splitting variable at node \(t\), \(n_t\) is the number of samples at that node, and \(\Delta i(t)\) is the impurity decrease.</p>
+</div>
+
+<div id="permutation-importance" class="section level3">
+<h3>Permutation Importance</h3>
+<p>For each feature \(x_j\), randomly permute (shuffle) its values in the OOB samples and measure the increase in OOB error. A large increase indicates the feature is important:</p>
+<p><span class="math display">\[\text{Importance}(x_j) = \frac{1}{B}\sum_{b=1}^B \frac{\text{Error}^{\text{OOB},\pi_j}_b - \text{Error}^{\text{OOB}}_b}{|\text{OOB}_b|}\]</span></p>
+<p>Permutation importance is generally more reliable than MDI, especially when features are correlated or have different scales.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="advantages-and-limitations" class="section level2">
+<h2>Advantages and Limitations</h2>
+
+<div id="advantages" class="section level3">
+<h3>Advantages</h3>
+<ul>
+<li>Excellent predictive accuracy across a wide range of problems</li>
+<li>Robust to overfitting — performance improves or plateaus as \(B\) grows, never degrades</li>
+<li>Handles high-dimensional data naturally (random subspace helps)</li>
+<li>Provides built-in feature importance measures</li>
+<li>OOB error estimation eliminates the need for a hold-out set or cross-validation</li>
+<li>Minimal hyperparameter tuning required (defaults work well)</li>
+<li>Handles both classification and regression, mixed feature types, missing data</li>
+</ul>
+</div>
+
+<div id="limitations" class="section level3">
+<h3>Limitations</h3>
+<ul>
+<li>Less interpretable than a single decision tree — the model is a "black box" ensemble</li>
+<li>Prediction can be slow for very large \(B\) (must traverse all trees)</li>
+<li>MDI feature importance is biased toward high-cardinality and correlated features</li>
+<li>Cannot extrapolate beyond the range of training data (unlike linear models)</li>
+<li>Memory-intensive: stores all \(B\) full trees</li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

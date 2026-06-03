@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Becoming a Wandmaker: Writing Custom Plugins</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Becoming a Wandmaker: Writing Custom Plugins</h2>
+                        <hr class="small">
+                        <h5>Pytest Hooks &mdash; Crafting Your Own Magic</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<h2>🪄 Becoming a Wandmaker</h2>
+<p>Ollivander doesn't just sell wands &mdash; he <em>crafts</em> them. Each wand has a unique core, length, and flexibility, tailored to its owner. Similarly, writing custom pytest plugins means crafting hooks &mdash; extension points where you inject your own behavior into pytest's execution pipeline. You become the wandmaker of your testing framework.</p>
+
+<h3>1. What Are Hooks? &mdash; The Wand Cores</h3>
+<p>Hooks are well-defined functions that pytest calls at specific moments during execution. By implementing these functions, you alter pytest's behavior. Key hooks include:</p>
+<table class="table table-condensed">
+<tr><th>Hook</th><th>When It Fires</th><th>Analogy</th></tr>
+<tr><td><code>pytest_addoption</code></td><td>When CLI options are registered</td><td>Choosing the wand wood</td></tr>
+<tr><td><code>pytest_configure</code></td><td>After CLI parsing, before collection</td><td>Selecting the core</td></tr>
+<tr><td><code>pytest_collection_modifyitems</code></td><td>After tests are collected</td><td>Sorting the wand blanks</td></tr>
+<tr><td><code>pytest_report_header</code></td><td>When header info is printed</td><td>Engraving the maker's mark</td></tr>
+<tr><td><code>pytest_runtest_makereport</code></td><td>After each test phase (setup/call/teardown)</td><td>Inspecting the finished wand</td></tr>
+</table>
+
+<h3>2. conftest.py as a Local Plugin &mdash; The Workshop</h3>
+<p>Before packaging a full plugin, use <code>conftest.py</code> as your local workshop. Any hook implemented there applies to all tests in that directory and below:</p>
+<pre><code class="python"># conftest.py &mdash; your local wandmaker's workshop
+# pytest auto-discovers this file. No registration needed!
+
+def pytest_report_header(config):
+    """Add a custom header line &mdash; the maker's mark."""
+    return "⚡ Powered by Ollivander's Custom Test Framework ⚡"
+</code></pre>
+<p>Run <code>pytest</code> and you'll see your mark in the output header. Simple, powerful, local.</p>
+
+<h3>3. Example: Randomizing Test Order &mdash; Shuffling the Wand Blanks</h3>
+<p>Sometimes you want to shuffle test order to catch hidden dependencies (like choosing a random wand to see which one picks you):</p>
+<pre><code class="python"># conftest.py
+import random
+
+def pytest_collection_modifyitems(items):
+    """Shuffle test order &mdash; no test should depend on another's position."""
+    random.shuffle(items)
+    # 'items' is modified IN PLACE &mdash; no return needed
+</code></pre>
+<p>This is exactly what <code>pytest-randomly</code> does (with more sophistication). But here you've crafted it yourself &mdash; a bespoke wand for your specific needs.</p>
+
+<h3>4. Example: Adding Custom CLI Options &mdash; Choosing the Wood</h3>
+<p>Add a <code>--hogwarts-house</code> option that filters tests by house:</p>
+<pre><code class="python"># conftest.py
+import pytest
+
+def pytest_addoption(parser):
+    """Register a custom CLI option &mdash; choosing the wand's wood."""
+    parser.addoption(
+        "--hogwarts-house",
+        action="store",
+        default=None,
+        help="Only run tests marked with this Hogwarts house"
+    )
+
+def pytest_configure(config):
+    """Register custom markers."""
+    config.addinivalue_line("markers", "gryffindor: Tests for the brave")
+    config.addinivalue_line("markers", "slytherin: Tests for the cunning")
+    config.addinivalue_line("markers", "ravenclaw: Tests for the wise")
+    config.addinivalue_line("markers", "hufflepuff: Tests for the loyal")
+
+def pytest_collection_modifyitems(config, items):
+    """Filter tests by house if --hogwarts-house is specified."""
+    house = config.getoption("--hogwarts-house")
+    if house is None:
+        return  # No filtering
+
+    selected = []
+    deselected = []
+    for item in items:
+        if house in [mark.name for mark in item.iter_markers()]:
+            selected.append(item)
+        else:
+            deselected.append(item)
+
+    items[:] = selected
+    config.hook.pytest_deselected(items=deselected)
+</code></pre>
+<p>Usage:</p>
+<pre><code class="python"># test_spells.py
+import pytest
+
+@pytest.mark.gryffindor
+def test_expelliarmus():
+    assert cast("Expelliarmus") == "disarmed"
+
+@pytest.mark.slytherin
+def test_avada_kedavra():
+    assert cast("Avada Kedavra") == "forbidden"
+
+# Run only Gryffindor tests:
+# pytest --hogwarts-house=gryffindor
+</code></pre>
+
+<h3>5. Example: Custom Reporting &mdash; Inspecting the Finished Wand</h3>
+<p>Track which tests failed and report a summary at the end:</p>
+<pre><code class="python"># conftest.py
+import pytest
+
+# Store results as we go
+_results = {"passed": [], "failed": [], "error": []}
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Intercept test results after the 'call' phase."""
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.when == "call":  # Only care about the actual test, not setup/teardown
+        if report.passed:
+            _results["passed"].append(item.name)
+        elif report.failed:
+            _results["failed"].append(item.name)
+
+    if report.when == "setup" and report.failed:
+        _results["error"].append(item.name)
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Print a custom summary &mdash; the wandmaker's quality report."""
+    terminalreporter.write_sep("=", "⚡ Ollivander's Quality Report ⚡")
+    terminalreporter.write_line(f"  Wands that work (passed): {len(_results['passed'])}")
+    terminalreporter.write_line(f"  Wands that backfired (failed): {len(_results['failed'])}")
+    if _results["failed"]:
+        for name in _results["failed"]:
+            terminalreporter.write_line(f"    💥 {name}")
+    terminalreporter.write_line(f"  Wands that exploded in setup (error): {len(_results['error'])}")
+</code></pre>
+
+<h3>6. Packaging as an Installable Plugin &mdash; Opening Your Own Shop</h3>
+<p>Once your conftest hooks are mature, package them as a proper installable plugin using <code>entry_points</code>:</p>
+<pre><code class="python"># Directory structure:
+# pytest-ollivander/
+# ├── setup.py (or pyproject.toml)
+# └── pytest_ollivander.py  (the plugin module)
+
+# pytest_ollivander.py
+"""Ollivander's custom pytest plugin."""
+
+def pytest_report_header(config):
+    return "⚡ Ollivander's Testing Framework v1.0 ⚡"
+
+def pytest_collection_modifyitems(items):
+    import random
+    random.shuffle(items)
+</code></pre>
+<pre><code class="python"># setup.py
+from setuptools import setup
+
+setup(
+    name="pytest-ollivander",
+    version="1.0.0",
+    py_modules=["pytest_ollivander"],
+    entry_points={
+        # THIS is the magic line &mdash; pytest discovers plugins via this entry point
+        "pytest11": [
+            "ollivander = pytest_ollivander",
+        ],
+    },
+    install_requires=["pytest>=7.0"],
+)
+</code></pre>
+<pre><code class="python"># Install your plugin:
+pip install -e ./pytest-ollivander
+
+# Now it's auto-discovered by pytest everywhere!
+# Verify:
+pytest --co -q  # You'll see "ollivander" in the plugins list
+</code></pre>
+<p>The key is the <code>"pytest11"</code> entry point group &mdash; this is how pytest discovers third-party plugins. Name it, package it, publish it to PyPI, and other wizards can install your wands.</p>
+
+<h3>Summary &mdash; The Wandmaker's Creed</h3>
+<ul>
+<li><strong>Hooks</strong> are extension points in pytest's lifecycle</li>
+<li><strong>conftest.py</strong> is your local workshop &mdash; no packaging needed</li>
+<li><strong>pytest_collection_modifyitems</strong> lets you reorder/filter tests</li>
+<li><strong>pytest_addoption + pytest_configure</strong> add CLI options</li>
+<li><strong>pytest_runtest_makereport</strong> gives you post-test results</li>
+<li><strong>entry_points["pytest11"]</strong> makes your plugin installable</li>
+</ul>
+<p><em>"The wand chooses the wizard, Mr. Potter."</em> &mdash; Ollivander. But the wandmaker chooses the hooks. Now go craft something magical.</p>
+
+    </div>
+
+    <script>
+      (function () {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+        document.getElementsByTagName("head")[0].appendChild(script);
+      })();
+    </script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

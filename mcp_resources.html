@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Sensor Array Active: Exposing Resources</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Sensor Array Active: Exposing Resources</h2>
+                        <hr class="small">
+                        <h5>MCP Series — Part 4</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>📡 What Are Resources? The Ship's Sensor Array</h2>
+<p>When the Enterprise scans a planet, it doesn't <em>change</em> the planet — it <strong>observes</strong> it. The sensor array is a read-only system that gathers information for the bridge crew to act upon.</p>
+<p>MCP <strong>Resources</strong> work exactly like this:</p>
+<ul>
+<li><strong>Read-only data</strong> that the model can access</li>
+<li><strong>Application-controlled</strong> — the host (not the model) decides when to fetch them</li>
+<li>Identified by <strong>URIs</strong> with custom protocol schemes</li>
+<li>Can be static (files, configs) or dynamic (computed in real-time)</li>
+<li>Return text or binary data</li>
+</ul>
+<p>Resources are the model's <em>eyes and ears</em>. They provide context — the raw data that informs decisions — without allowing the model to modify anything.</p>
+</div>
+
+<div class="section level2">
+<h2>🎯 The @resource Decorator: Registering Sensors</h2>
+<p>Just as each sensor on the Enterprise has a designation (long-range sensors, short-range sensors, lateral sensors), each MCP resource has a <strong>URI</strong> that uniquely identifies it:</p>
+<pre><code class="python">from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP('USS Enterprise NCC-1701-D')
+
+@enterprise.resource('starfleet://ship-name')
+def get_ship_name() -> str:
+    """The ship's official registry name."""
+    return 'USS Enterprise NCC-1701-D'
+</code></pre>
+<p>The URI <code>starfleet://ship-name</code> is a custom protocol. You define the scheme — it can be anything meaningful to your domain: <code>database://</code>, <code>config://</code>, <code>metrics://</code>, etc.</p>
+</div>
+
+<div class="section level2">
+<h2>📂 Static Resources: Reading the Ship's Manifest</h2>
+<p>Static resources serve <strong>pre-existing data</strong> — files, configuration, reference material. Like consulting the ship's crew manifest or technical specifications:</p>
+
+<pre><code class="python">from pathlib import Path
+from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP('USS Enterprise NCC-1701-D')
+DATA_DIR = Path(__file__).parent / 'ship_data'
+
+
+@enterprise.resource('starfleet://crew-manifest')
+def get_crew_manifest() -> str:
+    """Complete crew manifest of the Enterprise.
+
+    Contains all active personnel: name, rank, department, species.
+    """
+    return (DATA_DIR / 'crew.json').read_text()
+
+
+@enterprise.resource('starfleet://technical-specs')
+def get_technical_specifications() -> str:
+    """Ship technical specifications — Galaxy-class starship."""
+    return (DATA_DIR / 'specs.json').read_text()
+
+
+@enterprise.resource('starfleet://mission-log')
+def get_captains_log() -> str:
+    """Captain's log — current mission parameters and status."""
+    return (DATA_DIR / 'captains_log.md').read_text()
+</code></pre>
+
+<p>These resources simply read from disk and return the content. The data exists before anyone asks for it — like a PADD loaded with reference material.</p>
+</div>
+
+<div class="section level2">
+<h2>⚡ Dynamic Resources: Real-Time Sensor Readings</h2>
+<p>Dynamic resources <strong>compute data on the fly</strong> — like the ship's sensors actively scanning the environment. Every time you query them, they return the latest state:</p>
+
+<pre><code class="python">import json
+import random
+from datetime import datetime
+from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP('USS Enterprise NCC-1701-D')
+
+
+@enterprise.resource('sensors://status')
+def get_sensor_status() -> str:
+    """Real-time sensor array status — all primary systems."""
+    shield_integrity = random.uniform(95.0, 100.0)
+    warp_core_temp = random.uniform(1400, 1600)  # Kelvin
+    hull_integrity = random.uniform(97.0, 100.0)
+
+    sensor_readings = {
+        'timestamp': datetime.now().isoformat(),
+        'shields': round(shield_integrity, 1),
+        'hull_integrity': round(hull_integrity, 1),
+        'warp_core_temp_kelvin': round(warp_core_temp, 0),
+        'life_support': 'nominal',
+        'weapons_status': 'standby',
+        'crew_complement': 1014,
+    }
+    return json.dumps(sensor_readings, indent=2)
+
+
+@enterprise.resource('sensors://long-range/{sector}')
+def scan_sector(sector: str) -> str:
+    """Long-range sensor scan of a specific sector.
+
+    Args:
+        sector: Sector designation (e.g., "001", "Neutral-Zone")
+    """
+    # In reality, this would query a database or external API
+    scan_result = {
+        'sector': sector,
+        'scan_time': datetime.now().isoformat(),
+        'objects_detected': random.randint(0, 12),
+        'anomalies': random.randint(0, 3),
+        'threat_level': random.choice(['none', 'low', 'moderate']),
+        'classification': 'routine patrol scan',
+    }
+    return json.dumps(scan_result, indent=2)
+
+
+@enterprise.resource('engineering://warp-core-diagnostics')
+def warp_core_diagnostics() -> str:
+    """Level 3 warp core diagnostic — real-time telemetry."""
+    diagnostics = {
+        'matter_flow': f'{random.uniform(98, 100):.2f}%',
+        'antimatter_containment': 'stable',
+        'dilithium_crystal_alignment': f'{random.uniform(99.5, 100):.3f}%',
+        'plasma_temperature': f'{random.randint(1400, 1550)}K',
+        'output_efficiency': f'{random.uniform(95, 99.9):.1f}%',
+        'last_maintenance_stardate': '2026.153',
+        'status': 'nominal',
+    }
+    return json.dumps(diagnostics, indent=2)
+</code></pre>
+
+<p>Notice the <strong>URI template</strong> in <code>sensors://long-range/{sector}</code> — the <code>{sector}</code> part is a parameter. The client can request <code>sensors://long-range/001</code> or <code>sensors://long-range/Neutral-Zone</code>, and the function receives the sector name as an argument.</p>
+</div>
+
+<div class="section level2">
+<h2>🔗 Resource URIs: Custom Protocols</h2>
+<p>MCP resources use URIs as identifiers. You define the protocol scheme to organize your resources logically:</p>
+
+<table class="table table-condensed">
+<thead><tr><th>URI Pattern</th><th>Use Case</th><th>Star Trek Analogy</th></tr></thead>
+<tbody>
+<tr><td><code>file:///path/to/data.json</code></td><td>Local files</td><td>Ship's library computer</td></tr>
+<tr><td><code>database://users/active</code></td><td>Database queries</td><td>Personnel records</td></tr>
+<tr><td><code>config://app/settings</code></td><td>Configuration values</td><td>System parameters</td></tr>
+<tr><td><code>metrics://system/health</code></td><td>Live metrics</td><td>Engineering readouts</td></tr>
+<tr><td><code>sensors://long-range/{sector}</code></td><td>Parameterized data</td><td>Targeted sensor scans</td></tr>
+</tbody>
+</table>
+
+<p>The scheme is arbitrary — choose something meaningful to your domain. The key rule: URIs must be <strong>unique</strong> within a server.</p>
+</div>
+
+<div class="section level2">
+<h2>⚖️ Resources vs Tools: When to Use Which</h2>
+<p>This is the critical distinction every Starfleet engineer must understand:</p>
+
+<table class="table table-condensed">
+<thead><tr><th></th><th>Resources (Sensors)</th><th>Tools (Phasers)</th></tr></thead>
+<tbody>
+<tr><td><strong>Nature</strong></td><td>Read-only data</td><td>Executable actions</td></tr>
+<tr><td><strong>Control</strong></td><td>Application-controlled</td><td>Model-controlled</td></tr>
+<tr><td><strong>Side effects</strong></td><td>None — pure observation</td><td>Yes — changes state</td></tr>
+<tr><td><strong>When fetched</strong></td><td>Host decides (e.g., on context load)</td><td>Model decides (during reasoning)</td></tr>
+<tr><td><strong>Analogy</strong></td><td>Reading a sensor display</td><td>Firing phasers / engaging warp</td></tr>
+<tr><td><strong>Safety</strong></td><td>Always safe to fetch</td><td>May require confirmation</td></tr>
+</tbody>
+</table>
+
+<p><strong>Rule of thumb:</strong></p>
+<ul>
+<li>If the LLM needs to <em>see</em> data to answer a question → <strong>Resource</strong></li>
+<li>If the LLM needs to <em>do</em> something → <strong>Tool</strong></li>
+</ul>
+
+<p>Example: "What's the crew count?" → Read the crew manifest <strong>resource</strong>. "Transfer crewman to engineering" → Call a personnel management <strong>tool</strong>.</p>
+</div>
+
+<div class="section level2">
+<h2>🛠️ Putting It All Together</h2>
+<pre><code class="python">import json
+import logging
+from pathlib import Path
+from datetime import datetime
+from mcp.server.fastmcp import FastMCP
+
+logging.basicConfig(filename='/tmp/enterprise.log', level=logging.DEBUG)
+captains_log = logging.getLogger('bridge')
+
+enterprise = FastMCP('USS Enterprise NCC-1701-D', host='0.0.0.0', port=1701)
+DATA_DIR = Path(__file__).parent / 'ship_data'
+
+
+# === RESOURCES (Sensors — read-only) ===
+
+@enterprise.resource('starfleet://crew-manifest')
+def get_crew_manifest() -> str:
+    """Complete crew manifest of the Enterprise."""
+    return (DATA_DIR / 'crew.json').read_text()
+
+
+@enterprise.resource('sensors://status')
+def get_sensor_status() -> str:
+    """Real-time sensor array status."""
+    return json.dumps({'shields': 100, 'hull_integrity': 98.5, 'warp_core_temp': 1500})
+
+
+# === TOOLS (Phasers — executable actions) ===
+
+@enterprise.tool()
+def engage_warp(factor: int) -> str:
+    """Engage warp drive at specified factor."""
+    captains_log.info(f'Warp {factor} engaged')
+    return f'Aye sir, warp {factor} engaged. ETA to destination: {10/factor:.1f} hours.'
+
+
+@enterprise.tool()
+def red_alert() -> str:
+    """Activate Red Alert — all hands to battle stations."""
+    captains_log.warning('RED ALERT activated')
+    return 'Red Alert! All hands to battle stations. Shields up, weapons armed.'
+
+
+# === MAIN ===
+if __name__ == '__main__':
+    import sys
+    transport = 'streamable-http' if '--http' in sys.argv else 'stdio'
+    enterprise.run(transport=transport)
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🖖 What's Next</h2>
+<p>The sensor array is online. The Enterprise can now <strong>observe</strong> (Resources) and <strong>act</strong> (Tools). In future installments, we'll explore advanced topics: composing multiple MCP servers, authentication, and building a full agent that autonomously coordinates between sensors, weapons, and navigation.</p>
+<p><em>The Federation's finest, reporting for duty.</em></p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

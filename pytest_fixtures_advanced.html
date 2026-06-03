@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="pytest Advanced Fixtures">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>The Room of Requirement: Advanced Magic</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-147261423-1'); </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i></button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="site-heading">
+                <h2>The Room of Requirement: Advanced Magic</h2>
+                <hr class="small">
+                <h5>pytest Deep-Dives — Hogwarts Edition</h5>
+            </div>
+        </div></div></div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>📜 Yield Fixtures — Opening &amp; Closing the Marauder's Map</h2>
+<p>The Marauder's Map must be <em>activated</em> ("I solemnly swear that I am up to no good") and <em>deactivated</em> ("Mischief managed!"). Yield fixtures follow the same pattern: <strong>setup → yield → teardown</strong>.</p>
+
+<pre><code class="python">import pytest
+
+class MaraudersMap:
+    def __init__(self):
+        self.is_active = False
+        self.tracking = []
+
+    def activate(self):
+        self.is_active = True
+        print("🗺️ I solemnly swear that I am up to no good!")
+
+    def deactivate(self):
+        self.is_active = False
+        self.tracking.clear()
+        print("🗺️ Mischief managed!")
+
+    def locate(self, person: str) -> str:
+        if not self.is_active:
+            raise RuntimeError("Map is not active!")
+        location = f"{person} → Great Hall"
+        self.tracking.append(location)
+        return location
+
+@pytest.fixture
+def marauders_map():
+    """Yield fixture: setup before yield, teardown after."""
+    the_map = MaraudersMap()
+    the_map.activate()       # ← SETUP (before yield)
+    yield the_map            # ← test receives this object
+    the_map.deactivate()     # ← TEARDOWN (runs even if test fails!)
+
+def test_locate_snape(marauders_map):
+    location = marauders_map.locate("Severus Snape")
+    assert "Snape" in location
+    assert marauders_map.is_active is True
+
+def test_locate_draco(marauders_map):
+    location = marauders_map.locate("Draco Malfoy")
+    assert "Draco" in location
+</code></pre>
+<p>The teardown code after <code>yield</code> <strong>always runs</strong>, even if the test raises an exception — like a magical contract!</p>
+</div>
+
+<div class="section level2">
+<h2>🔒 Fixture Finalizers — request.addfinalizer</h2>
+<p>An alternative to <code>yield</code> for teardown. Useful when you need <strong>multiple</strong> cleanup steps or conditional teardown (like destroying multiple Horcruxes).</p>
+
+<pre><code class="python">@pytest.fixture
+def horcrux_collection(request):
+    """Using addfinalizer — can register multiple teardown steps."""
+    horcruxes = []
+
+    def destroy_all_horcruxes():
+        for h in horcruxes:
+            print(f"💀 Destroying horcrux: {h}")
+        horcruxes.clear()
+
+    def notify_dumbledore():
+        print("📨 Notifying Dumbledore: all horcruxes destroyed.")
+
+    request.addfinalizer(notify_dumbledore)  # runs LAST (LIFO order)
+    request.addfinalizer(destroy_all_horcruxes)  # runs FIRST
+
+    # Setup
+    horcruxes.extend(["Diary", "Ring", "Locket", "Cup", "Diadem", "Harry", "Nagini"])
+    return horcruxes
+
+def test_count_horcruxes(horcrux_collection):
+    assert len(horcrux_collection) == 7
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🌟 Autouse Fixtures — The Trace (Applied Automatically)</h2>
+<p>Like the Trace on underage wizards, <code>autouse=True</code> fixtures apply to <strong>every test</strong> in their scope without being explicitly requested.</p>
+
+<pre><code class="python">@pytest.fixture(autouse=True)
+def reset_house_points():
+    """Automatically resets house points before EVERY test."""
+    Hogwarts.reset_points()
+    yield
+    # After each test, verify no house has negative points
+    for house in ["Gryffindor", "Slytherin", "Hufflepuff", "Ravenclaw"]:
+        assert Hogwarts.get_points(house) >= 0
+
+def test_award_points():
+    Hogwarts.award("Gryffindor", 50)
+    assert Hogwarts.get_points("Gryffindor") == 50
+
+def test_deduct_points():
+    Hogwarts.deduct("Slytherin", 10)
+    # autouse ensures points were reset, so this starts from 0
+    # Gryffindor is back to 0, not 50!
+    assert Hogwarts.get_points("Gryffindor") == 0
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🧪 Parametrized Fixtures — Multiple Potions from One Cauldron</h2>
+<pre><code class="python">@pytest.fixture(params=["Polyjuice", "Veritaserum", "Amortentia"])
+def potion(request):
+    """This fixture runs the test 3 times — once per potion."""
+    potion_name = request.param
+    cauldron = Cauldron()
+    brewed = cauldron.brew(potion_name)
+    yield brewed
+    cauldron.clean()  # teardown
+
+def test_potion_is_liquid(potion):
+    """Runs 3 times: Polyjuice, Veritaserum, Amortentia."""
+    assert potion.state == "liquid"
+
+def test_potion_has_color(potion):
+    """Also runs 3 times! 3 potions × 2 tests = 6 total test cases."""
+    assert potion.color is not None
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🔀 Indirect Parametrize — Casting Through a Proxy</h2>
+<p>Sometimes you want to parametrize the <strong>fixture itself</strong> from the test, passing arguments <em>through</em> the fixture (like casting a spell through another wizard's wand).</p>
+
+<pre><code class="python">@pytest.fixture
+def wand(request):
+    """Fixture receives params indirectly from @pytest.mark.parametrize."""
+    wood, core = request.param
+    return Wand(wood=wood, core=core, length_inches=11.0)
+
+@pytest.mark.parametrize("wand", [
+    ("holly", "phoenix_feather"),
+    ("elder", "thestral_tail_hair"),
+    ("vine", "dragon_heartstring"),
+], indirect=True)  # ← key: tells pytest to pass params TO the fixture
+def test_wand_allegiance(wand):
+    """Each parametrized tuple is passed to the 'wand' fixture via request.param."""
+    assert wand.wood in ["holly", "elder", "vine"]
+    assert wand.cast("Lumos") == "Lumos!"
+</code></pre>
+<p>The <code>indirect=True</code> flag redirects parametrize values into <code>request.param</code> inside the fixture, letting you build complex objects from simple test-level parameters.</p>
+</div>
+
+    </div>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+        </div></div></div>
+    </footer>
+</body>
+</html>

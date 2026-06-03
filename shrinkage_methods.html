@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Shrinkage Methods</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Shrinkage Methods</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In high-dimensional settings where the number of predictors <span class="math inline">\(p\)</span> is large relative to the number of observations <span class="math inline">\(n\)</span>, Ordinary Least Squares (OLS) tends to overfit the training data. Shrinkage methods constrain or regularize the coefficient estimates, shrinking them toward zero. This reduces variance at the cost of a slight increase in bias.</p>
+<p>The two main shrinkage approaches are:</p>
+<ul>
+<li><strong>Ridge Regression</strong> (L2 penalty)</li>
+<li><strong>LASSO</strong> (L1 penalty)</li>
+</ul>
+<p>Both add a penalty term to the OLS objective function, controlling model complexity through a tuning parameter <span class="math inline">\(\lambda\)</span>.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="why-shrink" class="section level2">
+<h2>Why Shrink?</h2>
+<p>The motivation comes from the <strong>bias-variance tradeoff</strong>. Recall that the expected prediction error (MSE) decomposes as:</p>
+<p><span class="math display">\[ \text{MSE} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error} \]</span></p>
+<p>OLS is unbiased, but when <span class="math inline">\(p\)</span> is large (especially when <span class="math inline">\(p \approx n\)</span> or <span class="math inline">\(p > n\)</span>), the variance of the coefficient estimates becomes very high. By accepting a small amount of bias, we can substantially reduce variance, leading to lower overall MSE.</p>
+<p><strong>Geometric intuition:</strong> Shrinkage methods solve a constrained optimization problem. Instead of finding the OLS solution anywhere in parameter space, we restrict the coefficients to lie within a constraint region (a sphere for Ridge, a diamond for LASSO). The solution is the point where the RSS contours first touch the constraint region.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="ridge-regression" class="section level2">
+<h2>Ridge Regression (L2 Penalty)</h2>
+<p>Ridge regression minimizes the penalized residual sum of squares:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{ridge}} = \underset{\beta}{\arg\min} \left\{ \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} x_{ij} \beta_j \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right\} \]</span></p>
+<p>This is equivalent to the constrained problem:</p>
+<p><span class="math display">\[ \min_{\beta} \; \text{RSS} \quad \text{subject to} \quad \sum_{j=1}^{p} \beta_j^2 \leq s \]</span></p>
+<p>There is a one-to-one correspondence between <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(s\)</span>.</p>
+
+<div id="ridge-closed-form" class="section level3">
+<h3>Closed-Form Solution</h3>
+<p>Ridge regression has an explicit solution in matrix form:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{ridge}} = (X^T X + \lambda I)^{-1} X^T y \]</span></p>
+<p>Note that <span class="math inline">\(X^T X + \lambda I\)</span> is always invertible for <span class="math inline">\(\lambda > 0\)</span>, even when <span class="math inline">\(X^T X\)</span> is singular (which happens when <span class="math inline">\(p > n\)</span>).</p>
+</div>
+
+<div id="ridge-properties" class="section level3">
+<h3>Properties</h3>
+<ul>
+<li>Shrinks all coefficients toward zero, but never sets them exactly to zero</li>
+<li>When <span class="math inline">\(\lambda = 0\)</span>: reduces to OLS</li>
+<li>When <span class="math inline">\(\lambda \to \infty\)</span>: all <span class="math inline">\(\hat{\beta}_j \to 0\)</span></li>
+<li>The intercept <span class="math inline">\(\beta_0\)</span> is typically not penalized</li>
+<li><strong>Important:</strong> Predictors must be standardized before applying Ridge, since the penalty is not scale-invariant</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="lasso" class="section level2">
+<h2>LASSO (L1 Penalty)</h2>
+<p>The LASSO (Least Absolute Shrinkage and Selection Operator) minimizes:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{lasso}} = \underset{\beta}{\arg\min} \left\{ \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} x_{ij} \beta_j \right)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \right\} \]</span></p>
+<p>Equivalently:</p>
+<p><span class="math display">\[ \min_{\beta} \; \text{RSS} \quad \text{subject to} \quad \sum_{j=1}^{p} |\beta_j| \leq s \]</span></p>
+
+<div id="lasso-key-difference" class="section level3">
+<h3>Key Difference from Ridge</h3>
+<p>The L1 penalty can set coefficients <strong>exactly to zero</strong>. This means LASSO performs <strong>variable selection</strong> — it produces sparse models where only a subset of predictors have non-zero coefficients.</p>
+<p>There is no closed-form solution for the LASSO. It is typically solved using <strong>coordinate descent</strong> algorithms.</p>
+</div>
+
+<div id="lasso-geometry" class="section level3">
+<h3>Geometric Interpretation</h3>
+<p>The L1 constraint region is a diamond (in 2D) or a cross-polytope (in higher dimensions). Its corners lie on the coordinate axes. The RSS contours (ellipses) are most likely to first touch the constraint region at a corner, where one or more coordinates are exactly zero. In contrast, the L2 constraint region is a sphere with no corners, so tangency points rarely occur on the axes.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="elastic-net" class="section level2">
+<h2>Elastic Net</h2>
+<p>The Elastic Net combines both L1 and L2 penalties:</p>
+<p><span class="math display">\[ \hat{\beta}^{\text{enet}} = \underset{\beta}{\arg\min} \left\{ \text{RSS} + \lambda \left[ \alpha \sum_{j=1}^{p} |\beta_j| + (1-\alpha) \sum_{j=1}^{p} \beta_j^2 \right] \right\} \]</span></p>
+<p>where <span class="math inline">\(\alpha \in [0,1]\)</span> controls the mix:</p>
+<ul>
+<li><span class="math inline">\(\alpha = 1\)</span>: pure LASSO</li>
+<li><span class="math inline">\(\alpha = 0\)</span>: pure Ridge</li>
+</ul>
+<p><strong>When to use Elastic Net:</strong></p>
+<ul>
+<li>When predictors are highly correlated. In this case, LASSO tends to arbitrarily select one variable from a group of correlated predictors and discard the others. Elastic Net encourages a grouping effect — correlated predictors tend to get similar coefficients.</li>
+<li>When <span class="math inline">\(p > n\)</span>: LASSO can select at most <span class="math inline">\(n\)</span> variables, while Elastic Net does not have this limitation.</li>
+</ul>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="choosing-lambda" class="section level2">
+<h2>Choosing <span class="math inline">\(\lambda\)</span></h2>
+<p>The tuning parameter <span class="math inline">\(\lambda\)</span> controls the strength of regularization. It is chosen via <strong>cross-validation</strong>:</p>
+<ol>
+<li>Define a grid of <span class="math inline">\(\lambda\)</span> values (typically on a log scale)</li>
+<li>For each <span class="math inline">\(\lambda\)</span>, perform K-fold CV and compute the average prediction error</li>
+<li>Select the <span class="math inline">\(\lambda\)</span> that minimizes cross-validated error</li>
+</ol>
+
+<div id="lambda-selection-rules" class="section level3">
+<h3>Selection Rules</h3>
+<ul>
+<li><span class="math inline">\(\lambda_{\min}\)</span>: the value that minimizes the CV error — gives the best predictive model</li>
+<li><span class="math inline">\(\lambda_{1\text{se}}\)</span>: the largest <span class="math inline">\(\lambda\)</span> within one standard error of the minimum — gives the most parsimonious model whose error is statistically indistinguishable from the best</li>
+</ul>
+</div>
+
+<div id="regularization-path" class="section level3">
+<h3>Regularization Path</h3>
+<p>A useful diagnostic is the <strong>regularization path</strong>: a plot of coefficient values as a function of <span class="math inline">\(\lambda\)</span> (or equivalently, of <span class="math inline">\(\|\hat{\beta}\|_1 / \|\hat{\beta}^{\text{OLS}}\|_1\)</span>). This shows how each coefficient is progressively shrunk toward zero as regularization increases.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="comparison" class="section level2">
+<h2>Comparison: Ridge vs LASSO</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Ridge (L2)</th>
+<th>LASSO (L1)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>Penalty</strong></td><td><span class="math inline">\(\lambda \sum \beta_j^2\)</span></td><td><span class="math inline">\(\lambda \sum |\beta_j|\)</span></td></tr>
+<tr><td><strong>Variable selection</strong></td><td>No (all coefficients remain non-zero)</td><td>Yes (sets some to exactly zero)</td></tr>
+<tr><td><strong>Closed-form</strong></td><td>Yes</td><td>No</td></tr>
+<tr><td><strong>Best when</strong></td><td>Many predictors with small effects</td><td>Few predictors with large effects (sparse truth)</td></tr>
+<tr><td><strong>Correlated predictors</strong></td><td>Shares weight among group</td><td>Selects one arbitrarily</td></tr>
+<tr><td><strong>Constraint geometry</strong></td><td>Sphere (smooth)</td><td>Diamond (corners on axes)</td></tr>
+</tbody>
+</table>
+<p><strong>Summary:</strong> Both Ridge and LASSO outperform OLS when <span class="math inline">\(p\)</span> is large relative to <span class="math inline">\(n\)</span>. Ridge is preferable when the true model has many small, diffuse effects. LASSO is preferable when only a few predictors are truly relevant (sparse models). When in doubt, Elastic Net provides a compromise.</p>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

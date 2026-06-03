@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="pytest Built-in Fixtures">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>Ministry-Issued Spells: Built-in Fixtures</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-147261423-1'); </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i></button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="site-heading">
+                <h2>Ministry-Issued Spells: Built-in Fixtures</h2>
+                <hr class="small">
+                <h5>pytest Deep-Dives — Hogwarts Edition</h5>
+            </div>
+        </div></div></div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>📢 capsys — Capturing Spell Incantations (stdout/stderr)</h2>
+<p>When a wizard shouts an incantation, <code>capsys</code> captures everything that goes to stdout and stderr — like an Extendable Ear from Weasleys' Wizard Wheezes.</p>
+
+<pre><code class="python">def cast_spell_aloud(spell_name: str):
+    """A wizard who shouts their spells."""
+    print(f"🪄 {spell_name.upper()}!")
+
+def test_incantation_is_shouted(capsys):
+    cast_spell_aloud("Expelliarmus")
+    captured = capsys.readouterr()
+    assert "EXPELLIARMUS" in captured.out
+    assert captured.err == ""  # no errors
+
+def test_multiple_spells(capsys):
+    cast_spell_aloud("Lumos")
+    cast_spell_aloud("Nox")
+    captured = capsys.readouterr()
+    assert "LUMOS" in captured.out
+    assert "NOX" in captured.out
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>📁 capfd — Capturing File Descriptors (Low-Level Magic)</h2>
+<p>While <code>capsys</code> captures Python-level output, <code>capfd</code> works at the file-descriptor level — capturing output from C extensions and subprocesses too. Like intercepting owl post at the Ministry level.</p>
+
+<pre><code class="python">import os
+
+def test_low_level_howler(capfd):
+    """capfd captures even os.write() calls."""
+    os.write(1, b"RONALD WEASLEY! HOW DARE YOU STEAL THAT CAR!\n")
+    captured = capfd.readouterr()
+    assert "RONALD WEASLEY" in captured.out
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>📋 caplog — Capturing Logging Output (The Hogwarts Quill)</h2>
+<p>The Quill of Acceptance records every magical child born in Britain. <code>caplog</code> does the same for Python's <code>logging</code> module.</p>
+
+<pre><code class="python">import logging
+
+logger = logging.getLogger("hogwarts.admissions")
+
+def register_student(name: str, is_magical: bool):
+    if is_magical:
+        logger.info(f"Quill recorded: {name}")
+    else:
+        logger.warning(f"Muggle detected: {name}")
+
+def test_magical_student_logged(caplog):
+    with caplog.at_level(logging.INFO, logger="hogwarts.admissions"):
+        register_student("Harry Potter", is_magical=True)
+
+    assert "Quill recorded: Harry Potter" in caplog.text
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "INFO"
+
+def test_muggle_warning(caplog):
+    with caplog.at_level(logging.WARNING):
+        register_student("Dudley Dursley", is_magical=False)
+
+    assert "Muggle detected" in caplog.text
+    assert caplog.records[0].levelname == "WARNING"
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🧪 monkeypatch — The Polyjuice Potion of Testing</h2>
+<p>Polyjuice Potion lets you temporarily <em>become</em> someone else. <code>monkeypatch</code> lets you temporarily replace attributes, environment variables, and dict items — and it <strong>automatically reverts</strong> after the test!</p>
+
+<pre><code class="python">import os
+
+class OllivandersShop:
+    def get_wand_price(self) -> int:
+        base = int(os.environ.get("GALLEON_EXCHANGE_RATE", "7"))
+        return base * 2
+
+def test_wand_price_with_custom_exchange(monkeypatch):
+    """Temporarily change an environment variable."""
+    monkeypatch.setenv("GALLEON_EXCHANGE_RATE", "10")
+    shop = OllivandersShop()
+    assert shop.get_wand_price() == 20
+
+def test_wand_price_default(monkeypatch):
+    """Ensure env var doesn't exist (undo any previous state)."""
+    monkeypatch.delenv("GALLEON_EXCHANGE_RATE", raising=False)
+    shop = OllivandersShop()
+    assert shop.get_wand_price() == 14  # 7 * 2
+
+class MinistryRegistry:
+    _minister = "Cornelius Fudge"
+
+    @classmethod
+    def get_minister(cls):
+        return cls._minister
+
+def test_new_minister(monkeypatch):
+    """Temporarily replace a class attribute."""
+    monkeypatch.setattr(MinistryRegistry, "_minister", "Kingsley Shacklebolt")
+    assert MinistryRegistry.get_minister() == "Kingsley Shacklebolt"
+    # After the test, it reverts to "Cornelius Fudge" automatically!
+
+def test_patch_dict(monkeypatch):
+    """Patch dictionary items."""
+    spell_registry = {"Lumos": "light", "Nox": "darkness"}
+    monkeypatch.setitem(spell_registry, "Lumos", "SUPER BRIGHT LIGHT")
+    assert spell_registry["Lumos"] == "SUPER BRIGHT LIGHT"
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>📂 tmp_path — Temporary Filesystem (The Vanishing Cabinet)</h2>
+<p>Like the Vanishing Cabinet that creates a passage and then disappears, <code>tmp_path</code> provides a temporary directory unique to each test — automatically cleaned up.</p>
+
+<pre><code class="python">from pathlib import Path
+
+def save_spell_book(directory: Path, spells: list[str]):
+    spell_file = directory / "advanced_potions.txt"
+    spell_file.write_text("\n".join(spells))
+    return spell_file
+
+def test_save_spell_book(tmp_path):
+    """tmp_path is a unique Path object per test invocation."""
+    spells = ["Sectumsempra", "Levicorpus", "Liberacorpus"]
+    result = save_spell_book(tmp_path, spells)
+
+    assert result.exists()
+    content = result.read_text()
+    assert "Sectumsempra" in content
+    assert len(content.splitlines()) == 3
+
+def test_tmp_path_factory(tmp_path_factory):
+    """For session-scoped temporary dirs (shared across tests)."""
+    shared_dir = tmp_path_factory.mktemp("hogwarts_cache")
+    (shared_dir / "student_list.txt").write_text("Harry\nRon\nHermione")
+    assert (shared_dir / "student_list.txt").exists()
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🔍 request — Accessing Test Metadata (The Sorting Hat's Insight)</h2>
+<p>The Sorting Hat sees into your mind. The <code>request</code> fixture gives you introspection into the <em>current test</em> — its name, markers, params, and more.</p>
+
+<pre><code class="python">@pytest.fixture
+def adaptive_fixture(request):
+    """Adapts behavior based on test markers — like the Sorting Hat."""
+    if request.node.get_closest_marker("dark_arts"):
+        return {"defense_level": "maximum", "location": "Room of Requirement"}
+    else:
+        return {"defense_level": "normal", "location": "Classroom"}
+
+@pytest.mark.dark_arts
+def test_practice_patronus(adaptive_fixture):
+    assert adaptive_fixture["location"] == "Room of Requirement"
+
+def test_regular_lesson(adaptive_fixture):
+    assert adaptive_fixture["location"] == "Classroom"
+</code></pre>
+</div>
+
+    </div>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+        </div></div></div>
+    </footer>
+</body>
+</html>

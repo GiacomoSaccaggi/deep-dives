@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Armory and Replicators: Creating Tools</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        #myInput { width: 100%; font-size: 16px; border-radius: 4px; padding: 12px 20px 12px 40px; border: 1px solid #ddd; margin-bottom: 12px; }
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a { padding: 12px; text-decoration: none; font-size: 18px; color: black; white-space: pre; display: block; }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Armory and Replicators: Creating Tools</h2>
+                        <hr class="small">
+                        <h5>MCP Deep-Dive Series</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>🔫 What Are Tools?</h2>
+<p>In the Model Context Protocol, <strong>Tools</strong> are executable functions that the AI model can <em>call</em>. Think of them as the USS Enterprise's tactical systems — the phaser array, the shields, the replicator. Each tool is a capability the ship (your server) exposes to Starfleet Command (the LLM client).</p>
+<p>Unlike Resources (read-only data feeds — the ship's sensors), Tools <strong>perform actions</strong>. They fire phasers. They open hailing frequencies. They replicate Earl Grey, hot. The model decides <em>when</em> to invoke them based on the user's request, and your server executes the operation and returns a result.</p>
+<p>Key properties of a Tool:</p>
+<ul>
+<li><strong>Name</strong> — a unique identifier (e.g. <code>fire_phasers</code>)</li>
+<li><strong>Description</strong> — what the tool does (used by the model to decide when to call it)</li>
+<li><strong>Input Schema</strong> — typed parameters (auto-generated from Python type hints)</li>
+<li><strong>Output</strong> — a return value sent back to the model</li>
+</ul>
+</div>
+
+<div class="section level2">
+<h2>🎯 The <code>@mcp.tool()</code> Decorator — Simple Function Registration</h2>
+<p>Registering a tool is as simple as decorating a function. The MCP SDK introspects your type annotations and docstring to build the JSON Schema that describes your tool to the client.</p>
+
+<pre><code class="python">from mcp.server.fastmcp import FastMCP
+
+enterprise = FastMCP("USS Enterprise NCC-1701-D")
+
+@enterprise.tool()
+def fire_phasers(target: str, power_level: int = 50) -> str:
+    """Fire phaser array at specified target. Power level 1-100."""
+    if power_level > 80:
+        return f'Maximum phaser discharge at {target}. Direct hit!'
+    return f'Phaser burst at {target}, power level {power_level}%. Standing by.'
+</code></pre>
+
+<p>That's it. The <code>fire_phasers</code> function is now available as a tool. The model sees the name, the docstring (as description), and the parameters with their types. When it decides to fire phasers, it sends a <code>tools/call</code> request and your function executes.</p>
+</div>
+
+<div class="section level2">
+<h2>🔧 Registering Existing Functions as Tools</h2>
+<p>Sometimes you already have utility functions written — legacy code from a previous stardate. You don't need to rewrite them. Just register them directly:</p>
+
+<pre><code class="python">def existing_function(system: str, diagnostic_level: int = 1) -> str:
+    """Run a diagnostic on a ship system."""
+    return f"Level {diagnostic_level} diagnostic on {system}: All systems nominal."
+
+# Register as a tool without modifying the original function
+enterprise.tool()(existing_function)
+</code></pre>
+
+<p>This pattern is useful when you want to expose third-party library functions or keep your tool registration separate from your business logic.</p>
+</div>
+
+<div class="section level2">
+<h2>📡 Tools with External API Calls — Hailing Frequencies</h2>
+<p>Tools can reach out to external services — databases, APIs, other microservices. Think of it as opening hailing frequencies to a Federation starbase:</p>
+
+<pre><code class="python">import requests
+
+@enterprise.tool()
+def hail_starbase(starbase_id: int) -> str:
+    """Open hailing frequencies to a Federation starbase."""
+    response = requests.get(f'https://api.example.com/starbase/{starbase_id}')
+    return response.json().get('message', 'No response on subspace frequency.')
+</code></pre>
+
+<p>The model doesn't know (or care) that your tool is making an HTTP request. It just sees: "I can hail a starbase by providing an ID, and I'll get a message back." The complexity is hidden behind the tool interface.</p>
+</div>
+
+<div class="section level2">
+<h2>🚨 Error Handling — Red Alert Conditions</h2>
+<p>When things go wrong (and in space, they always do), your tools should handle errors gracefully. MCP tools can raise exceptions or return error information — the SDK will translate these into proper MCP error responses:</p>
+
+<pre><code class="python">@enterprise.tool()
+def engage_warp(factor: float) -> str:
+    """Engage warp drive at the specified warp factor."""
+    if factor < 1 or factor > 9.99:
+        raise ValueError(f"Warp factor {factor} is outside safe parameters (1-9.99)!")
+    if factor > 9.9:
+        return f"WARNING: Warp {factor} engaged. Hull stress at critical levels!"
+    return f"Warp {factor} engaged. Estimated arrival: 2 hours, 14 minutes."
+</code></pre>
+
+<p>If a <code>ValueError</code> is raised, the client receives an error response with <code>isError: true</code> and the exception message. The model can then inform the user that something went wrong — Red Alert!</p>
+</div>
+
+<div class="section level2">
+<h2>⚖️ Tools vs Resources — Decision Matrix</h2>
+<p>When should you use a Tool vs a Resource? Here's your tactical decision matrix:</p>
+
+<table class="table table-condensed">
+<tr><th>Criterion</th><th>Resource (Sensors)</th><th>Tool (Weapons/Replicators)</th></tr>
+<tr><td>Purpose</td><td>Read data</td><td>Perform actions / compute</td></tr>
+<tr><td>Side effects</td><td>None (idempotent reads)</td><td>May have side effects</td></tr>
+<tr><td>Who initiates?</td><td>Client (application-controlled)</td><td>Model (LLM-controlled)</td></tr>
+<tr><td>Examples</td><td>Database records, file contents, config</td><td>Send email, run query, call API</td></tr>
+<tr><td>Star Trek analogy</td><td>Long-range sensors, ship's computer lookup</td><td>Fire phasers, raise shields, replicate</td></tr>
+</table>
+
+<p><strong>Rule of thumb:</strong> If the operation is safe to repeat and just returns data → Resource. If it <em>does something</em> or requires computation → Tool.</p>
+</div>
+
+<div class="section level2">
+<h2>🖥️ The Client Calling Tools Programmatically</h2>
+<p>On the other side of the subspace channel, a client can discover and call your tools programmatically. Here's how to connect to a server and invoke <code>fire_phasers</code>:</p>
+
+<pre><code class="python">import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+async def main():
+    params = StdioServerParameters(command='python', args=['warp_core.py'])
+    async with stdio_client(params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+
+            # Discover available tools
+            tools = await session.list_tools()
+            print(f"Available weapons systems: {[t.name for t in tools.tools]}")
+
+            # Fire!
+            result = await session.call_tool(
+                'fire_phasers',
+                {'target': 'Borg cube', 'power_level': 95}
+            )
+            print(result.content[0].text)
+
+asyncio.run(main())
+</code></pre>
+<pre><code># Output:
+# Available weapons systems: ['fire_phasers', 'engage_warp', 'hail_starbase']
+# Maximum phaser discharge at Borg cube. Direct hit!
+</code></pre>
+
+<p>The client spawns your server as a subprocess (stdio transport), initializes the session, lists the tools (like running a systems check), and then calls one. The result comes back as structured content — text, images, or embedded resources.</p>
+
+<p><strong>Make it so.</strong> 🖖</p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

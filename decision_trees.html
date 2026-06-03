@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>Decision Trees</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        /* Base Structure */
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+
+        /* Titles */
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+
+        /* Accordion Menu */
+        .accordion {
+            background-color: #FFFFFF;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #eee;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+
+        /* Search Bar */
+        #myInput {
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* Index Lists */
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a {
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            color: black;
+            white-space: pre;
+            display: block;
+        }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+
+</head>
+
+<body>
+
+<!-- code folding -->
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                  
+                    <li>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a>
+                    </li>
+                    <li>
+                        <a href="https://giacomosaccaggi.github.io/contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>Decision Trees</h2>
+                        <hr class="small">
+                        <h5>In-depth Articles</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+ 
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Decision Trees are a <strong>non-parametric supervised learning</strong> method used for both classification and regression tasks. Unlike parametric models, they make no assumptions about the underlying data distribution.</p>
+<p>A decision tree has a hierarchical structure composed of:</p>
+<ul>
+<li><strong>Root node</strong>: the topmost decision node, representing the entire dataset</li>
+<li><strong>Internal nodes</strong>: decision rules that split the data based on feature values</li>
+<li><strong>Leaves (terminal nodes)</strong>: final predictions (class labels for classification, continuous values for regression)</li>
+</ul>
+<p>The key appeal of decision trees lies in their <strong>interpretability</strong>: the model can be visualized as a flowchart of if-then rules, making it easy to understand and explain predictions. They require no feature scaling, handle both numerical and categorical features, and naturally capture non-linear relationships and feature interactions.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="classification-trees" class="section level2">
+<h2>Classification Trees (CART)</h2>
+<p>The CART (Classification and Regression Trees) algorithm builds classification trees via <strong>recursive binary splitting</strong>. At each internal node, the algorithm searches for the best split — a feature \(j\) and a threshold \(s\) — that minimizes an impurity measure in the resulting child nodes.</p>
+
+<div id="impurity-measures" class="section level3">
+<h3>Impurity Measures</h3>
+<p>Let \(p_k\) denote the proportion of observations belonging to class \(k\) in a given node, with \(K\) total classes.</p>
+
+<h4>a) Gini Index</h4>
+<p>The Gini Index measures the probability of misclassifying a randomly chosen element:</p>
+<p><span class="math display">\[ G = \sum_{k=1}^{K} p_k (1 - p_k) = 1 - \sum_{k=1}^{K} p_k^2 \]</span></p>
+<p>The Gini Index equals 0 when all observations belong to a single class (pure node) and reaches its maximum when classes are equally distributed.</p>
+
+<h4>b) Entropy (Information Gain)</h4>
+<p>Entropy quantifies the disorder or uncertainty in a node:</p>
+<p><span class="math display">\[ H = -\sum_{k=1}^{K} p_k \log_2(p_k) \]</span></p>
+<p>Like the Gini Index, entropy is 0 for a pure node and maximal for uniform class distributions.</p>
+
+<h4>c) Misclassification Rate</h4>
+<p>The simplest impurity measure:</p>
+<p><span class="math display">\[ E = 1 - \max_k(p_k) \]</span></p>
+<p>This measure is less sensitive to changes in class probabilities and is therefore less commonly used for tree growing (but useful for pruning).</p>
+</div>
+
+<div id="information-gain" class="section level3">
+<h3>Information Gain</h3>
+<p>The quality of a split is evaluated via <strong>Information Gain</strong>, defined as the reduction in impurity from parent to children:</p>
+<p><span class="math display">\[ \text{Information Gain} = H(\text{parent}) - \sum_{c \in \{L, R\}} \frac{n_c}{n_{\text{parent}}} H(\text{child}_c) \]</span></p>
+<p>where \(n_c\) is the number of observations in child node \(c\) and \(n_{\text{parent}}\) is the total number in the parent node. The split that maximizes Information Gain (or equivalently, minimizes the weighted child impurity) is selected.</p>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="regression-trees" class="section level2">
+<h2>Regression Trees</h2>
+<p>For regression tasks, the tree predicts a continuous value. The feature space is partitioned into \(J\) distinct regions \(R_1, R_2, \ldots, R_J\), and for each region the prediction is the mean of the training observations falling in that region:</p>
+<p><span class="math display">\[ \hat{y}_{R_j} = \frac{1}{|R_j|} \sum_{i \in R_j} y_i \]</span></p>
+<p>The objective is to find the partition that minimizes the <strong>Residual Sum of Squares (RSS)</strong>:</p>
+<p><span class="math display">\[ \text{RSS} = \sum_{j=1}^{J} \sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2 \]</span></p>
+<p>At each split, we choose the feature \(j\) and threshold \(s\) that define two half-planes:</p>
+<p><span class="math display">\[ R_1(j,s) = \{X \mid X_j \leq s\} \quad \text{and} \quad R_2(j,s) = \{X \mid X_j > s\} \]</span></p>
+<p>and we seek \(j\) and \(s\) that minimize:</p>
+<p><span class="math display">\[ \sum_{i: x_i \in R_1(j,s)} (y_i - \hat{y}_{R_1})^2 + \sum_{i: x_i \in R_2(j,s)} (y_i - \hat{y}_{R_2})^2 \]</span></p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="splitting-algorithm" class="section level2">
+<h2>The Splitting Algorithm</h2>
+<p>Finding the globally optimal tree partition is computationally infeasible (NP-hard). Therefore, decision trees use a <strong>greedy</strong> top-down approach known as recursive binary splitting:</p>
+<ol>
+<li>Starting at the root, consider all features \(j = 1, \ldots, p\) and all possible thresholds \(s\) for each feature.</li>
+<li>For each candidate split \((j, s)\), compute the impurity reduction (Information Gain for classification, RSS reduction for regression).</li>
+<li>Select the \((j^*, s^*)\) pair that maximizes the impurity reduction.</li>
+<li>Split the node into two child nodes based on whether \(X_j \leq s\) or \(X_j > s\).</li>
+<li>Repeat recursively on each child node until a stopping criterion is met (e.g., minimum samples per leaf, maximum depth, or no further impurity reduction possible).</li>
+</ol>
+<p>This greedy procedure does not guarantee a globally optimal tree but is computationally tractable with complexity \(O(n \cdot p \cdot \log n)\) per split when features are pre-sorted.</p>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="pruning" class="section level2">
+<h2>Pruning</h2>
+<p>A fully grown tree (one that perfectly classifies training data) will typically <strong>overfit</strong> — it captures noise in the training set and generalizes poorly to unseen data. Pruning addresses this by reducing the tree's complexity.</p>
+
+<div id="cost-complexity-pruning" class="section level3">
+<h3>Cost-Complexity Pruning (Weakest Link Pruning)</h3>
+<p>Rather than using early stopping criteria, the preferred approach is to grow a large tree \(T_0\) and then prune it back. Cost-complexity pruning defines a penalized objective:</p>
+<p><span class="math display">\[ C_\alpha(T) = \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \hat{y}_m)^2 + \alpha |T| \]</span></p>
+<p>where:</p>
+<ul>
+<li>\(|T|\) is the number of terminal nodes (leaves) in the subtree \(T\)</li>
+<li>\(\hat{y}_m\) is the prediction for region \(R_m\)</li>
+<li>\(\alpha \geq 0\) is the <strong>complexity parameter</strong> that controls the trade-off between tree size and goodness of fit</li>
+</ul>
+<p>When \(\alpha = 0\), the full tree \(T_0\) is optimal. As \(\alpha\) increases, there is a penalty for having too many leaves, leading to smaller subtrees.</p>
+</div>
+
+<div id="selecting-alpha" class="section level3">
+<h3>Selecting \(\alpha\) via Cross-Validation</h3>
+<p>The optimal \(\alpha\) is selected using <strong>k-fold cross-validation</strong>:</p>
+<ol>
+<li>Divide the training data into \(k\) folds.</li>
+<li>For each fold, grow a full tree on the remaining \(k-1\) folds and compute the sequence of subtrees for a range of \(\alpha\) values.</li>
+<li>Evaluate prediction error on the held-out fold for each \(\alpha\).</li>
+<li>Choose \(\alpha\) that minimizes the average cross-validated error.</li>
+<li>Return the subtree from the full training set corresponding to the chosen \(\alpha\).</li>
+</ol>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="advantages-limitations" class="section level2">
+<h2>Advantages and Limitations</h2>
+
+<div id="advantages" class="section level3">
+<h3>Advantages</h3>
+<ul>
+<li><strong>Interpretability</strong>: easily visualized and explained to non-technical stakeholders</li>
+<li><strong>Handles mixed feature types</strong>: works with both numerical and categorical variables without encoding</li>
+<li><strong>No feature scaling required</strong>: invariant to monotone transformations of features</li>
+<li><strong>Captures interactions</strong>: naturally models feature interactions through the tree structure</li>
+<li><strong>Handles missing data</strong>: surrogate splits can deal with missing values</li>
+<li><strong>Fast inference</strong>: prediction time is \(O(\log n)\) — just traverse the tree</li>
+</ul>
+</div>
+
+<div id="limitations" class="section level3">
+<h3>Limitations</h3>
+<ul>
+<li><strong>High variance</strong>: small changes in the training data can produce a completely different tree (instability)</li>
+<li><strong>Tendency to overfit</strong>: without pruning, trees memorize training noise</li>
+<li><strong>Axis-aligned splits only</strong>: decision boundaries are perpendicular to feature axes, making it difficult to capture diagonal relationships</li>
+<li><strong>Greedy and suboptimal</strong>: the top-down greedy approach does not guarantee a globally optimal partition</li>
+<li><strong>Bias toward features with many levels</strong>: features with more unique values have more candidate splits and may be unfairly favoured</li>
+</ul>
+</div>
+<br>
+<hr>
+<p><br></p>
+</div>
+
+<div id="ensembles" class="section level2">
+<h2>From Single Trees to Ensembles</h2>
+<p>The high variance and instability of individual decision trees motivates the development of <strong>ensemble methods</strong> that combine multiple trees to produce more robust predictions:</p>
+<ul>
+<li><strong>Bagging (Bootstrap Aggregating)</strong>: train many trees on bootstrap samples of the data, then average predictions (regression) or take majority vote (classification). Reduces variance without increasing bias.</li>
+<li><strong>Random Forests</strong>: an extension of bagging that additionally decorrelates trees by considering only a random subset of \(m \approx \sqrt{p}\) features at each split. This further reduces variance.</li>
+<li><strong>Boosting (Gradient Boosting)</strong>: sequentially build shallow trees, each one correcting the errors of the previous ensemble. Reduces both bias and variance, though more prone to overfitting if not regularized.</li>
+</ul>
+<p>The fundamental insight is that while a single tree is a <strong>weak learner</strong> with high variance, an ensemble of many trees can achieve the performance of a <strong>strong learner</strong> by averaging out individual errors:</p>
+<p><span class="math display">\[ \text{Var}\left(\frac{1}{B}\sum_{b=1}^{B} T_b(x)\right) = \rho \sigma^2 + \frac{1-\rho}{B}\sigma^2 \]</span></p>
+<p>where \(\rho\) is the pairwise correlation between trees and \(\sigma^2\) is the variance of a single tree. As \(B \to \infty\), the second term vanishes, and reducing \(\rho\) (via random feature subsets) directly reduces ensemble variance.</p>
+</div>
+
+
+    </div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+ <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/SaccaggiGiacomo">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GiacomoSaccaggi/">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

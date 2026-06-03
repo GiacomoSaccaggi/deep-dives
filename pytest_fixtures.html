@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="pytest Fixtures Basics">
+    <meta name="author" content="Giacomo Saccaggi">
+    <title>The Room of Requirement: Fixtures Basics</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-147261423-1'); </script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i></button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="site-heading">
+                <h2>The Room of Requirement: Fixtures Basics</h2>
+                <hr class="small">
+                <h5>pytest Deep-Dives — Hogwarts Edition</h5>
+            </div>
+        </div></div></div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>🚪 What Are Fixtures? — The Room That Provides What You Need</h2>
+<p>The Room of Requirement at Hogwarts manifests whatever the seeker truly needs. pytest fixtures work the same way: they <strong>set up</strong> and <strong>provide</strong> objects that your tests require — wands, wizards, potions, database connections — anything.</p>
+<p>A fixture is simply a function decorated with <code>@pytest.fixture</code> that <strong>returns</strong> (or <strong>yields</strong>) an object your test can use.</p>
+
+<h3>Basic Fixture — Summoning a Wand</h3>
+<pre><code class="python">import pytest
+
+class Wand:
+    def __init__(self, wood: str, core: str, length_inches: float):
+        self.wood = wood
+        self.core = core
+        self.length_inches = length_inches
+
+    def cast(self, spell: str) -> str:
+        return f"{spell}!"
+
+@pytest.fixture
+def elder_wand():
+    """The Deathstick, the Wand of Destiny."""
+    return Wand(wood="elder", core="thestral_tail_hair", length_inches=15.0)
+
+def test_elder_wand_properties(elder_wand):
+    assert elder_wand.wood == "elder"
+    assert elder_wand.core == "thestral_tail_hair"
+
+def test_elder_wand_casts_spell(elder_wand):
+    result = elder_wand.cast("Expelliarmus")
+    assert result == "Expelliarmus!"
+</code></pre>
+<p>pytest sees <code>elder_wand</code> in the test signature, finds the matching fixture, calls it, and injects the result. No manual setup needed!</p>
+</div>
+
+<div class="section level2">
+<h2>🧙 Fixtures Using Other Fixtures — Composition (The Order of the Phoenix)</h2>
+<pre><code class="python">class Wizard:
+    def __init__(self, name: str, house: str, wand: Wand):
+        self.name = name
+        self.house = house
+        self.wand = wand
+        self.spells_cast = []
+
+    def cast(self, spell: str) -> str:
+        result = self.wand.cast(spell)
+        self.spells_cast.append(spell)
+        return result
+
+@pytest.fixture
+def harry_wand():
+    return Wand(wood="holly", core="phoenix_feather", length_inches=11.0)
+
+@pytest.fixture
+def harry_potter(harry_wand):
+    """Fixtures can depend on other fixtures — like The Chosen One needs his wand."""
+    return Wizard(name="Harry Potter", house="Gryffindor", wand=harry_wand)
+
+def test_harry_can_cast_patronus(harry_potter):
+    result = harry_potter.cast("Expecto Patronum")
+    assert result == "Expecto Patronum!"
+    assert "Expecto Patronum" in harry_potter.spells_cast
+</code></pre>
+</div>
+
+<div class="section level2">
+<h2>🏰 Fixture Scope — How Long the Room Stays Open</h2>
+<p>By default, fixtures are <strong>function-scoped</strong>: created fresh for each test. But some resources are expensive (like brewing Polyjuice Potion — it takes a month!). Use <code>scope</code> to control lifetime:</p>
+
+<pre><code class="python">class PotionsCauldron:
+    """Expensive to set up — like Snape's classroom."""
+    brew_count = 0
+
+    def __init__(self):
+        PotionsCauldron.brew_count += 1
+        self.contents = None
+
+    def brew(self, potion_name: str):
+        self.contents = potion_name
+        return self.contents
+
+# function scope (default): new cauldron per test
+@pytest.fixture(scope="function")
+def disposable_cauldron():
+    return PotionsCauldron()
+
+# session scope: ONE cauldron for the ENTIRE test session
+@pytest.fixture(scope="session")
+def shared_cauldron():
+    """Like the Room of Requirement — created once, used by everyone."""
+    return PotionsCauldron()
+
+# module scope: one per test file
+@pytest.fixture(scope="module")
+def module_cauldron():
+    return PotionsCauldron()
+
+# class scope: one per test class
+@pytest.fixture(scope="class")
+def class_cauldron():
+    return PotionsCauldron()
+
+def test_brew_polyjuice(shared_cauldron):
+    assert shared_cauldron.brew("Polyjuice") == "Polyjuice"
+
+def test_brew_veritaserum(shared_cauldron):
+    # Same cauldron instance as above — no re-creation!
+    assert shared_cauldron.brew("Veritaserum") == "Veritaserum"
+</code></pre>
+
+<table class="table table-condensed">
+<tr><th>Scope</th><th>Created</th><th>Destroyed</th><th>Use Case</th></tr>
+<tr><td><code>function</code></td><td>Before each test</td><td>After each test</td><td>Cheap, isolated objects</td></tr>
+<tr><td><code>class</code></td><td>Once per test class</td><td>After class finishes</td><td>Shared within a class</td></tr>
+<tr><td><code>module</code></td><td>Once per .py file</td><td>After file finishes</td><td>DB connections per file</td></tr>
+<tr><td><code>session</code></td><td>Once per test run</td><td>After all tests</td><td>Expensive shared resources</td></tr>
+</table>
+</div>
+
+<div class="section level2">
+<h2>📜 usefixtures — Applying Without Requesting the Return Value</h2>
+<pre><code class="python">@pytest.fixture
+def silence_classroom():
+    """Cast Silencio on the classroom — no return value needed."""
+    print("\n🔇 Silencio! Classroom is quiet.")
+    # setup happens just by running the fixture
+
+@pytest.mark.usefixtures("silence_classroom")
+class TestPotionsExam:
+    """All tests in this class get a silent classroom, 
+    but don't need the fixture's return value."""
+
+    def test_brew_sleeping_draught(self):
+        potion = brew("Sleeping Draught")
+        assert potion.effect == "sleep"
+
+    def test_brew_antidote(self):
+        potion = brew("Antidote to Common Poisons")
+        assert potion.cures == "common_poisons"
+</code></pre>
+<p><code>@pytest.mark.usefixtures</code> triggers the fixture <strong>without</strong> injecting its return value into the test. Perfect for side-effect-only fixtures (logging, DB seeding, environment setup).</p>
+</div>
+
+    </div>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <footer>
+       <div class="container"><div class="row"><div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+        </div></div></div>
+    </footer>
+</body>
+</html>

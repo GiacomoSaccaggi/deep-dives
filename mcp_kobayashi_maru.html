@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ML and Statistics">
+    <meta name="author" content="Giacomo Saccaggi">
+
+    <title>The Kobayashi Maru: Testing and Deployment</title>
+    <link rel="shortcut icon" href="https://image.flaticon.com/icons/png/512/413/413772.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147261423-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-147261423-1');
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" media="screen and (min-width:481px)" href="cv.css">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <script src="Plotimpo_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Plotimpo_files/plotly-binding-4.9.0/plotly.js"></script>
+    <script src="Plotimpo_files/typedarray-0.1/typedarray.min.js"></script>
+    <link href="Plotimpo_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="Plotimpo_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link href="Plotimpo_files/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="Plotimpo_files/plotly-main-1.46.1/plotly-latest.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        code { white-space: pre; }
+        pre:not([class]) { background-color: white; }
+        h1 { font-size: 34px; } h1.title { font-size: 38px; }
+        h2 { font-size: 30px; } h3 { font-size: 24px; }
+        h4 { font-size: 18px; }
+        .table th:not([align]) { text-align: left; }
+        .accordion { background-color: #FFFFFF; color: #444; cursor: pointer; padding: 18px; width: 100%; border: 1px solid #eee; text-align: left; outline: none; font-size: 15px; transition: 0.4s; }
+        .active, .accordion:hover { background-color: hsl(120, 100%, 99%); }
+        .panel { padding: 0 18px; display: none; background-color: white; overflow: hidden; }
+        #myInput { width: 100%; font-size: 16px; border-radius: 4px; padding: 12px 20px 12px 40px; border: 1px solid #ddd; margin-bottom: 12px; }
+        ul { list-style-type: none; }
+        #myUL { list-style-type: none; padding: 0; margin: 0; }
+        #myUL li a { padding: 12px; text-decoration: none; font-size: 18px; color: black; white-space: pre; display: block; }
+        #myUL li a:hover:not(.header) { background-color: #eee; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="https://giacomosaccaggi.github.io">Home</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="https://giacomosaccaggi.github.io/deep-dives">All projects</a></li>
+                    <li><a href="https://giacomosaccaggi.github.io/contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="intro-header" style="background-image: url('sfondo.png')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h2>The Kobayashi Maru: Testing and Deployment</h2>
+                        <hr class="small">
+                        <h5>MCP Deep-Dive Series</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+<div class="section level2">
+<h2>🎭 Testing with MCP Inspector — Holodeck Simulations</h2>
+<p>Before sending the Enterprise into battle, every system is tested on the holodeck. In MCP, that holodeck is the <strong>MCP Inspector</strong> — an interactive development tool that lets you poke and prod your server without needing a full LLM client:</p>
+
+<pre><code class="bash"># Launch the Inspector — your personal holodeck
+mcp dev your_server.py
+</code></pre>
+
+<p>The Inspector opens a web UI where you can:</p>
+<ul>
+<li>See all registered Tools, Resources, and Prompts</li>
+<li>Call tools with custom arguments and see responses</li>
+<li>Read resources and inspect their content</li>
+<li>Invoke prompts with parameters</li>
+<li>Watch the JSON-RPC messages flowing back and forth</li>
+</ul>
+<p>Think of it as running a Level 1 diagnostic from the bridge. You can validate every system before going to warp.</p>
+</div>
+
+<div class="section level2">
+<h2>🖥️ The MCP CLI for Development</h2>
+<p>The <code>mcp</code> CLI provides additional commands for development workflow:</p>
+
+<pre><code class="bash"># Install your server in Claude Desktop for testing
+mcp install your_server.py
+
+# Install with a custom name
+mcp install your_server.py --name "USS Enterprise"
+
+# Install with environment variables (like ship access codes)
+mcp install your_server.py -v STARFLEET_API_KEY=alpha-omega-7
+
+# Run the interactive inspector
+mcp dev your_server.py
+</code></pre>
+
+<p>The <code>install</code> command automatically configures Claude Desktop to connect to your server — no manual JSON editing required. It's like docking at a starbase and having the maintenance crew handle the hookups.</p>
+</div>
+
+<div class="section level2">
+<h2>🧪 Writing a Test Client — The Kobayashi Maru</h2>
+<p>The Kobayashi Maru is Starfleet's no-win scenario — a stress test that pushes cadets to their limits. Your MCP server deserves the same treatment. Here's how to write programmatic tests:</p>
+
+<pre><code class="python">import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+async def kobayashi_maru_test():
+    """The no-win scenario: stress test all ship systems."""
+    params = StdioServerParameters(command='python', args=['warp_core.py'])
+
+    async with stdio_client(params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+
+            # Test 1: Tool discovery — can we see all weapons systems?
+            tools = await session.list_tools()
+            assert len(tools.tools) > 0, 'No tools found — weapons offline!'
+            print(f"✓ {len(tools.tools)} tools discovered")
+
+            # Test 2: Resource access — are sensors operational?
+            resources = await session.list_resources()
+            print(f"✓ {len(resources.resources)} resources available")
+
+            # Test 3: Tool execution — fire at will!
+            result = await session.call_tool('engage_warp', {'factor': 9})
+            assert 'engaged' in result.content[0].text.lower(), \
+                'Warp drive failed to engage!'
+            print(f"✓ Warp drive: {result.content[0].text}")
+
+            # Test 4: Error handling — push past the limits
+            try:
+                result = await session.call_tool('engage_warp', {'factor': 15})
+                # Should have raised an error
+                if result.isError:
+                    print("✓ Warp factor limits enforced correctly")
+            except Exception as e:
+                print(f"✓ Error properly raised: {e}")
+
+            print("\n🖖 All systems nominal. Ship is ready for deployment.")
+
+asyncio.run(kobayashi_maru_test())
+</code></pre>
+
+<p>This test spawns your server, connects to it, and exercises every capability — just like Starfleet Academy's infamous test scenario. Run it in CI/CD to catch regressions before they reach production.</p>
+</div>
+
+<div class="section level2">
+<h2>🚢 Multi-Server Client — Connecting the Fleet</h2>
+<p>A single ship is powerful. A fleet is unstoppable. MCP clients can connect to <strong>multiple servers simultaneously</strong>, combining their capabilities into a single unified interface:</p>
+
+<pre><code class="python">from langchain_mcp_adapters.client import MultiServerMCPClient
+
+# Connect to an entire fleet of MCP servers
+client = MultiServerMCPClient({
+    'enterprise': {
+        'command': 'python',
+        'args': ['enterprise_server.py'],
+    },
+    'defiant': {
+        'command': 'python',
+        'args': ['defiant_server.py'],
+    },
+})
+
+# The LLM now has access to ALL tools from ALL servers
+# Enterprise tools: fire_phasers, raise_shields, sensor_scan
+# Defiant tools: quantum_torpedo, ablative_armor, cloaking_device
+</code></pre>
+
+<p>Each server runs independently — different processes, possibly different languages. The client aggregates all their tools into a single namespace. The model sees one unified set of capabilities, like an admiral commanding multiple ships from a flagship.</p>
+</div>
+
+<div class="section level2">
+<h2>🐳 Deployment with Docker — Loading into Spacedock</h2>
+<p>For production deployment, containerize your MCP server. It's like loading the ship into spacedock — everything sealed, self-contained, ready for any environment:</p>
+
+<pre><code class="dockerfile"># Dockerfile for your MCP server
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY warp_core.py .
+
+# MCP servers communicate via stdio, so no ports to expose
+CMD ["python", "warp_core.py"]
+</code></pre>
+
+<p>Since MCP uses stdio transport by default, there are no ports to expose — the client spawns the container and pipes stdin/stdout. For remote deployments, MCP also supports <strong>SSE (Server-Sent Events)</strong> transport over HTTP.</p>
+</div>
+
+<div class="section level2">
+<h2>🎯 Claude Desktop / Cursor Integration — Connecting to Starfleet Command</h2>
+<p>To connect your server to Claude Desktop (Starfleet Command), add it to the configuration file. On macOS, edit <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>:</p>
+
+<pre><code class="json">{
+  "mcpServers": {
+    "enterprise": {
+      "command": "python",
+      "args": ["/path/to/warp_core.py"],
+      "env": {
+        "STARFLEET_API_KEY": "your-api-key-here"
+      }
+    },
+    "defiant": {
+      "command": "python",
+      "args": ["/path/to/defiant_server.py"]
+    }
+  }
+}
+</code></pre>
+
+<p>For <strong>Cursor</strong>, the configuration lives in <code>.cursor/mcp.json</code> at the project root:</p>
+
+<pre><code class="json">{
+  "mcpServers": {
+    "enterprise": {
+      "command": "python",
+      "args": ["./warp_core.py"]
+    }
+  }
+}
+</code></pre>
+
+<p>After saving, restart the client. Your server's tools will appear in the interface — ready for the model to invoke at will.</p>
+</div>
+
+<div class="section level2">
+<h2>🔍 Debugging Tips — Engineering Deck</h2>
+<p>When things go wrong (hull breach on Deck 7!), here's how to diagnose issues:</p>
+
+<h3>1. Check the MCP logs</h3>
+<p>Claude Desktop writes MCP logs to:</p>
+<pre><code class="bash"># macOS
+~/Library/Logs/Claude/mcp*.log
+
+# Tail logs in real-time during development
+tail -f ~/Library/Logs/Claude/mcp-server-enterprise.log
+</code></pre>
+
+<h3>2. Use stderr for debugging output</h3>
+<p>Since MCP uses stdout for protocol messages, print debug info to stderr:</p>
+<pre><code class="python">import sys
+
+@enterprise.tool()
+def problematic_tool(x: int) -> str:
+    """A tool that needs debugging."""
+    print(f"DEBUG: received x={x}", file=sys.stderr)  # Goes to logs, not protocol
+    return f"Result: {x * 2}"
+</code></pre>
+
+<h3>3. Common transport issues</h3>
+<ul>
+<li><strong>"Server disconnected"</strong> — Your server crashed. Check stderr/logs for the Python traceback.</li>
+<li><strong>"Tool not found"</strong> — The tool name in the call doesn't match the registered name. Remember: function name = tool name.</li>
+<li><strong>Timeout</strong> — Your tool is taking too long. MCP has timeouts; long-running operations should return early and use progress notifications.</li>
+<li><strong>"Command not found"</strong> — The <code>command</code> in config doesn't resolve. Use absolute paths or ensure the binary is on PATH.</li>
+</ul>
+</div>
+
+<div class="section level2">
+<h2>🌟 Final Complete Server — All Hands, Battle Stations</h2>
+<p>Here's a complete, production-ready MCP server bringing all the concepts together — resources, tools, prompts, error handling, and external API calls:</p>
+
+<pre><code class="python">"""
+USS Enterprise NCC-1701-D — MCP Server
+A complete Model Context Protocol server demonstrating all three primitives.
+"""
+from mcp.server.fastmcp import FastMCP
+import httpx
+
+enterprise = FastMCP("USS Enterprise NCC-1701-D")
+
+# ============================================================
+# RESOURCES — Ship's Sensors (read-only, application-controlled)
+# ============================================================
+
+@enterprise.resource("enterprise://ship/status")
+def ship_status() -> str:
+    """Current ship status report."""
+    return (
+        "USS Enterprise NCC-1701-D Status Report\n"
+        "========================================\n"
+        "Hull Integrity: 98%\n"
+        "Shields: Online (standby)\n"
+        "Warp Core: Nominal\n"
+        "Life Support: Optimal\n"
+        "Crew Complement: 1,014\n"
+        "Current Position: Sector 001, Sol System"
+    )
+
+@enterprise.resource("enterprise://crew/{department}")
+def crew_manifest(department: str) -> str:
+    """Crew manifest for a specific department."""
+    departments = {
+        "command": "Picard, J-L (Captain)\nRiker, W.T. (Commander)\nData (Lt. Cmdr)",
+        "engineering": "La Forge, G. (Lt. Cmdr)\nBarclay, R. (Lieutenant)",
+        "medical": "Crusher, B. (Cmdr)\nOgawa, A. (Nurse)",
+        "security": "Worf (Lt. Cmdr)\nDaniels (Lieutenant)",
+    }
+    return departments.get(department, f"Unknown department: {department}")
+
+# ============================================================
+# TOOLS — Weapons & Systems (model-controlled, may have side effects)
+# ============================================================
+
+@enterprise.tool()
+def fire_phasers(target: str, power_level: int = 50) -> str:
+    """Fire phaser array at specified target. Power level 1-100."""
+    if power_level < 1 or power_level > 100:
+        raise ValueError("Power level must be between 1 and 100!")
+    if power_level > 80:
+        return f"Maximum phaser discharge at {target}. Direct hit!"
+    return f"Phaser burst at {target}, power level {power_level}%. Standing by."
+
+@enterprise.tool()
+def raise_shields(configuration: str = "standard") -> str:
+    """Raise deflector shields. Configurations: standard, modulated, metaphasic."""
+    configs = {
+        "standard": "Standard shield configuration active. All frequencies rotating.",
+        "modulated": "Shields modulated to counter Borg cutting beam frequency.",
+        "metaphasic": "Metaphasic shields engaged. Safe for stellar corona entry.",
+    }
+    result = configs.get(configuration)
+    if not result:
+        raise ValueError(f"Unknown shield configuration: {configuration}")
+    return result
+
+@enterprise.tool()
+def engage_warp(factor: float) -> str:
+    """Engage warp drive. Factor must be between 1 and 9.99."""
+    if factor < 1 or factor > 9.99:
+        raise ValueError(f"Warp factor {factor} outside safe parameters (1-9.99)!")
+    if factor > 9.9:
+        return f"WARNING: Warp {factor} engaged. Hull stress approaching critical!"
+    return f"Warp {factor} engaged. Smooth sailing through subspace."
+
+@enterprise.tool()
+async def hail_starbase(starbase_id: int) -> str:
+    """Open hailing frequencies to a Federation starbase."""
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                f"https://api.example.com/starbase/{starbase_id}",
+                timeout=10.0
+            )
+            return response.json().get("message", "Channel open. No response.")
+        except httpx.RequestError:
+            return f"Unable to establish subspace link to Starbase {starbase_id}."
+
+# ============================================================
+# PROMPTS — Tactical Patterns (user-controlled, selectable)
+# ============================================================
+
+@enterprise.prompt()
+def tactical_analysis(threat: str, quadrant: str = "Alpha") -> str:
+    """Request a tactical analysis of a threat."""
+    return (
+        f"You are Lt. Commander Worf, tactical officer aboard the USS Enterprise.\n\n"
+        f"Analyze the following threat: {threat} in the {quadrant} Quadrant.\n\n"
+        f"Provide:\n"
+        f"1) Threat assessment (scale 1-10)\n"
+        f"2) Recommended shield configuration\n"
+        f"3) Suggested evasive maneuvers\n"
+        f"4) Diplomatic options (if any — you may note your skepticism)"
+    )
+
+@enterprise.prompt()
+def captains_log(stardate: str, summary: str) -> str:
+    """Format a Captain's Log entry in the style of Jean-Luc Picard."""
+    return (
+        f"Captain's Log, Stardate {stardate}.\n\n"
+        f"Context: {summary}\n\n"
+        f"Write a formal Captain's Log entry. Reflect on the philosophical "
+        f"and ethical implications of the situation. Reference relevant literature "
+        f"or historical parallels where appropriate. Maintain the measured, "
+        f"contemplative tone characteristic of Captain Picard."
+    )
+
+# ============================================================
+# MAIN — Launch the ship
+# ============================================================
+
+if __name__ == "__main__":
+    enterprise.run()
+</code></pre>
+
+<p>Save this as <code>warp_core.py</code>, run <code>mcp dev warp_core.py</code> to test, then <code>mcp install warp_core.py</code> to deploy to Claude Desktop. Your ship is now fully operational.</p>
+
+<p><strong>There are four lights.</strong> 🖖</p>
+</div>
+
+    </div>
+
+<script>
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+    <!-- Footer -->
+    <footer>
+       <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li><a href="https://twitter.com/SaccaggiGiacomo"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://www.linkedin.com/in/giacomo-saccaggi-782439163/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-linkedin fa-stack-1x fa-inverse"></i></span></a></li>
+                        <li><a href="https://github.com/GiacomoSaccaggi/"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-github fa-stack-1x fa-inverse"></i></span></a></li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; GiacomoSaccaggi</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
