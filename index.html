@@ -90,6 +90,11 @@
             white-space: pre;
             display: block;
         }
+        @media (max-width: 600px) {
+            #myUL li a { white-space: normal; font-size: 15px; padding-right: 70px; }
+            .article-date { margin-top: 0; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); }
+            .accordion { position: relative; }
+        }
         #myUL li a:hover:not(.header) { background-color: #eee; }
         .accordion .iconify { font-size: 20px; margin-right: 8px; vertical-align: middle; color: #555; }
     </style>
